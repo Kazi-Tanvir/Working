@@ -1,0 +1,266 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ============================================================
+// ACADEMIC
+// ============================================================
+
+enum ExamStatus {
+  PENDING
+  COMPLETED
+}
+
+enum AssignmentPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum MaterialType {
+  LECTURE_SHEET
+  BOOK
+  NOTES
+  PREVIOUS_QUESTION
+  SOURCE_MATERIAL
+}
+
+enum NoteSource {
+  SCANNED
+  DIGITAL
+}
+
+model Exam {
+  id         String     @id @default(cuid())
+  subject    String     @db.VarChar(100)
+  syllabus   String?    @db.Text
+  date       DateTime
+  result     Float?
+  maxResult  Float      @default(4.0)
+  status     ExamStatus @default(PENDING)
+  notes      String?    @db.Text
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model ClassSchedule {
+  id         String   @id @default(cuid())
+  subject    String   @db.VarChar(100)
+  dayOfWeek  Int      // 0 = Sunday, 6 = Saturday
+  startTime  String   @db.VarChar(5) // HH:mm
+  endTime    String   @db.VarChar(5) // HH:mm
+  room       String?  @db.VarChar(50)
+  color      String   @default("#60A5FA") @db.VarChar(7)
+  isActive   Boolean  @default(true)
+  attendance String   @default("PENDING") @db.VarChar(20)
+  status     String   @default("ACTIVE") @db.VarChar(20)
+  createdAt  DateTime @default(now())
+}
+
+model Assignment {
+  id          String             @id @default(cuid())
+  subject     String             @db.VarChar(100)
+  topic       String             @db.VarChar(200)
+  deadline    DateTime
+  completed   Boolean            @default(false)
+  completedAt DateTime?
+  priority    AssignmentPriority @default(MEDIUM)
+  notes       String?            @db.Text
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model Material {
+  id         String       @id @default(cuid())
+  title      String       @db.VarChar(200)
+  type       MaterialType
+  subject    String       @db.VarChar(100)
+  fileName   String?      @db.VarChar(255)
+  fileSize   Int?
+  filePath   String?      @db.VarChar(500)
+  tags       String?      @db.Text // JSON array stored as string
+  uploadedAt DateTime     @default(now())
+}
+
+model PersonalNote {
+  id          String     @id @default(cuid())
+  title       String     @db.VarChar(200)
+  source      NoteSource
+  subject     String?    @db.VarChar(100)
+  imageUrl    String?    @db.VarChar(500)
+  obsidianUri String?    @db.VarChar(500)
+  createdAt   DateTime   @default(now())
+}
+
+// ============================================================
+// ENTERTAINMENT
+// ============================================================
+
+enum MediaType {
+  ANIME
+  ANIME_MOVIE
+  SERIES
+  MOVIE
+  MANGA
+  PC_GAME
+  MOBILE_GAME
+}
+
+enum MediaStatus {
+  COMPLETED
+  ONGOING
+  PLAN_TO_CONSUME
+  DROPPED
+  ON_HOLD
+}
+
+enum ProgressUnit {
+  EPISODES
+  CHAPTERS
+  HOURS
+  MOVIES
+}
+
+model MediaEntry {
+  id              String       @id @default(cuid())
+  title           String       @db.VarChar(255)
+  type            MediaType
+  status          MediaStatus
+  score           Float?
+  progressCurrent Int?
+  progressTotal   Int?
+  progressUnit    ProgressUnit @default(EPISODES)
+  season          String?      @db.VarChar(20)
+  coverUrl        String?      @db.VarChar(500)
+  startedAt       DateTime?
+  completedAt     DateTime?
+  watchtime       Int?         // minutes
+  notes           String?      @db.Text
+  shindbId        String?      @db.VarChar(100)
+  externalId      String?      @db.VarChar(100) // RAWG/TMDB/AniList ID
+  externalSource  String?      @db.VarChar(20)  // "rawg" | "tmdb" | "anilist"
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+// ============================================================
+// PROJECTS
+// ============================================================
+
+enum ProjectStatus {
+  PLANNED
+  IN_PROGRESS
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum ProjectPriority {
+  P0
+  P1
+  P2
+  P3
+}
+
+enum ErrorSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ErrorStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+}
+
+model Project {
+  id            String          @id @default(cuid())
+  name          String          @db.VarChar(100)
+  description   String?         @db.Text
+  status        ProjectStatus   @default(PLANNED)
+  priority      ProjectPriority @default(P2)
+  progress      Int             @default(0) // 0-100
+  techStack     String?         @db.Text    // JSON array stored as string
+  githubUrl     String?         @db.VarChar(500)
+  startedAt     DateTime?
+  completedAt   DateTime?
+  prd           String?         @db.LongText
+  documentation String?         @db.LongText
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  errors        ProjectError[]
+}
+
+model ProjectError {
+  id          String        @id @default(cuid())
+  projectId   String
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String        @db.VarChar(255)
+  description String?       @db.Text
+  severity    ErrorSeverity @default(MEDIUM)
+  status      ErrorStatus   @default(OPEN)
+  resolution  String?       @db.Text
+  createdAt   DateTime      @default(now())
+  resolvedAt  DateTime?
+}
+
+// ============================================================
+// FINANCE
+// ============================================================
+
+model Transaction {
+  id                  String   @id @default(cuid())
+  account             String   @db.VarChar(50)   // CASH | BKASH | SAVINGS
+  amount              Float
+  currency            String   @default("BDT") @db.VarChar(10)
+  title               String?  @db.VarChar(255)
+  note                String?  @db.Text
+  date                DateTime
+  isIncome            Boolean  @default(false)
+  type                String   @default("default") @db.VarChar(50)
+  category            String   @db.VarChar(100)
+  subcategory         String?  @db.VarChar(100)
+  isBalanceCorrection Boolean  @default(false)
+  color               String?  @db.VarChar(20)
+  icon                String?  @db.VarChar(50)
+  userNote            String?  @db.Text          // manually added notes
+  createdAt           DateTime @default(now())
+}
+
+// ============================================================
+// GLOBAL
+// ============================================================
+
+model ActivityFeed {
+  id        String   @id @default(cuid())
+  section   String   @db.VarChar(50)
+  type      String   @db.VarChar(50)
+  title     String   @db.VarChar(500)
+  timestamp DateTime @default(now())
+  icon      String   @db.VarChar(10)
+  linkTo    String?  @db.VarChar(200)
+}
+
+model GlobalNote {
+  id        String   @id @default(cuid())
+  key       String   @unique @db.VarChar(100) // e.g. "scratchpad"
+  content   String   @db.LongText
+  updatedAt DateTime @updatedAt
+}
+
+model AppSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique @db.VarChar(100)
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}

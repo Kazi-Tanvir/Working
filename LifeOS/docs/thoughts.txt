@@ -1,0 +1,41 @@
+i want to make a life os where i can track the following thinhgs
+
+====================================
+1.ACADEMIC 
+====================================
+1. Track 1.Class Routines 2.Exams 3.Assignments
+2. Collect Lecture Sheet , Books , Notes , Previos Question , Source Material 
+3. Personal Notes , Solution 
+4. Codes Collection 
+
+====================================
+2. ENTERTAINMENT TRACKING
+====================================
+- externally connect ot shinDB
+- Track anime , anime movies , series , movies , manga , pc games and mobile games 
+- Completed , Ongoing , Plan to Consume , Dropped , On Hold
+
+====================================
+3. SKILL IMPROVEMENT 
+====================================
+3.1 ACTIVE PROJECT :
+    1. shinDB
+    2. VOX Agent
+    3. e-commerce website
+3.2 COMPLETED PROJECT:
+    1. Portfolio Website
+3.3 ARCHIVED PROJECT :
+    1. Student DashBoard 
+    2. DCITC
+3.4 PLANNED PROJECT
+    1. ShareX for Mobile
+3.5 PRACTICE PROJECT
+3.6 Other Skills 
+    1. Obsidian
+    2. Data Center
+
+====================================
+4. DAILY TRACKING
+====================================
+1. Routine like google calender 
+2. todo list 

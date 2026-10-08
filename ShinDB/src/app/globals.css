@@ -1,0 +1,373 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  
+  --cyber-purple: #8b5cf6;
+  --cyber-green: #00ff66;
+  --cyber-cyan: #00f0ff;
+  --cyber-yellow: #ffee00;
+  --cyber-orange: #ff6b00;
+  --cyber-red: #ff003c;
+  --cyber-card: #0d0d0f;
+  --cyber-border: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--cyber-card);
+  --color-cyber-purple: var(--cyber-purple);
+  --color-cyber-green: var(--cyber-green);
+  --color-cyber-cyan: var(--cyber-cyan);
+  --color-cyber-yellow: var(--cyber-yellow);
+  --color-cyber-orange: var(--cyber-orange);
+  --color-cyber-red: var(--cyber-red);
+  
+  --font-sans: 'Space Grotesk', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Space Grotesk', Arial, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ----------------------------------------------------
+   NEOBRUTALIST CUSTOM UTILITY CLASSES
+   ---------------------------------------------------- */
+
+.neo-border {
+  border: 2px solid #ffffff;
+}
+
+.neo-shadow {
+  box-shadow: 4px 4px 0px 0px #ffffff;
+  transition: all 0.15s ease-in-out;
+}
+
+.neo-shadow-purple {
+  box-shadow: 4px 4px 0px 0px var(--cyber-purple);
+  transition: all 0.15s ease-in-out;
+}
+
+.neo-shadow-green {
+  box-shadow: 4px 4px 0px 0px var(--cyber-green);
+  transition: all 0.15s ease-in-out;
+}
+
+.neo-shadow-cyan {
+  box-shadow: 4px 4px 0px 0px var(--cyber-cyan);
+  transition: all 0.15s ease-in-out;
+}
+
+.neo-shadow-yellow {
+  box-shadow: 4px 4px 0px 0px var(--cyber-yellow);
+  transition: all 0.15s ease-in-out;
+}
+
+.neo-shadow-orange {
+  box-shadow: 4px 4px 0px 0px var(--cyber-orange);
+  transition: all 0.15s ease-in-out;
+}
+
+/* Interactive elements */
+.neo-clickable {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neo-clickable:hover {
+  transform: translate(-2px, -2px);
+}
+
+.neo-clickable:active {
+  transform: translate(2px, 2px);
+}
+
+/* Card presets */
+.cyber-card {
+  background-color: var(--cyber-card);
+  border: 2px solid #ffffff;
+  box-shadow: 4px 4px 0px 0px #ffffff;
+  transition: all 0.15s ease-in-out;
+}
+
+.cyber-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #ffffff;
+}
+
+.cyber-card-purple {
+  background-color: var(--cyber-card);
+  border: 2px solid var(--cyber-purple);
+  box-shadow: 4px 4px 0px 0px var(--cyber-purple);
+  transition: all 0.15s ease-in-out;
+}
+
+.cyber-card-purple:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--cyber-purple);
+}
+
+.cyber-card-green {
+  background-color: var(--cyber-card);
+  border: 2px solid var(--cyber-green);
+  box-shadow: 4px 4px 0px 0px var(--cyber-green);
+  transition: all 0.15s ease-in-out;
+}
+
+.cyber-card-green:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--cyber-green);
+}
+
+.cyber-card-cyan {
+  background-color: var(--cyber-card);
+  border: 2px solid var(--cyber-cyan);
+  box-shadow: 4px 4px 0px 0px var(--cyber-cyan);
+  transition: all 0.15s ease-in-out;
+}
+
+.cyber-card-cyan:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--cyber-cyan);
+}
+
+.cyber-card-yellow {
+  background-color: var(--cyber-card);
+  border: 2px solid var(--cyber-yellow);
+  box-shadow: 4px 4px 0px 0px var(--cyber-yellow);
+  transition: all 0.15s ease-in-out;
+}
+
+.cyber-card-yellow:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--cyber-yellow);
+}
+
+.cyber-card-orange {
+  background-color: var(--cyber-card);
+  border: 2px solid var(--cyber-orange);
+  box-shadow: 4px 4px 0px 0px var(--cyber-orange);
+  transition: all 0.15s ease-in-out;
+}
+
+.cyber-card-orange:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--cyber-orange);
+}
+
+/* Button tactile clicks */
+.neo-btn-primary {
+  background-color: var(--cyber-purple);
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  box-shadow: 4px 4px 0px 0px #ffffff;
+  font-weight: 700;
+  transition: all 0.1s ease;
+}
+
+.neo-btn-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #ffffff;
+}
+
+.neo-btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #ffffff;
+}
+
+.neo-btn-cyan {
+  background-color: var(--cyber-cyan);
+  color: #000000;
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+  font-weight: 700;
+  transition: all 0.1s ease;
+}
+
+.neo-btn-cyan:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.neo-btn-cyan:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+.neo-btn-green {
+  background-color: var(--cyber-green);
+  color: #000000;
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+  font-weight: 700;
+  transition: all 0.1s ease;
+}
+
+.neo-btn-green:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.neo-btn-green:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+/* Custom glow text effects */
+.glow-purple {
+  text-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+}
+
+.glow-green {
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+}
+
+.glow-cyan {
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+}
+
+.glow-yellow {
+  text-shadow: 0 0 8px rgba(255, 238, 0, 0.6);
+}
+
+/* -------------------------------------------------------
+   SUBTLE UX ENHANCEMENTS
+   ------------------------------------------------------- */
+
+/* Smooth scroll for the page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar — slim, dark, unobtrusive */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Staggered card entrance animation */
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-card-in {
+  animation: cardFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Section slide-in from left */
+@keyframes sectionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-section-in {
+  animation: sectionSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Subtle stat number shimmer */
+@keyframes statShimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.stat-shimmer {
+  animation: statShimmer 2.5s ease-in-out infinite;
+}
+
+/* CRT scanline overlay (very subtle) */
+.scanline-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  z-index: 1;
+}
+
+/* Subtle noise texture */
+.noise-bg {
+  position: relative;
+}
+
+.noise-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 0;
+}
+
+/* Hover lift for stat cards */
+.stat-card-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-card-hover:hover {
+  transform: translateY(-3px);
+}
+
+/* Tooltip-style focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--cyber-purple);
+  outline-offset: 2px;
+}
+
+/* Navbar backdrop blur on scroll (applied via JS) */
+.navbar-scrolled {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Badge pulse for active items */
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(0, 240, 255, 0); }
+}
+
+.badge-pulse {
+  animation: badgePulse 2s ease-in-out infinite;
+}

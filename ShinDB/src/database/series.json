@@ -1,0 +1,321 @@
+[
+  {
+    "id": "s-3",
+    "title": "Breaking Bad",
+    "rating": "10.0/10",
+    "status": "Completed",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMzU5ZGYzNmQtMTdhYy00OGRiLTg0NmQtYjVjNzliZTg1ZGE4XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg",
+    "progress": "S5E16",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "releaseYear": 2008,
+    "type": "series"
+  },
+  {
+    "title": "A Knight of the Seven Kingdoms",
+    "releaseYear": 2026,
+    "status": "Completed",
+    "progress": "S1E06",
+    "rating": "10.0/10",
+    "genres": [
+      "tv"
+    ],
+    "type": "series",
+    "id": "s-30dfw90y",
+    "coverImage": "https://image.tmdb.org/t/p/w500/k8yARbD9iYn2nRX2HvsopfKDN2r.jpg"
+  },
+  {
+    "title": "Adolescence",
+    "releaseYear": 2025,
+    "status": "Completed",
+    "progress": "S1E04",
+    "rating": "9.0/10",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "type": "series",
+    "id": "s-fpvmyu9f",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNGY1YjBiNzMtYWZhNC00OWViLWE0MzItNjc4YzczOGNiM2I0XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+  },
+  {
+    "title": "Better Call Saul",
+    "releaseYear": 2015,
+    "status": "Completed",
+    "progress": "S1E63",
+    "rating": "10.0/10",
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-ksk2kiyz",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNDdjNTEzMjMtYjM3Mi00NzQ3LWFlNWMtZjdmYWU3ZDkzMjk1XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Dark",
+    "releaseYear": 2017,
+    "status": "Completed",
+    "progress": "S1E26",
+    "rating": "10.0/10",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Mystery"
+    ],
+    "type": "series",
+    "id": "s-onba2qs7",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BOWJjMGViY2UtNTAzNS00ZGFjLWFkNTMtMDBiMDMyZTM1NTY3XkEyXkFqcGc@._V1_QL75_UX380_CR0,57,380,562_.jpg"
+  },
+  {
+    "title": "Game of Thrones",
+    "releaseYear": 2011,
+    "status": "Completed",
+    "progress": "S1E73",
+    "rating": "10.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-g3fjmt5b",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMTNhMDJmNmYtNDQ5OS00ODdlLWE0ZDAtZTgyYTIwNDY3OTU3XkEyXkFqcGc@._V1_QL75_UX380_CR0,3,380,562_.jpg"
+  },
+  {
+    "title": "Gen V",
+    "releaseYear": 2023,
+    "status": "Completed",
+    "progress": "S1E16",
+    "rating": "7.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Comedy"
+    ],
+    "type": "series",
+    "id": "s-di3hw16w",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BYWU4YTljYmItYjczNS00MWY0LWI3NjctZjJhYjU3NWNmNWZhXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Hannibal",
+    "releaseYear": 2013,
+    "status": "Completed",
+    "progress": "S1E26",
+    "rating": "8.0/10",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Horror"
+    ],
+    "type": "series",
+    "id": "s-6zdc9hi3",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNjBmYjdiMzItNTEwNi00YTI2LTg4YjctOTRjNDYxNTUxNGQ1XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Hostel Daze",
+    "releaseYear": 2019,
+    "status": "Completed",
+    "progress": "S1E21",
+    "rating": "8.0/10",
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-jgn7xa0h",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BZWZlNWMxNDYtNTAzYi00OWFiLThhZDUtZGZkYWMyMzQ5ZGYyXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "House of the Dragon",
+    "releaseYear": 2022,
+    "status": "Completed",
+    "progress": "S1E26",
+    "rating": "8.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-u7rz4bf8",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BZGM4MTczODQtNGIxOC00Y2U2LTk1YmItNzA2N2VhYmE0Y2YwXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+  },
+  {
+    "title": "Kota Factory",
+    "releaseYear": 2019,
+    "status": "Completed",
+    "progress": "S1E15",
+    "rating": "8.0/10",
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-namifqh2",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BY2U5MjY1NWEtZDI2MS00NTlhLWEyODQtYzE0MzY3NDUyNzE3XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Mirzapur",
+    "releaseYear": 2018,
+    "status": "Completed",
+    "progress": "S1E29",
+    "rating": "6.0/10",
+    "genres": [
+      "Action",
+      "Crime",
+      "Thriller"
+    ],
+    "type": "series",
+    "id": "s-repon8yt",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BZTFjMzMxZTUtYTMyNy00OWNhLTk4ODQtNGI1NjI1NjJhMzc3XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Narcos",
+    "releaseYear": 2015,
+    "status": "Dropped",
+    "progress": "S1E08",
+    "rating": "6.0/10",
+    "genres": [
+      "Biography",
+      "Crime",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-sdjprezf",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNzQwOTcwMzIwN15BMl5BanBnXkFtZTgwMjYxMTA0NjE@._V1_SX300.jpg"
+  },
+  {
+    "title": "Ozark",
+    "releaseYear": 2017,
+    "status": "Dropped",
+    "progress": "S1E30",
+    "rating": "8.0/10",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "type": "series",
+    "id": "s-r84yuqp2",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BZDk1ZTdjOWItNTJmYS00MGIzLThmY2ItZWNiOGY5MzJlNTA5XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Panchayat",
+    "releaseYear": 2020,
+    "status": "Completed",
+    "progress": "S1E32",
+    "rating": "9.0/10",
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-77zooktx",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BYzkwZGNkYTctZDc2MS00OWM2LWI2NTUtMTM2ZGMzMTY0N2Q1XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Peaky Blinders",
+    "releaseYear": 2013,
+    "status": "Dropped",
+    "progress": "S1E06",
+    "rating": "6.0/10",
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-hxkfjz0h",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BOGM0NGY3ZmItOGE2ZC00OWIxLTk0N2EtZWY4Yzg3ZDlhNGI3XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg"
+  },
+  {
+    "title": "Sherlock",
+    "releaseYear": 2010,
+    "status": "Plan to Watch",
+    "progress": "S1E01",
+    "rating": "9.0/10",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Mystery"
+    ],
+    "type": "series",
+    "id": "s-8div8mgx",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNTQzNGZjNDEtOTMwYi00MzFjLWE2ZTYtYzYxYzMwMjZkZDc5XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg"
+  },
+  {
+    "title": "Shogun",
+    "releaseYear": 2024,
+    "status": "Completed",
+    "progress": "S1E10",
+    "rating": "7.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-e92ulwiy",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BZmJkMDRjYzEtMWI3Ny00OWE3LWJlNTItMGQ1MTQzMzc3NDY5XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Stranger Things",
+    "releaseYear": 2016,
+    "status": "Completed",
+    "progress": "S1E42",
+    "rating": "7.0/10",
+    "genres": [
+      "Drama",
+      "Fantasy",
+      "Horror"
+    ],
+    "type": "series",
+    "id": "s-7zocl1f9",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNjRiMTA4NWUtNmE0ZC00NGM0LWJhMDUtZWIzMDM5ZDIzNTg3XkEyXkFqcGc@._V1_QL75_UY562_CR35,0,380,562_.jpg"
+  },
+  {
+    "title": "The Boys",
+    "releaseYear": 2019,
+    "status": "Completed",
+    "progress": "S1E40",
+    "rating": "7.0/10",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Crime"
+    ],
+    "type": "series",
+    "id": "s-kqxp6fik",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BZjU4OWNiYzQtMzc1NS00NjZlLTgyYTctZWY4ZmEzMTkxYjA4XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg"
+  },
+  {
+    "title": "The Witcher",
+    "releaseYear": 2019,
+    "status": "Dropped",
+    "progress": "S1E16",
+    "rating": "7.9/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Drama"
+    ],
+    "type": "series",
+    "id": "s-hysqt5h0",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BOTQzMzNmMzUtODgwNS00YTdhLTg5N2MtOWU1YTc4YWY3NjRlXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "id": "s-mptv55c1",
+    "title": "INVINCIBLE",
+    "rating": "8.6/10",
+    "status": "Plan to Watch",
+    "coverImage": "https://image.tmdb.org/t/p/w500/4tblBrslcKSifMVZ3TmtT2ukMor.jpg",
+    "progress": "S1E01",
+    "genres": [],
+    "releaseYear": 2021,
+    "type": "series"
+  }
+]

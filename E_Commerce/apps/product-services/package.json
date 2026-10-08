@@ -1,0 +1,29 @@
+{
+  "name": "product-services",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx --env-file=.env --watch src/index.ts",
+    "check-types": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@repo/kafka": "workspace:*",
+    "@repo/types": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "tsx": "^4.23.1"
+  },
+  "dependencies": {
+    "@clerk/express": "^2.1.7",
+    "@repo/product-db": "workspace:*",
+    "cors": "^2.8.6",
+    "express": "^5.0.3"
+  }
+}

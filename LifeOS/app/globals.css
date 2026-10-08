@@ -1,0 +1,428 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+/* ============================================================
+   DESIGN SYSTEM TOKENS - CYBERPUNK / HIGH CONTRAST NEON
+   ============================================================ */
+:root {
+  /* Backgrounds */
+  --bg-primary:    #000000;
+  --bg-secondary:  #08080C;
+  --bg-tertiary:   #12121A;
+  --border:        #1A1A24;
+
+  /* Text */
+  --text-primary:   #FFFFFF;
+  --text-secondary: #D8D8E5; /* High contrast bright silver */
+  --text-muted:     #9A9AB3; /* Readable medium gray for labels and titles */
+
+  /* Neon Accents */
+  --accent-red:    #FF0055;
+  --accent-green:  #39FF14;
+  --accent-purple: #D946EF;
+  --accent-blue:   #3B82F6;
+  --accent-amber:  #FFB000;
+  --accent-cyan:   #00E5FF;
+  --accent-pink:   #FF007F;
+
+  /* Sidebar & Topbar */
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 64px;
+  --topbar-height: 60px;
+
+  /* Typography */
+  --font-display: 'JetBrains Mono', monospace;
+  --font-body:    'JetBrains Mono', monospace;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  /* Card */
+  --card-bg:     rgba(8, 8, 12, 0.95);
+  --card-border: rgba(255, 255, 255, 0.03);
+  --card-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+  --card-radius: 12px;
+}
+
+/* ============================================================
+   TAILWIND THEME EXTENSION (v4 @theme)
+   ============================================================ */
+@theme inline {
+  --color-bg-primary:    var(--bg-primary);
+  --color-bg-secondary:  var(--bg-secondary);
+  --color-bg-tertiary:   var(--bg-tertiary);
+  --color-border-dim:    var(--border);
+  --color-text-primary:  var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted:    var(--text-muted);
+  --color-accent-red:    var(--accent-red);
+  --color-accent-green:  var(--accent-green);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-blue:   var(--accent-blue);
+  --color-accent-amber:  var(--accent-amber);
+  --color-accent-cyan:   var(--accent-cyan);
+  --color-accent-pink:   var(--accent-pink);
+  --font-display:        var(--font-display);
+  --font-body:           var(--font-body);
+  --font-mono:           var(--font-mono);
+}
+
+/* ============================================================
+   GLOBAL RESETS & BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px; /* Increased from 13px for general legibility */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Focus styling */
+*:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 229, 255, 0.25);
+  color: #FFFFFF;
+}
+
+/* ============================================================
+   CYBERPUNK GLOW CARDS
+   ============================================================ */
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Specific glows */
+.cyber-blue {
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+.cyber-blue:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.cyber-magenta {
+  border: 1px solid rgba(217, 70, 239, 0.2);
+}
+.cyber-magenta:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 15px rgba(217, 70, 239, 0.15);
+  transform: translateY(-1px);
+}
+
+.cyber-cyan {
+  border: 1px solid rgba(0, 229, 255, 0.2);
+}
+.cyber-cyan:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.cyber-green {
+  border: 1px solid rgba(57, 255, 20, 0.2);
+}
+.cyber-green:hover {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.15);
+  transform: translateY(-1px);
+}
+
+.cyber-pink {
+  border: 1px solid rgba(255, 0, 127, 0.2);
+}
+.cyber-pink:hover {
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.15);
+  transform: translateY(-1px);
+}
+
+.cyber-amber {
+  border: 1px solid rgba(255, 176, 0, 0.2);
+}
+.cyber-amber:hover {
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 15px rgba(255, 176, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
+.font-mono    { font-family: var(--font-mono); }
+
+.text-display {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.text-section-header {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.text-stat {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress-bar {
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ============================================================
+   BADGE / STATUS PILLS
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-primary {
+  background: transparent;
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+}
+.btn-primary:hover {
+  background: var(--accent-cyan);
+  color: #000000;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+.btn-ghost:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.btn-pill {
+  border-radius: 9999px;
+}
+
+/* ============================================================
+   DATA TABLES
+   ============================================================ */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.data-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(26, 26, 36, 0.5);
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+.data-table tr:hover td {
+  background: rgba(255, 255, 255, 0.01);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  width: min(500px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9);
+}
+
+/* ============================================================
+   FORM INPUTS
+   ============================================================ */
+.input {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  transition: all 0.2s;
+  outline: none;
+}
+.input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
+}
+.input::placeholder { color: var(--text-muted); }
+
+select.input option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.tab-item {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tab-item:hover { color: var(--text-secondary); }
+.tab-item.active {
+  color: var(--accent-cyan);
+  border-bottom-color: var(--accent-cyan);
+}
+
+/* ============================================================
+   STATUS STYLES (Cyber theme)
+   ============================================================ */
+.status-ongoing      { color: var(--accent-purple); border-color: rgba(217, 70, 239, 0.3); background: rgba(217, 70, 239, 0.05); }
+.status-completed    { color: var(--accent-green);  border-color: rgba(57, 255, 20, 0.3);  background: rgba(57, 255, 20, 0.05);  }
+.status-planned      { color: var(--accent-blue);   border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.05); }
+.status-paused       { color: var(--accent-amber);  border-color: rgba(255, 176, 0, 0.3);  background: rgba(255, 176, 0, 0.05);  }
+.status-dropped      { color: var(--accent-red);    border-color: rgba(255, 0, 85, 0.3);   background: rgba(255, 0, 85, 0.05);   }
+.status-on-hold      { color: var(--text-secondary); border-color: rgba(158, 158, 174, 0.3); background: rgba(158, 158, 174, 0.05); }
+.status-in-progress  { color: var(--accent-cyan);   border-color: rgba(0, 229, 255, 0.3);  background: rgba(0, 229, 255, 0.05);  }
+
+/* ============================================================
+   ACCESSIBILITY OVERRIDES (Boost Small Fonts and Contrast)
+   ============================================================ */
+.text-\[7px\] { font-size: 10px !important; }
+.text-\[8px\] { font-size: 11px !important; }
+.text-\[9px\] { font-size: 12px !important; }
+.text-\[10px\] { font-size: 13px !important; }
+.text-\[11px\] { font-size: 14px !important; }
+.text-xs { font-size: 13px !important; }
+.text-sm { font-size: 14px !important; }
+

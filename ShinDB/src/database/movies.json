@@ -1,0 +1,1349 @@
+[
+  {
+    "id": "mv-2",
+    "title": "Interstellar",
+    "rating": "9.0/10",
+    "status": "Watching",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BYzdjMDAxZGItMjI2My00ODA1LTlkNzItOWFjMDU5ZDJlYWY3XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+    "progress": "169 mins",
+    "genres": [
+      "Writ: Jonathan Nolan",
+      "Christopher Nolan"
+    ],
+    "releaseYear": 2014,
+    "type": "movie"
+  },
+  {
+    "title": "12 Angry Men",
+    "releaseYear": 1957,
+    "status": "Watching",
+    "progress": "96 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Writ: Reginald Rose"
+    ],
+    "type": "movie",
+    "id": "mv-a2zdsvw2",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BYjE4NzdmOTYtYjc5Yi00YzBiLWEzNDEtNTgxZGQ2MWVkN2NiXkEyXkFqcGc@._V1_QL75_UX380_CR0,11,380,562_.jpg"
+  },
+  {
+    "title": "12th Fail",
+    "releaseYear": 2023,
+    "status": "Watching",
+    "progress": "147 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Writ: Vidhu Vinod Chopra",
+      "Jaskunwar Kohli",
+      "Anurag Pathak"
+    ],
+    "type": "movie",
+    "id": "mv-hng20ues",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNTE3OTIxZDYtNjA0NC00N2YxLTg1NGQtOTYxNmZkMDkwOWNjXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "3 Idiots",
+    "releaseYear": 2009,
+    "status": "Watching",
+    "progress": "170 mins",
+    "rating": "8.4/10",
+    "genres": [
+      "Writ: Abhijat Joshi",
+      "Rajkumar Hirani",
+      "Vidhu Vinod Chopra"
+    ],
+    "type": "movie",
+    "id": "mv-q2e9kzs1",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNzc4ZWQ3NmYtODE0Ny00YTQ4LTlkZWItNTBkMGQ0MmUwMmJlXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "5 Centimeters per Second",
+    "releaseYear": 2007,
+    "status": "Completed",
+    "progress": "22 mins",
+    "rating": "5.0/10",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "type": "movie",
+    "id": "mv-hr4j6a5j",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1410/112994.jpg"
+  },
+  {
+    "title": "A Quiet Place",
+    "releaseYear": 2018,
+    "status": "Watching",
+    "progress": "90 mins",
+    "rating": "6.0/10",
+    "genres": [
+      "Writ: Bryan Woods",
+      "Scott Beck",
+      "John Krasinski"
+    ],
+    "type": "movie",
+    "id": "mv-l2wq6lrg",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMjI0MDMzNTQ0M15BMl5BanBnXkFtZTgwMTM5NzM3NDM@._V1_SX300.jpg"
+  },
+  {
+    "title": "A Silent Voice",
+    "releaseYear": 2016,
+    "status": "Completed",
+    "progress": "130 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Award Winning",
+      "Drama"
+    ],
+    "type": "movie",
+    "id": "mv-bw9gcplq",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1122/96435.jpg"
+  },
+  {
+    "title": "Attack on Titan: Chronicle",
+    "releaseYear": 2020,
+    "status": "Completed",
+    "progress": "120 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Action",
+      "Drama",
+      "Suspense"
+    ],
+    "type": "movie",
+    "id": "mv-ta76rm5w",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1786/110717.jpg"
+  },
+  {
+    "title": "Borat",
+    "releaseYear": 2006,
+    "status": "Watching",
+    "progress": "84 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Writ: Sacha Baron Cohen",
+      "Anthony Hines",
+      "Peter Baynham"
+    ],
+    "type": "movie",
+    "id": "mv-x1wu0k2h",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMTk0MTQ3NDQ4Ml5BMl5BanBnXkFtZTcwOTQ3OTQzMw@@._V1_SX300.jpg"
+  },
+  {
+    "title": "Borat Subsequent Moviefilm",
+    "releaseYear": 2020,
+    "status": "Watching",
+    "progress": "95 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Writ: Sacha Baron Cohen",
+      "Anthony Hines",
+      "Dan Swimer"
+    ],
+    "type": "movie",
+    "id": "mv-zs9cu8y1",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BOWJmNDcyOTItYTE0ZS00NzAwLThjNGUtYTdhMjBjMTAwNDc4XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Boruto: Naruto the Movie",
+    "releaseYear": 2015,
+    "status": "Watching",
+    "progress": "95 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-jil8iqg8",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/4/78280.jpg"
+  },
+  {
+    "title": "Bâan: The Boundary of Adulthood",
+    "releaseYear": 2025,
+    "status": "Completed",
+    "progress": "18 mins",
+    "rating": "7.2/10",
+    "genres": [
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-3toz5ots",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1879/150911.jpg"
+  },
+  {
+    "title": "Chainsaw Man – The Movie: Reze Arc",
+    "releaseYear": 2025,
+    "status": "Completed",
+    "progress": "99 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Action",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-7hgk7f3q",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1763/150638.jpg"
+  },
+  {
+    "title": "Demon Slayer: Kimetsu no Yaiba - The Movie: Infinity Castle - Part 1: Akaza Returns",
+    "releaseYear": 2025,
+    "status": "Completed",
+    "progress": "155 mins",
+    "rating": "8.7/10",
+    "genres": [
+      "Action",
+      "Award Winning",
+      "Supernatural"
+    ],
+    "type": "movie",
+    "id": "mv-rb9lgbax",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1681/148216.jpg"
+  },
+  {
+    "title": "Demon Slayer: Kimetsu no Yaiba - The Movie: Mugen Train",
+    "releaseYear": 2020,
+    "status": "Completed",
+    "progress": "116 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Action",
+      "Supernatural"
+    ],
+    "type": "movie",
+    "id": "mv-drzyxmi9",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1704/106947.jpg"
+  },
+  {
+    "title": "Demon Slayer: Kimetsu no Yaiba - The Movie 2: Infinity Castle",
+    "releaseYear": 2026,
+    "status": "Plan to Watch",
+    "progress": "0 mins",
+    "rating": "N/A",
+    "genres": [
+      "Action",
+      "Supernatural"
+    ],
+    "type": "movie",
+    "id": "mv-1k7nwe98",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1000/152184.jpg"
+  },
+  {
+    "title": "Evangelion: 1.0 You Are (Not) Alone",
+    "releaseYear": 2007,
+    "status": "Completed",
+    "progress": "101 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Sci-Fi",
+      "Suspense"
+    ],
+    "type": "movie",
+    "id": "mv-6t87izou",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/7/74975.jpg"
+  },
+  {
+    "title": "Evangelion: 2.0 You Can (Not) Advance",
+    "releaseYear": 2009,
+    "status": "Completed",
+    "progress": "112 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Drama",
+      "Sci-Fi",
+      "Suspense"
+    ],
+    "type": "movie",
+    "id": "mv-zrwcifb8",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/5/74983.jpg"
+  },
+  {
+    "title": "Evangelion: 3.0 You Can (Not) Redo",
+    "releaseYear": 2012,
+    "status": "Completed",
+    "progress": "95 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Sci-Fi",
+      "Suspense"
+    ],
+    "type": "movie",
+    "id": "mv-pz2jifhc",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/9/43201.jpg"
+  },
+  {
+    "title": "Fight Club",
+    "releaseYear": 1999,
+    "status": "Watching",
+    "progress": "139 mins",
+    "rating": "6.0/10",
+    "genres": [
+      "Writ: Chuck Palahniuk",
+      "Jim Uhls"
+    ],
+    "type": "movie",
+    "id": "mv-exs09hyf",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BOTgyOGQ1NDItNGU3Ny00MjU3LTg2YWEtNmEyYjBiMjI1Y2M5XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg"
+  },
+  {
+    "title": "Fullmetal Alchemist: The Movie - Conqueror of Shamballa",
+    "releaseYear": 2005,
+    "status": "Completed",
+    "progress": "104 mins",
+    "rating": "6.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Award Winning",
+      "Drama",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-f44qoav2",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1707/94039.jpg"
+  },
+  {
+    "title": "Fullmetal Alchemist: The Sacred Star of Milos",
+    "releaseYear": 2011,
+    "status": "Watching",
+    "progress": "110 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-k6txqpks",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1217/152912.jpg"
+  },
+  {
+    "title": "Gintama: The Very Final",
+    "releaseYear": 2021,
+    "status": "Completed",
+    "progress": "104 mins",
+    "rating": "9.1/10",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Drama",
+      "Sci-Fi"
+    ],
+    "type": "movie",
+    "id": "mv-vbs25hvc",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1245/116760.jpg"
+  },
+  {
+    "title": "Grave of the Fireflies",
+    "releaseYear": 1988,
+    "status": "Completed",
+    "progress": "88 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Drama"
+    ],
+    "type": "movie",
+    "id": "mv-qorcydnp",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1485/141208.jpg"
+  },
+  {
+    "title": "Haikyu!! Movie: The Dumpster Battle",
+    "releaseYear": 2024,
+    "status": "Completed",
+    "progress": "84 mins",
+    "rating": "8.6/10",
+    "genres": [
+      "Sports"
+    ],
+    "type": "movie",
+    "id": "mv-uedtfru9",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1665/140360.jpg"
+  },
+  {
+    "title": "Haikyu!! The Movie: Battle of Concepts",
+    "releaseYear": 2017,
+    "status": "Completed",
+    "progress": "88 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Sports"
+    ],
+    "type": "movie",
+    "id": "mv-gr856160",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1854/147254.jpg"
+  },
+  {
+    "title": "Haikyu!! The Movie: Talent and Sense",
+    "releaseYear": 2017,
+    "status": "Completed",
+    "progress": "89 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Sports"
+    ],
+    "type": "movie",
+    "id": "mv-11ndrjbw",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1034/147253.jpg"
+  },
+  {
+    "title": "Haikyu!! the Movie: The End and the Beginning",
+    "releaseYear": 2015,
+    "status": "Completed",
+    "progress": "89 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Sports"
+    ],
+    "type": "movie",
+    "id": "mv-l0k39ewg",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/8/76011.jpg"
+  },
+  {
+    "title": "Haikyuu!! the Movie: The Winner and the Loser",
+    "releaseYear": 2015,
+    "status": "Completed",
+    "progress": "88 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Sports"
+    ],
+    "type": "movie",
+    "id": "mv-1ko1cot6",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/2/74813.jpg"
+  },
+  {
+    "title": "Homebound",
+    "releaseYear": 2021,
+    "status": "Watching",
+    "progress": "71 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Writ: Sebastian Godwin",
+      "Jon Gilbert"
+    ],
+    "type": "movie",
+    "id": "mv-7gs7tmc9",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNzU4YzhlOTUtZjMyZC00MTYzLTgzNDAtZmNjZmNjNDY1YmMyXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "I Want To Eat Your Pancreas",
+    "releaseYear": 2018,
+    "status": "Completed",
+    "progress": "108 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "type": "movie",
+    "id": "mv-ic3o1bml",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1768/93291.jpg"
+  },
+  {
+    "title": "Inception",
+    "releaseYear": 2010,
+    "status": "Watching",
+    "progress": "148 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Writ: Christopher Nolan"
+    ],
+    "type": "movie",
+    "id": "mv-swi918xf",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+  },
+  {
+    "title": "Into the Forest of Fireflies' Light",
+    "releaseYear": 2011,
+    "status": "Completed",
+    "progress": "45 mins",
+    "rating": "6.0/10",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Romance",
+      "Supernatural"
+    ],
+    "type": "movie",
+    "id": "mv-qz10ytzf",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1599/112267.jpg"
+  },
+  {
+    "title": "Josee, the Tiger and the Fish",
+    "releaseYear": 2020,
+    "status": "Completed",
+    "progress": "98 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "type": "movie",
+    "id": "mv-ud9hs85x",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1714/108892.jpg"
+  },
+  {
+    "title": "Jujutsu Kaisen 0",
+    "releaseYear": 2021,
+    "status": "Completed",
+    "progress": "104 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Action",
+      "Supernatural"
+    ],
+    "type": "movie",
+    "id": "mv-yjgpxhvj",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1121/119044.jpg"
+  },
+  {
+    "title": "Kaguya-sama: Love is War -The First Kiss That Never Ends-",
+    "releaseYear": 2022,
+    "status": "Completed",
+    "progress": "96 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Romance"
+    ],
+    "type": "movie",
+    "id": "mv-rv9mvsks",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1670/130060.jpg"
+  },
+  {
+    "title": "Look Back",
+    "releaseYear": 2024,
+    "status": "Watching",
+    "progress": "57 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-f0o06els",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1716/142633.jpg"
+  },
+  {
+    "title": "Memento (2000)",
+    "releaseYear": 2000,
+    "status": "Watching",
+    "progress": "0 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Writ: N/A"
+    ],
+    "type": "movie",
+    "id": "mv-jeznd461",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMGQ3Y2Q4NjktN2E4Ny00Y2Q2LTliZDUtZTNiNjRhY2I0NGIyXkEyXkFqcGc@._V1_.jpg"
+  },
+  {
+    "title": "Naruto Shippuden: Chunin Exam on Fire! Naruto vs. Konohamaru!",
+    "releaseYear": 2011,
+    "status": "Completed",
+    "progress": "14 mins",
+    "rating": "5.0/10",
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
+    "type": "movie",
+    "id": "mv-2js2qw9u",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/9/30813.jpg"
+  },
+  {
+    "title": "Naruto Shippuden the Movie 1",
+    "releaseYear": 2007,
+    "status": "Completed",
+    "progress": "94 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-80p1x5l5",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1703/134493.jpg"
+  },
+  {
+    "title": "Naruto Shippuden the Movie 2: Bonds",
+    "releaseYear": 2008,
+    "status": "Completed",
+    "progress": "92 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-tsqcu57m",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1484/134494.jpg"
+  },
+  {
+    "title": "Naruto Shippuden the Movie 3: The Will of Fire",
+    "releaseYear": 2009,
+    "status": "Completed",
+    "progress": "95 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-4tkyhitv",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1493/116732.jpg"
+  },
+  {
+    "title": "Naruto Shippuden the Movie 4: The Lost Tower",
+    "releaseYear": 2010,
+    "status": "Completed",
+    "progress": "85 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-s5ydddpz",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1479/116734.jpg"
+  },
+  {
+    "title": "Naruto Shippuden the Movie 5: Blood Prison",
+    "releaseYear": 2011,
+    "status": "Completed",
+    "progress": "102 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-rra7pv34",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1500/134496.jpg"
+  },
+  {
+    "title": "Naruto Shippuden the Movie 6: Road to Ninja",
+    "releaseYear": 2012,
+    "status": "Completed",
+    "progress": "109 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-n5aadblq",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1620/94336.jpg"
+  },
+  {
+    "title": "Naruto Shippuden the Movie 7: The Last",
+    "releaseYear": 2014,
+    "status": "Completed",
+    "progress": "112 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Romance"
+    ],
+    "type": "movie",
+    "id": "mv-4y41lqwf",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1491/134498.jpg"
+  },
+  {
+    "title": "Naruto the Movie 1: Ninja Clash in the Land of Snow",
+    "releaseYear": 2004,
+    "status": "Completed",
+    "progress": "82 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-8ttpbh7m",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1231/134484.jpg"
+  },
+  {
+    "title": "Naruto the Movie 2: Legend of the Stone of Gelel",
+    "releaseYear": 2005,
+    "status": "Completed",
+    "progress": "97 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-xx11zxr4",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1114/134485.jpg"
+  },
+  {
+    "title": "Naruto the Movie 3: Guardians of the Crescent Moon Kingdom",
+    "releaseYear": 2006,
+    "status": "Completed",
+    "progress": "94 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-0pv8dbdm",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1918/134487.jpg"
+  },
+  {
+    "title": "Neon Genesis Evangelion: The End of Evangelion",
+    "releaseYear": 1997,
+    "status": "Completed",
+    "progress": "86 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Avant Garde",
+      "Drama",
+      "Sci-Fi",
+      "Suspense"
+    ],
+    "type": "movie",
+    "id": "mv-q7eu9ut3",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1404/98182.jpg"
+  },
+  {
+    "title": "Night Is Short, Walk on Girl",
+    "releaseYear": 2017,
+    "status": "Completed",
+    "progress": "92 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Comedy",
+      "Romance"
+    ],
+    "type": "movie",
+    "id": "mv-hkikpwg4",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/2/86940.jpg"
+  },
+  {
+    "title": "No Game, No Life: Zero",
+    "releaseYear": 2017,
+    "status": "Completed",
+    "progress": "106 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Drama",
+      "Fantasy",
+      "Romance"
+    ],
+    "type": "movie",
+    "id": "mv-79p94lv6",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1085/90759.jpg"
+  },
+  {
+    "title": "Oldboy",
+    "releaseYear": 2003,
+    "status": "Watching",
+    "progress": "120 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Writ: Garon Tsuchiya",
+      "Nobuaki Minegishi",
+      "Park Chan-wook"
+    ],
+    "type": "movie",
+    "id": "mv-tnndxqan",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMTAwNzNjYWItZmI0Ni00ZTcyLWIwNWMtZjlmNGMxZTEyYTJmXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "One Piece: Baron Omatsuri and the Secret Island",
+    "releaseYear": 2005,
+    "status": "Completed",
+    "progress": "91 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Drama",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-d6rl4k7n",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1328/147315.jpg"
+  },
+  {
+    "title": "One Piece: Chopper Kingdom of Strange Animal Island",
+    "releaseYear": 2002,
+    "status": "Completed",
+    "progress": "55 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-wsvtet53",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1017/97698.jpg"
+  },
+  {
+    "title": "One Piece: Clockwork Island Adventure",
+    "releaseYear": 2001,
+    "status": "Completed",
+    "progress": "55 mins",
+    "rating": "5.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-vooitzrl",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1939/97699.jpg"
+  },
+  {
+    "title": "One Piece: Dead End Adventure",
+    "releaseYear": 2003,
+    "status": "Completed",
+    "progress": "95 mins",
+    "rating": "5.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-evadx7vo",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1100/116767.jpg"
+  },
+  {
+    "title": "One Piece: Stampede",
+    "releaseYear": 2019,
+    "status": "Completed",
+    "progress": "101 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-bop042fa",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1221/100550.jpg"
+  },
+  {
+    "title": "One Piece: The Curse of the Sacred Sword",
+    "releaseYear": 2004,
+    "status": "Completed",
+    "progress": "95 mins",
+    "rating": "5.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-uhz5pxnb",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/2/25413.jpg"
+  },
+  {
+    "title": "One Piece: The Movie",
+    "releaseYear": 2000,
+    "status": "Completed",
+    "progress": "50 mins",
+    "rating": "5.0/10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-ljw4k3xi",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1770/97704.jpg"
+  },
+  {
+    "title": "One Piece Film: Gold",
+    "releaseYear": 2016,
+    "status": "Watching",
+    "progress": "120 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-3w2803b9",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1081/137690.jpg"
+  },
+  {
+    "title": "One Piece Film: Red",
+    "releaseYear": 2022,
+    "status": "Watching",
+    "progress": "115 mins",
+    "rating": "5.0/10",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-1ts4gr0n",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1668/125323.jpg"
+  },
+  {
+    "title": "One Piece Film: Strong World",
+    "releaseYear": 2009,
+    "status": "Watching",
+    "progress": "115 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-56v4dvoq",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1192/116784.jpg"
+  },
+  {
+    "title": "One Piece Film: Z",
+    "releaseYear": 2012,
+    "status": "Watching",
+    "progress": "107 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-dpljyqcz",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/6/44297.jpg"
+  },
+  {
+    "title": "Oppenheimer",
+    "releaseYear": 2023,
+    "status": "Watching",
+    "progress": "180 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Writ: Christopher Nolan",
+      "Kai Bird",
+      "Martin Sherwin"
+    ],
+    "type": "movie",
+    "id": "mv-p8ek8duz",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtZjg3YS00NmFiLWIyZmQtZTJmNTM5MjVmYTQ4XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+  },
+  {
+    "title": "Parasite",
+    "releaseYear": 2019,
+    "status": "Watching",
+    "progress": "132 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Writ: Bong Joon Ho",
+      "Han Jin-won"
+    ],
+    "type": "movie",
+    "id": "mv-6fs5svii",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BYjk1Y2U4MjQtY2ZiNS00OWQyLWI3MmYtZWUwNmRjYWRiNWNhXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Perfect Blue",
+    "releaseYear": 1998,
+    "status": "Watching",
+    "progress": "81 mins",
+    "rating": "8.6/10",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-hf2ssoen",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1254/134212.jpg"
+  },
+  {
+    "title": "Pirates of the Caribbean: At World's End",
+    "releaseYear": 2007,
+    "status": "Watching",
+    "progress": "169 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Writ: Ted Elliott",
+      "Terry Rossio",
+      "Stuart Beattie"
+    ],
+    "type": "movie",
+    "id": "mv-c9f58kk2",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMjIyNjkxNzEyMl5BMl5BanBnXkFtZTYwMjc3MDE3._V1_QL75_UX380_CR0,0,380,562_.jpg"
+  },
+  {
+    "title": "Pirates of the Caribbean: Dead Man's Chest",
+    "releaseYear": 2006,
+    "status": "Watching",
+    "progress": "151 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Writ: Ted Elliott",
+      "Terry Rossio",
+      "Stuart Beattie"
+    ],
+    "type": "movie",
+    "id": "mv-zk8ebdcs",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMTcwODc1MTMxM15BMl5BanBnXkFtZTYwMDg1NzY3._V1_QL75_UX380_CR0,0,380,562_.jpg"
+  },
+  {
+    "title": "Pirates of the Caribbean: The Curse of the Black Pearl",
+    "releaseYear": 2003,
+    "status": "Watching",
+    "progress": "143 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Writ: Ted Elliott",
+      "Terry Rossio",
+      "Stuart Beattie"
+    ],
+    "type": "movie",
+    "id": "mv-s0xfgpw1",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNDhlMzEyNzItMTA5Mi00YWRhLThlNTktYTQyMTA0MDIyNDEyXkEyXkFqcGc@._V1_QL75_UX380_CR0,2,380,562_.jpg"
+  },
+  {
+    "title": "Re:ZERO -Starting Life in Another World- Memory Snow",
+    "releaseYear": 2018,
+    "status": "Completed",
+    "progress": "60 mins",
+    "rating": "3.0/10",
+    "genres": [
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-s6v61r1p",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1081/95707.jpg"
+  },
+  {
+    "title": "Re:ZERO -Starting Life in Another World- Memory Snow: Manner Movie",
+    "releaseYear": 2018,
+    "status": "Completed",
+    "progress": "3 mins",
+    "rating": "3.0/10",
+    "genres": [
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-xcvp4yi1",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1018/122070.jpg"
+  },
+  {
+    "title": "Re:ZERO -Starting Life in Another World- The Frozen Bond",
+    "releaseYear": 2019,
+    "status": "Completed",
+    "progress": "76 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Drama",
+      "Fantasy",
+      "Suspense"
+    ],
+    "type": "movie",
+    "id": "mv-gbixgstz",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1238/104023.jpg"
+  },
+  {
+    "title": "Re:ZERO -Starting Life in Another World- The Frozen Bond: Manner Movie",
+    "releaseYear": 2019,
+    "status": "Completed",
+    "progress": "3 mins",
+    "rating": "3.0/10",
+    "genres": [
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-67m4lsjo",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1599/106827.jpg"
+  },
+  {
+    "title": "Sekiro: No Defeat",
+    "releaseYear": 2026,
+    "status": "Watching",
+    "progress": "0 mins",
+    "rating": "N/A",
+    "genres": [
+      "anime-movie"
+    ],
+    "type": "movie",
+    "id": "mv-hnyw8s31",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1944/157379.jpg"
+  },
+  {
+    "title": "Spirited Away",
+    "releaseYear": 2001,
+    "status": "Completed",
+    "progress": "124 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Adventure",
+      "Award Winning",
+      "Fantasy"
+    ],
+    "type": "movie",
+    "id": "mv-jbm3rnj7",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/6/79597.jpg"
+  },
+  {
+    "title": "Steins;Gate: The Movie - Load Region of Déjà Vu",
+    "releaseYear": 2013,
+    "status": "Completed",
+    "progress": "90 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Drama",
+      "Sci-Fi"
+    ],
+    "type": "movie",
+    "id": "mv-jw4i2pkt",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1611/112806.jpg"
+  },
+  {
+    "title": "Stolen",
+    "releaseYear": 2023,
+    "status": "Watching",
+    "progress": "92 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Writ: Karan Tejpal",
+      "Gaurav Dhingra",
+      "Swapnil Salkar"
+    ],
+    "type": "movie",
+    "id": "mv-7nxk6e13",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BOThmMTZjMTUtMTE5OC00OTA0LWIzNjktZTA5NTBmZDc4Mjk0XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "Suzume",
+    "releaseYear": 2022,
+    "status": "Completed",
+    "progress": "121 mins",
+    "rating": "8.2/10",
+    "genres": [
+      "Adventure",
+      "Supernatural"
+    ],
+    "type": "movie",
+    "id": "mv-1oz0vaxz",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1598/128450.jpg"
+  },
+  {
+    "title": "Tenet",
+    "releaseYear": 2020,
+    "status": "Watching",
+    "progress": "150 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Writ: Christopher Nolan"
+    ],
+    "type": "movie",
+    "id": "mv-b9cvem3l",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNTIzNDIxMzktMzlkMi00MmUyLWFmMjQtZDgwMjBmOGJmNTI3XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+  },
+  {
+    "title": "The Call",
+    "releaseYear": 2020,
+    "status": "Watching",
+    "progress": "112 mins",
+    "rating": "6.0/10",
+    "genres": [
+      "Writ: Sergio Casci",
+      "Chung-Hyun Lee"
+    ],
+    "type": "movie",
+    "id": "mv-rpiomddl",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BYzZlOGEyZTMtYmIxYS00NmIxLWIwNjYtMzY3Yjg2OThjODU2XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "The Dictator",
+    "releaseYear": 2012,
+    "status": "Watching",
+    "progress": "83 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Writ: Sacha Baron Cohen",
+      "Alec Berg",
+      "David Mandel"
+    ],
+    "type": "movie",
+    "id": "mv-ekqe08tw",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BM2IwMDM3ZmQtNjQ3NS00OTFiLWI5YzEtYWE3YjI5NTk3YzkwXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "The Dreamers",
+    "releaseYear": 2003,
+    "status": "Watching",
+    "progress": "115 mins",
+    "rating": "5.0/10",
+    "genres": [
+      "Writ: Gilbert Adair"
+    ],
+    "type": "movie",
+    "id": "mv-81pi72vs",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BZmY0Y2YwZTgtZDE2Ny00ZmYzLWFhOTItNDFhZjhjMjAzNWVhXkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "The Garden of Words",
+    "releaseYear": 2013,
+    "status": "Completed",
+    "progress": "46 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Romance"
+    ],
+    "type": "movie",
+    "id": "mv-a65lyvlh",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1597/112995.jpg"
+  },
+  {
+    "title": "The Girl Who Leapt Through Time",
+    "releaseYear": 2006,
+    "status": "Completed",
+    "progress": "98 mins",
+    "rating": "4.0/10",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Romance",
+      "Sci-Fi"
+    ],
+    "type": "movie",
+    "id": "mv-vhc2q780",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1/2432.jpg"
+  },
+  {
+    "title": "The Lunchbox",
+    "releaseYear": 2013,
+    "status": "Watching",
+    "progress": "104 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Writ: Ritesh Batra",
+      "Vasan Bala"
+    ],
+    "type": "movie",
+    "id": "mv-qp06ymnl",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMTUwMzc1NjIzMV5BMl5BanBnXkFtZTgwODUyMTIxMTE@._V1_SX300.jpg"
+  },
+  {
+    "title": "The Pursuit of Happyness",
+    "releaseYear": 2006,
+    "status": "Watching",
+    "progress": "117 mins",
+    "rating": "10.0/10",
+    "genres": [
+      "Writ: Steve Conrad"
+    ],
+    "type": "movie",
+    "id": "mv-ul7x8bme",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMTQ5NjQ0NDI3NF5BMl5BanBnXkFtZTcwNDI0MjEzMw@@._V1_SX300.jpg"
+  },
+  {
+    "title": "The Shawshank Redemption",
+    "releaseYear": 1994,
+    "status": "Watching",
+    "progress": "142 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Writ: Stephen King",
+      "Frank Darabont"
+    ],
+    "type": "movie",
+    "id": "mv-899n760g",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMDAyY2FhYjctNDc5OS00MDNlLThiMGUtY2UxYWVkNGY2ZjljXkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg"
+  },
+  {
+    "title": "The Truman Show",
+    "releaseYear": 1998,
+    "status": "Watching",
+    "progress": "103 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Writ: Andrew Niccol"
+    ],
+    "type": "movie",
+    "id": "mv-g0755rva",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BNzA3ZjZlNzYtMTdjMy00NjMzLTk5ZGYtMTkyYzNiOGM1YmM3XkEyXkFqcGc@._V1_SX300.jpg"
+  },
+  {
+    "title": "The Wolf of Wall Street",
+    "releaseYear": 2013,
+    "status": "Watching",
+    "progress": "180 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Writ: Terence Winter",
+      "Jordan Belfort"
+    ],
+    "type": "movie",
+    "id": "mv-dt9lwg8t",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMjIxMjgxNTk0MF5BMl5BanBnXkFtZTgwNjIyOTg2MDE@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+  },
+  {
+    "title": "Train to Busan",
+    "releaseYear": 2016,
+    "status": "Watching",
+    "progress": "118 mins",
+    "rating": "6.0/10",
+    "genres": [
+      "Writ: Park Joo-suk",
+      "Yeon Sang-ho"
+    ],
+    "type": "movie",
+    "id": "mv-9cahfhft",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BMTkwOTQ4OTg0OV5BMl5BanBnXkFtZTgwMzQyOTM0OTE@._V1_SX300.jpg"
+  },
+  {
+    "title": "Weathering with You",
+    "releaseYear": 2019,
+    "status": "Completed",
+    "progress": "112 mins",
+    "rating": "8.0/10",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Romance",
+      "Supernatural"
+    ],
+    "type": "movie",
+    "id": "mv-ngdgjtdq",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/1880/101146.jpg"
+  },
+  {
+    "title": "Your Name.",
+    "releaseYear": 2016,
+    "status": "Completed",
+    "progress": "106 mins",
+    "rating": "9.0/10",
+    "genres": [
+      "Award Winning",
+      "Drama"
+    ],
+    "type": "movie",
+    "id": "mv-1war0lou",
+    "coverImage": "https://cdn.myanimelist.net/images/anime/5/87048.jpg"
+  },
+  {
+    "title": "Zindagi Na Milegi Dobara",
+    "releaseYear": 2011,
+    "status": "Watching",
+    "progress": "155 mins",
+    "rating": "7.0/10",
+    "genres": [
+      "Writ: Farhan Akhtar",
+      "Reema Kagti",
+      "Zoya Akhtar"
+    ],
+    "type": "movie",
+    "id": "mv-g59umtp0",
+    "coverImage": "https://m.media-amazon.com/images/M/MV5BOGIzYzg5NzItNDRkYS00NmIzLTk3NzQtZWYwY2VlZDhiYWQ4XkEyXkFqcGc@._V1_SX300.jpg"
+  }
+]

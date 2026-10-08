@@ -1,0 +1,28 @@
+{
+  "name": "order-services",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx --env-file=.env --watch src/index.ts",
+    "check-types": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@clerk/fastify": "^3.1.17",
+    "fastify": "^5.5.0",
+    "@repo/order-db": "workspace:*",
+    "@repo/kafka": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@repo/types": "workspace:*",
+    "@types/node": "^20",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}

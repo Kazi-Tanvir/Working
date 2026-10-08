@@ -1,0 +1,163 @@
+[
+  {
+    "id": "m-1",
+    "title": "Berserk",
+    "rating": "9.7/10",
+    "status": "Reading",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/1/157897.jpg",
+    "progress": "364/380 CH",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Award Winning",
+      "Drama",
+      "Fantasy",
+      "Horror"
+    ],
+    "releaseYear": 1989,
+    "type": "manga"
+  },
+  {
+    "id": "m-2",
+    "title": "Monster",
+    "rating": "10.0/10",
+    "status": "Reading",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/3/258224.jpg",
+    "progress": "0/162 CH",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Mystery"
+    ],
+    "releaseYear": 1994,
+    "type": "manga"
+  },
+  {
+    "id": "m-3",
+    "title": "Vagabond",
+    "rating": "9.6/10",
+    "status": "Reading",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/1/259070.jpg",
+    "progress": "0/327 CH",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Award Winning"
+    ],
+    "releaseYear": 1998,
+    "type": "manga"
+  },
+  {
+    "id": "m-4",
+    "title": "Goodnight Punpun",
+    "rating": "8.9/10",
+    "status": "Reading",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/3/266834.jpg",
+    "progress": "72/147 CH",
+    "genres": [
+      "Drama",
+      "Slice of Life"
+    ],
+    "releaseYear": 2007,
+    "type": "manga"
+  },
+  {
+    "title": "20th Century Boys",
+    "releaseYear": 1999,
+    "status": "Reading",
+    "progress": "0/249 CH",
+    "rating": "8.9/10",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Mystery",
+      "Sci Fi"
+    ],
+    "type": "manga",
+    "id": "m-mg9ljuul",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/5/260006.jpg"
+  },
+  {
+    "title": "Goodbye, Eri",
+    "releaseYear": 2022,
+    "status": "Completed",
+    "progress": "0/? CH",
+    "rating": "8.0/10",
+    "genres": [
+      "Drama"
+    ],
+    "type": "manga",
+    "id": "m-rc9pak6w",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/3/263979.jpg"
+  },
+  {
+    "title": "Homunculus",
+    "releaseYear": 2003,
+    "status": "Reading",
+    "progress": "0/166 CH",
+    "rating": "8.3/10",
+    "genres": [
+      "Drama",
+      "Horror",
+      "Mystery",
+      "Supernatural"
+    ],
+    "type": "manga",
+    "id": "m-rl76b31x",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/1/318.jpg"
+  },
+  {
+    "title": "Kaguya-sama: Love Is War",
+    "releaseYear": 2015,
+    "status": "Completed",
+    "progress": "0/281 CH",
+    "rating": "8.9/10",
+    "genres": [
+      "Award Winning",
+      "Comedy",
+      "Romance"
+    ],
+    "type": "manga",
+    "id": "m-t7eq8d4s",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/3/188896.jpg"
+  },
+  {
+    "title": "The Climber",
+    "releaseYear": 2007,
+    "status": "Plan to Watch",
+    "progress": "0/170 CH",
+    "rating": "8.8/10",
+    "genres": [
+      "Award Winning",
+      "Drama",
+      "Sports"
+    ],
+    "type": "manga",
+    "id": "m-q929d355",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/1/324690.jpg"
+  },
+  {
+    "title": "Three Days of Happiness",
+    "releaseYear": 2016,
+    "status": "Completed",
+    "progress": "0/18 CH",
+    "rating": "10.0/10",
+    "genres": [
+      "Drama"
+    ],
+    "type": "manga",
+    "id": "m-w4sltzv6",
+    "coverImage": "https://cdn.myanimelist.net/images/manga/5/260043.jpg"
+  },
+  {
+    "id": "m-mq5ha2n1",
+    "title": "My Brother's Slipped Inside Me in The Bathtub",
+    "rating": "7.0/10",
+    "status": "Completed",
+    "coverImage": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx114608-hbupYxBaw2Ww.jpg",
+    "progress": "0/? CH",
+    "genres": [],
+    "releaseYear": 2017,
+    "type": "manga"
+  }
+]

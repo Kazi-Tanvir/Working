@@ -1,0 +1,338 @@
+[
+  {
+    "id": "g-1",
+    "title": "Elden Ring",
+    "rating": "9.8/10",
+    "status": "Playing",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/header.jpg?t=1767883716",
+    "progress": "120 hrs",
+    "genres": [
+      "PC/Console"
+    ],
+    "releaseYear": 2022,
+    "type": "game"
+  },
+  {
+    "id": "g-mpnomem4",
+    "title": "Sekiro: Shadows Die Twice",
+    "rating": "9.0/10",
+    "status": "Plan to Watch",
+    "coverImage": "https://media.rawg.io/media/games/67f/67f62d1f062a6164f57575e0604ee9f6.jpg",
+    "progress": "0 hrs",
+    "genres": [],
+    "releaseYear": 2019,
+    "type": "game"
+  },
+  {
+    "title": "Assassin's Creed: Brotherhood",
+    "releaseYear": 2010,
+    "status": "Playing",
+    "progress": "20 hrs",
+    "rating": "8.0/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-gw0j7sno",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/48190/header.jpg?t=1681861086"
+  },
+  {
+    "title": "Assassin’s Creed® IV Black Flag™",
+    "releaseYear": 2026,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "N/A",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-kmcyn8w1",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/242050/header.jpg?t=1777052740"
+  },
+  {
+    "title": "Assassin’s Creed® Rogue",
+    "releaseYear": 2015,
+    "status": "Playing",
+    "progress": "10 hrs",
+    "rating": "7.4/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-uh07ypi0",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/311560/header.jpg?t=1751968973"
+  },
+  {
+    "title": "Boom Beach",
+    "releaseYear": 2014,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "6.1/10",
+    "genres": [
+      "Mobile"
+    ],
+    "type": "game",
+    "id": "g-8afuiyna",
+    "coverImage": "https://media.rawg.io/media/screenshots/7ff/7ff2f9307750f3fd47e6683c98f45d62.jpeg"
+  },
+  {
+    "title": "Brawl Stars",
+    "releaseYear": 2018,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "6.9/10",
+    "genres": [
+      "Mobile"
+    ],
+    "type": "game",
+    "id": "g-kj91gztk",
+    "coverImage": "https://supercell.com/images/1a5b69311180a4a1c374e10556941f05/hero_bg_brawlstars.a385872a.webp"
+  },
+  {
+    "title": "Call of Duty: Mobile",
+    "releaseYear": 2019,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "7.6/10",
+    "genres": [
+      "Mobile"
+    ],
+    "type": "game",
+    "id": "g-ja8y89a0",
+    "coverImage": "https://codm.garena.com/static/images/Main-page/P1/main-kv.jpg"
+  },
+  {
+    "title": "Clash Royale",
+    "releaseYear": 2016,
+    "status": "Playing",
+    "progress": "19 hrs",
+    "rating": "7.1/10",
+    "genres": [
+      "Mobile"
+    ],
+    "type": "game",
+    "id": "g-hnnh13yh",
+    "coverImage": "https://supercell.com/images/8654bffbaa77efb91243d3706b739c25/og_clashroyale.d235f90b.webp"
+  },
+  {
+    "title": "Clash of Clans",
+    "releaseYear": 2012,
+    "status": "Playing",
+    "progress": "167 hrs",
+    "rating": "6.6/10",
+    "genres": [
+      "Mobile"
+    ],
+    "type": "game",
+    "id": "g-zg690xr7",
+    "coverImage": "https://cdn.thegamesdb.net/images/medium/fanart/20496-1.jpg"
+  },
+  {
+    "title": "Far Cry 3",
+    "releaseYear": 2012,
+    "status": "Playing",
+    "progress": "4 hrs",
+    "rating": "8.8/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-3zw698zu",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/220240/header.jpg?t=1752169206"
+  },
+  {
+    "title": "Free Fire",
+    "releaseYear": 2017,
+    "status": "Playing",
+    "progress": "85 hrs",
+    "rating": "5.0/10",
+    "genres": [
+      "Mobile"
+    ],
+    "type": "game",
+    "id": "g-v73giceh",
+    "coverImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhuNTkGb4Y3ASToFdS8wgDbg--n2Jn3zvSog&s"
+  },
+  {
+    "title": "Genshin Impact",
+    "releaseYear": 2020,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "8.3/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-d5n4gi7o",
+    "coverImage": "https://media.rawg.io/media/games/c38/c38bdb5da139005777176d33c463d70f.jpg"
+  },
+  {
+    "title": "Ghost of Tsushima",
+    "releaseYear": 2020,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "8.3/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-n9jrwcm9",
+    "coverImage": "https://media.rawg.io/media/games/f24/f2493ea338fe7bd3c7d73750a85a0959.jpeg"
+  },
+  {
+    "title": "Ghost of Yotei",
+    "releaseYear": 2025,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "8.2/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-yhe2l4ul",
+    "coverImage": "https://media.rawg.io/media/games/30b/30b195c2321d763f807366967ffad793.jpg"
+  },
+  {
+    "title": "Grand Theft Auto IV",
+    "releaseYear": 2008,
+    "status": "Playing",
+    "progress": "10 hrs",
+    "rating": "9.5/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-3raz8k23",
+    "coverImage": "https://media.rawg.io/media/games/4a0/4a0a1316102366260e6f38fd2a9cfdce.jpg"
+  },
+  {
+    "title": "Grand Theft Auto V",
+    "releaseYear": 2013,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "9.2/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-0q2ehhma",
+    "coverImage": "https://media.rawg.io/media/games/20a/20aa03a10cda45239fe22d035c0ebe64.jpg"
+  },
+  {
+    "title": "Hay Day",
+    "releaseYear": 2012,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "7.2/10",
+    "genres": [
+      "Mobile"
+    ],
+    "type": "game",
+    "id": "g-qa06j4v8",
+    "coverImage": "https://media.rawg.io/media/screenshots/423/423e4613b95924ee000b6883188e3e2e.jpg"
+  },
+  {
+    "title": "Hollow Knight",
+    "releaseYear": 2017,
+    "status": "Playing",
+    "progress": "20 hrs",
+    "rating": "8.7/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-zs4m57mc",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/367520/3c3489495136b26b34f8a9543c7f5645b99d388c/header.jpg?t=1776125684"
+  },
+  {
+    "title": "Hollow Knight: Silksong",
+    "releaseYear": 2025,
+    "status": "Playing",
+    "progress": "120 hrs",
+    "rating": "10.0/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-klabizpp",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1030300/7983574d464e6559ac7e24275727f73a8bcca1f3/header.jpg?t=1776125736"
+  },
+  {
+    "title": "PUBG Mobile",
+    "releaseYear": 2018,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "6.8/10",
+    "genres": [
+      "Mobile"
+    ],
+    "type": "game",
+    "id": "g-hjrnhil1",
+    "coverImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJqbvQWD0IX_UXsai31QKFzaOrkEmrO4H5iQ&s"
+  },
+  {
+    "title": "Red Dead Redemption",
+    "releaseYear": 2024,
+    "status": "Playing",
+    "progress": "50 hrs",
+    "rating": "7.0/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-3xeqoza3",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2668510/header.jpg?t=1741118459"
+  },
+  {
+    "title": "Red Dead Redemption 2",
+    "releaseYear": 2019,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "9.3/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-tzqbm2kf",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/header.jpg?t=1759502961"
+  },
+  {
+    "title": "Sekiro™: Shadows Die Twice - GOTY Edition",
+    "releaseYear": 2019,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "8.8/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-37pcaoos",
+    "coverImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/814380/header.jpg?t=1762888662"
+  },
+  {
+    "title": "The Witcher 2: Assassins of Kings",
+    "releaseYear": 2011,
+    "status": "Playing",
+    "progress": "8 hrs",
+    "rating": "8.9/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-e3yi10ll",
+    "coverImage": "https://images.gog-statics.com/8355e657a19311b158a3553a154e109199d6991c7791a20c3305af1f84d15ed7_product_card_v2_mobile_slider_639.jpg"
+  },
+  {
+    "title": "The Witcher 3: Wild Hunt",
+    "releaseYear": 2015,
+    "status": "Playing",
+    "progress": "0 hrs",
+    "rating": "9.2/10",
+    "genres": [
+      "PC/Console"
+    ],
+    "type": "game",
+    "id": "g-l7ia0p26",
+    "coverImage": "https://media.rawg.io/media/games/618/618c2031a07bbff6b4f611f10b6bcdbc.jpg"
+  }
+]

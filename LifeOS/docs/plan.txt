@@ -1,0 +1,110 @@
+I WANT to make a centralized command center of the given things 
+0. DashBoard
+1. ACADEMIC
+2. ENTERTAINMENT TRACKING
+3. PROJECT 
+4. FINANCE
+5. MEDIA CONSUMTION 
+
+====================================
+0. DASHBOARD 
+====================================
+1. quick overview of all the sections
+2. quick stats for each section
+3. quick links to each section
+4. quick actions for each section
+
+====================================
+1. ACADEMIC 
+====================================
+Parts that i want 
+- Tracker 
+    - Exam - Syllabus , Date , Result 
+    - Class - Date
+    - Assignments - Topic ,Deadline
+- Material Collection 
+    - Lecture Sheet 
+    - Book 
+    - Notes 
+    - Previous Question 
+    - Source Material 
+-Personal Notes 
+    - Hard copy -scan-> Digital 
+    - Direct digital (Currently in Obsidian)
+- Codes Collection 
+    - Github [Near Perfect for now]
+
+====================================
+2. ENTERTAINMENT TRACKING
+====================================
+- externally connect ot shinDB [i will of some way to effieciently connect them]
+- Track anime , anime movies , series , movies , manga , pc games and mobile games 
+- Completed , Ongoing , Plan to Consume , Dropped , On Hold
+- show stats for total watchtime , average score , total count and few other stats 
+- get the ongoing media specially for showcase in DashBoard or somewere 
+
+====================================
+3. PROJECT TRACKING
+====================================
+Tracks : Project (Current state if the porject and progress)
+Notes : - Project PRD , Documentation [ only necessary part] , Error [relevant ones chosen manually]
+
+====================================
+4. FINANCE TRACKING
+====================================
+Data source : Cashew app export (CSV)
+Currency    : BDT
+
+-- Accounts --
+    - CASH
+    - BKASH
+    - SAVINGS
+    - show balance per account + total net worth
+
+-- Income --
+    Sources i track : Mother , Father , APU , Fahima , Savings (interest/return) , misc
+    - Monthly income breakdown by source
+    - running total for the month
+
+-- Expenses by Category --
+    Core expenses (fixed / heavy)
+        - Rent
+        - Chef (cook cost)
+        - Electricity
+        - Water
+    Groceries
+        - Food (chicken , rice , eggs , oil etc)
+        - Snacks
+        - Chef (ingredients bought for cook)
+    Travel
+        - In Dhaka (metro , rickshaw , cng)
+        - Out Dhaka (bus , train , long trip)
+    Education
+        - Stationary (pen , notebook , admit card)
+        - Books / Print
+        - Application fees (BUET , KUET , RUET , DU , SUST , MIST etc)
+        - Courses
+    Shopping (clothes , hoodie etc)
+    Other
+        - Recharge (phone top-up - Ammu , Abbu , Tamim , Tanvir etc)
+        - Bkashout fees
+        - Medicine
+        - Misc (laundry , weight etc)
+
+-- Views i want --
+    - Monthly summary : total income , total expense , savings delta
+    - Category breakdown for current month (bar or simple list)
+    - Per-account spending (where is money going from which account)
+    - Recent transactions feed (last 20-30 , filterable by category)
+    - Balance Correction entries should be hidden from normal views [internal transfers only]
+
+-- Notes --
+    - Balance Correction = internal transfers between accounts , NOT real income/expense
+    - Recharge under Other = mobile top-up for family mostly , not personal expense
+    - Some Core expense entries appear under SAVINGS directly (rent , chef paid from savings)
+    - there should be notes option inside each transactions [like in cashew]
+    
+====================================
+99. GLOBAL NOTES 
+====================================
+

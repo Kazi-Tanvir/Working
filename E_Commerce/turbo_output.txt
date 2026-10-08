@@ -1,0 +1,49 @@
+﻿
+   ΓÇó Packages in scope: @repo/eslint-config, @repo/typescript-config, admin, client, order-services, payment-services, product-services
+   ΓÇó Running dev in 7 packages
+   ΓÇó Remote caching disabled
+
+product-services:dev: cache bypass, force executing db5398410b24a87a
+order-services:dev: cache bypass, force executing 333a938efed286f7
+admin:dev: cache bypass, force executing 9940d0fb3e52c2e9
+client:dev: cache bypass, force executing f8b366b146921f4f
+payment-services:dev: cache bypass, force executing bbe2c7b3d151d324
+client:dev: 
+product-services:dev: 
+client:dev: > client@0.1.0 dev D:\02_CODE\04_TEST\e-commerce\apps\client
+product-services:dev: > product-services@1.0.0 dev D:\02_CODE\04_TEST\e-commerce\apps\product-services
+client:dev: > next dev --turbopack --port 3002
+product-services:dev: > pnpm dlx tsx --env-file=.env --watch src/index.ts
+client:dev: 
+product-services:dev: 
+admin:dev: 
+admin:dev: > admin@0.1.0 dev D:\02_CODE\04_TEST\e-commerce\apps\admin
+admin:dev: > next dev --turbopack --port 3003
+admin:dev: 
+payment-services:dev: 
+payment-services:dev: > payment-services@ dev D:\02_CODE\04_TEST\e-commerce\apps\payment-services
+payment-services:dev: > tsx --env-file=.env --watch src/index.ts
+payment-services:dev: 
+order-services:dev: 
+order-services:dev: > order-services@1.0.0 dev D:\02_CODE\04_TEST\e-commerce\apps\order-services
+order-services:dev: > pnpm dlx tsx --env-file=.env --watch src/index.ts
+order-services:dev: 
+payment-services:dev: Payment service is running on port 8002
+product-services:dev: Product service is running on port 8000
+order-services:dev: Order service is running on port 8001
+admin:dev:    Γû▓ Next.js 15.3.0 (Turbopack)
+admin:dev:    - Local:        http://localhost:3003
+admin:dev:    - Network:      http://192.168.0.192:3003
+admin:dev: 
+admin:dev:  Γ£ô Starting...
+client:dev:    Γû▓ Next.js 15.4.5 (Turbopack)
+client:dev:    - Local:        http://localhost:3002
+client:dev:    - Network:      http://192.168.0.192:3002
+client:dev: 
+client:dev:  Γ£ô Starting...
+admin:dev:  Γ£ô Ready in 2.5s
+client:dev:  Γ£ô Ready in 2.5s
+payment-services:dev: Restarting 'src/index.ts'
+payment-services:dev: Payment service is running on port 8002
+payment-services:dev: Restarting 'src/index.ts'
+payment-services:dev: Payment service is running on port 8002

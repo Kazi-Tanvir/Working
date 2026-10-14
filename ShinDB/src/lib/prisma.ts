@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
+// PrismaClient singleton instance for Next.js App Router
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };

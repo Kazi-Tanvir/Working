@@ -10,10 +10,15 @@ const CreateTrackSchema = z.object({
   type: z.enum(["anime", "manga", "game", "movie", "series"]),
   releaseYear: z.union([z.number(), z.string()]).optional(),
   coverImage: z.string().optional(),
-  rating: z.string().optional(),
+  rating: z.union([z.string(), z.number()]).optional(),
   status: z.string().optional(),
   progress: z.string().optional(),
   genres: z.array(z.string()).optional(),
+  seasons: z.array(z.any()).optional(),
+  currentSeason: z.number().optional(),
+  progressCurrent: z.number().optional(),
+  notes: z.string().optional(),
+  isFavorite: z.boolean().optional(),
 });
 
 const UpdateTrackSchema = CreateTrackSchema.partial().extend({
@@ -32,9 +37,10 @@ function normalizeStatusInput(status: string | undefined, type: MediaType): Medi
   return "watching";
 }
 
-function parseRatingInput(rating?: string): number | null {
-  if (!rating || rating === "N/A") return null;
-  const num = parseFloat(rating.split("/")[0]);
+function parseRatingInput(rating?: string | number): number | null {
+  if (rating === undefined || rating === null || rating === "N/A" || rating === "Unrated") return null;
+  if (typeof rating === "number") return Math.min(10, Math.max(0, rating));
+  const num = parseFloat(String(rating).split("/")[0]);
   return isNaN(num) ? null : Math.min(10, Math.max(0, num));
 }
 
@@ -51,16 +57,30 @@ function parseProgressInput(
 
   if (!progress) return { progressCurrent: 0, progressTotal: null, progressUnit: unit };
 
+  // 1. Structured total parenthetical e.g. "(16/32 Total)"
+  const totalMatch = progress.match(/\((\d+)\/(\d+)\s+Total\)/i);
+  if (totalMatch) {
+    return {
+      progressCurrent: parseInt(totalMatch[1], 10) || 0,
+      progressTotal: parseInt(totalMatch[2], 10) || null,
+      progressUnit: unit,
+    };
+  }
+
+  // 2. Standard ratio e.g. "8/8 EP" or "S1: 8/8"
   if (progress.includes("/")) {
     const [curr, tot] = progress.split("/");
+    const numCurr = curr.match(/\d+/g);
+    const lastCurr = numCurr ? numCurr[numCurr.length - 1] : "0";
     const totalMatch = tot.match(/\d+/);
     return {
-      progressCurrent: parseInt(curr, 10) || 0,
+      progressCurrent: parseInt(lastCurr, 10) || 0,
       progressTotal: totalMatch ? parseInt(totalMatch[0], 10) : null,
       progressUnit: unit,
     };
   }
 
+  // 3. S1E08 pattern
   const seMatch = progress.match(/S(\d+)E(\d+)/i);
   if (seMatch) {
     return {
@@ -70,8 +90,9 @@ function parseProgressInput(
     };
   }
 
+  const numMatch = progress.match(/\d+/);
   return {
-    progressCurrent: parseInt(progress, 10) || 0,
+    progressCurrent: numMatch ? parseInt(numMatch[0], 10) : 0,
     progressTotal: null,
     progressUnit: unit,
   };
@@ -142,8 +163,22 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { id, type, status, progress, rating, title, releaseYear, genres, coverImage } =
-      parsed.data;
+    const {
+      id,
+      type,
+      status,
+      progress,
+      progressCurrent,
+      rating,
+      title,
+      releaseYear,
+      genres,
+      coverImage,
+      seasons,
+      currentSeason,
+      notes,
+      isFavorite,
+    } = parsed.data;
 
     const existing = await prisma.mediaEntry.findUnique({
       where: { id },
@@ -156,19 +191,39 @@ export async function PUT(request: NextRequest) {
     const mediaType = (type as MediaType) || existing.type;
     const prog = progress !== undefined ? parseProgressInput(progress, mediaType) : undefined;
 
+    // Structured season calculation
+    let calculatedWatched = existing.progressCurrent;
+    let validatedSeasons: any = undefined;
+    if (Array.isArray(seasons)) {
+      validatedSeasons = seasons.map((s: any) => ({
+        seasonNumber: Number(s.seasonNumber) || 1,
+        title: s.title || `Season ${s.seasonNumber}`,
+        episodeCount: Math.max(0, Number(s.episodeCount) || 0),
+        episodesWatched: Math.max(0, Math.min(Number(s.episodeCount) || 0, Number(s.episodesWatched) || 0)),
+        isCompleted: Boolean(s.isCompleted || (s.episodeCount > 0 && s.episodesWatched >= s.episodeCount)),
+      }));
+      calculatedWatched = (validatedSeasons as any[]).reduce((sum, s) => sum + s.episodesWatched, 0);
+    } else if (progressCurrent !== undefined) {
+      calculatedWatched = Math.max(0, existing.progressTotal ? Math.min(existing.progressTotal, progressCurrent) : progressCurrent);
+    } else if (prog !== undefined) {
+      calculatedWatched = prog.progressCurrent;
+    }
+
     const updated = await prisma.mediaEntry.update({
       where: { id },
       data: {
         ...(title !== undefined && { title: title.trim() }),
         ...(status !== undefined && { status: normalizeStatusInput(status, mediaType) }),
         ...(rating !== undefined && { rating: parseRatingInput(rating) }),
-        ...(prog !== undefined && {
-          progressCurrent: prog.progressCurrent,
-          ...(prog.progressTotal !== null && { progressTotal: prog.progressTotal }),
-        }),
+        progressCurrent: calculatedWatched,
+        ...(prog?.progressTotal !== undefined && prog.progressTotal !== null && { progressTotal: prog.progressTotal }),
+        ...(validatedSeasons !== undefined && { seasons: validatedSeasons }),
+        ...(currentSeason !== undefined && { currentSeason }),
         ...(releaseYear !== undefined && { releaseYear: Number(releaseYear) }),
         ...(genres !== undefined && { genres }),
         ...(coverImage !== undefined && { coverImage }),
+        ...(notes !== undefined && { notes }),
+        ...(isFavorite !== undefined && { isFavorite }),
       },
     });
 
@@ -201,3 +256,26 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Failed to delete entry" }, { status: 500 });
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get("type") as MediaType | null;
+
+    const entries = await prisma.mediaEntry.findMany({
+      where: {
+        ...(type ? { type } : {}),
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return NextResponse.json({
+      success: true,
+      items: entries.map(toMediaItem),
+    });
+  } catch (error) {
+    console.error("[TRACK_API_GET]", error);
+    return NextResponse.json({ success: false, error: "Failed to fetch entries" }, { status: 500 });
+  }
+}
+

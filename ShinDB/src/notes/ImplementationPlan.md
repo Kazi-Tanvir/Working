@@ -272,7 +272,9 @@ During pre-development review, all specification documents were audited and unif
 | `GET /entries/favorites` | Favorites list |
 | `GET /recent` | Currently active + recently completed |
 | `GET /export` | JSON export of all entries |
+| `POST /api/track/sync` | Metadata sync for airing/unannounced entries (single or batch) |
 | **Supporting** | |
+| Airing Sync Engine | Multi-tier metadata provider (Kitsu REST, TVmaze) with retry HTTPS agent for updating unknown episode/chapter totals |
 | Activity log | Automatic logging on create, update, delete, restore, progress, favorite |
 | Progress history | Automatic logging on progress changes |
 | Error handler | Global error handler returning `ErrorResponse` format |
@@ -280,7 +282,7 @@ During pre-development review, all specification documents were audited and unif
 | Unit tests | Zod schema validation (valid + invalid inputs) |
 | Integration tests | CRUD operations against test database |
 
-**Exit Criteria**: All tracker endpoints work via REST client (Postman/Thunder Client). CRUD, progress, favorites, stats, and export verified.
+**Exit Criteria**: All tracker endpoints work via REST client (Postman/Thunder Client). CRUD, progress, favorites, stats, sync, and export verified.
 
 ---
 
@@ -385,6 +387,7 @@ During pre-development review, all specification documents were audited and unif
 |------|---------|
 | **Shared media list page** | Unified `MediaCollectionView` component used by all 5 routes (`/anime`, `/manga`, `/movies`, `/series`, `/games`) |
 | Page header | Category icon, title, result count, toolbar |
+| Airing sync button | `[🔄 Sync Airing]` button in toolbar — batch checks external APIs for items with unknown totals (`progressTotal: null`) |
 | Filter pills | Status-based filters, accent-colored active state |
 | Sort dropdown | Title, rating, date added, progress, year — with direction toggle |
 | Search input | Inline text search (client-side filter on title) |
@@ -392,11 +395,12 @@ During pre-development review, all specification documents were audited and unif
 | Lazy loading | IntersectionObserver for loading entries in batches of 50 |
 | Virtual scrolling | `react-window` for large collections (200+ entries) |
 | **Card interactions** | |
-| Click poster | Open Quick Edit Modal |
+| Click poster | Open Quick Edit Modal (`MediaModal`) |
 | [+1] button | Increment progress (optimistic update + toast) |
 | Auto-complete | When progress reaches total, auto-set status to "completed" |
 | **Quick Edit Modal** | |
 | Modal component | Overlay with entry details, editable fields |
+| Sync Metadata button | `[🔄 Sync Metadata]` in header & view actions + inline `Sync Airing` prompt on unknown total (`?`) |
 | Status dropdown | Type-appropriate status options |
 | Rating selector | 0-10 integer buttons |
 | Progress input | Current/total with +/- buttons, progress bar |

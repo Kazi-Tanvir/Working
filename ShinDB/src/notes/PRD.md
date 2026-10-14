@@ -188,6 +188,13 @@ The core of ShinDB. Users can track media entries across 5 types, each with type
 | **Update** | `PUT /media/entries/:id` | Update any entry fields |
 | **Delete** | `DELETE /media/entries/:id` | Remove entry permanently |
 | **Progress** | `PATCH /media/entries/:id/progress` | Increment or set progress |
+| **Sync Metadata** | `POST /api/track/sync` | Sync airing / unannounced entries with external databases (Kitsu, TVmaze) |
+
+#### Airing & Announced Metadata Sync
+When media (especially anime, manga, or TV series) is added while currently airing or newly announced, total episode/chapter counts are unknown (`progressTotal: null`, rendered as `0/? EP`). ShinDB features an active metadata synchronization engine:
+- **Single-Entry Sync**: Triggered on demand via `[🔄 Sync Metadata]` in the `MediaModal` or inline via the `Sync Airing` prompt on indeterminate progress cards.
+- **Batch Airing Sync**: Triggered via `[🔄 Sync Airing]` in the category toolbar (`MediaCollectionView`). Automatically queries external database records for all items where `progressTotal === null` and updates the database records once the show concludes or the count is officially published.
+- **External Data Providers**: Multi-tier fallback incorporating Kitsu REST API (anime/manga) and TVmaze (series) with retry agents and graceful error handling.
 
 ---
 

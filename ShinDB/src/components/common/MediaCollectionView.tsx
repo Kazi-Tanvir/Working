@@ -14,6 +14,7 @@ import {
   Plus,
   ChevronsUpDown,
   X,
+  RefreshCw,
 } from "lucide-react";
 import MediaCard, { MediaItem } from "@/components/common/MediaCard";
 import CreateMediaModal from "@/components/common/CreateMediaModal";
@@ -59,7 +60,7 @@ const CATEGORY_CONFIG: Record<MediaCategoryType, CategoryConfig> = {
     accentText: "text-cyber-green",
     activePillClass: "bg-cyber-green text-black border-cyber-green",
     drawerShadow: "shadow-[2px_2px_0px_0px_var(--cyber-green)]",
-    gridCols: "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7",
+    gridCols: "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6",
     statuses: ["all", "playing", "completed", "plan to play", "on hold", "dropped"],
     icon: <Gamepad2 className="w-4 h-4 text-cyber-green" />,
   },
@@ -99,6 +100,50 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
   const [showFilterDrawer, setShowFilterDrawer] = useState(true);
   const [showSearchDrawer, setShowSearchDrawer] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isBatchSyncing, setIsBatchSyncing] = useState(false);
+
+  const handleBatchSync = async () => {
+    setIsBatchSyncing(true);
+    try {
+      const res = await fetch("/api/track/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Batch sync failed.");
+      }
+
+      if (data.updatedCount > 0) {
+        showToast(
+          `✓ ${data.message || `Updated ${data.updatedCount} airing item(s) from external API`}`,
+          "success"
+        );
+        const refreshed = await fetch(`/api/track?type=${type}`).then((r) => r.json());
+        if (refreshed.success && refreshed.items) {
+          setItems(refreshed.items);
+        }
+      } else {
+        showToast("ℹ Airing logs checked: External databases have no newer counts yet.", "info");
+      }
+    } catch (err: any) {
+      showToast(err.message || "Failed to sync airing entries", "error");
+    } finally {
+      setIsBatchSyncing(false);
+    }
+  };
+
+  // Synchronize client items state whenever server revalidates initialItems
+  React.useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
+
+  const handleItemUpdate = (updatedItem: MediaItem) => {
+    setItems((prev) =>
+      prev.map((item) => (item.id === updatedItem.id ? updatedItem : item))
+    );
+  };
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     const prevItems = [...items];
@@ -119,23 +164,10 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
     }
   };
 
-  const handleProgressChange = async (id: string, newProgress: string) => {
-    const prevItems = [...items];
+  const handleProgressChange = (id: string, newProgress: string) => {
     setItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, progress: newProgress } : item))
     );
-
-    try {
-      const res = await fetch("/api/track", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, type, progress: newProgress }),
-      });
-      if (!res.ok) throw new Error("Failed to update progress");
-    } catch {
-      setItems(prevItems);
-      showToast("Failed to sync progress update", "error");
-    }
   };
 
   const cycleSort = () => {
@@ -181,6 +213,20 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
         </div>
 
         <div className="flex items-center gap-3.5">
+          {(type === "anime" || type === "manga" || type === "series") && (
+            <button
+              onClick={handleBatchSync}
+              disabled={isBatchSyncing}
+              className={`flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer ${
+                isBatchSyncing ? "text-cyber-purple font-bold" : ""
+              }`}
+              title="Scan and auto-sync total episodes/chapters for airing or unannounced entries from external databases"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isBatchSyncing ? "animate-spin" : ""}`} />
+              <span>{isBatchSyncing ? "Syncing..." : "Sync Airing"}</span>
+            </button>
+          )}
+
           <button
             onClick={cycleSort}
             className={`flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer ${
@@ -275,6 +321,7 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
               item={item}
               onStatusChange={handleStatusChange}
               onProgressChange={handleProgressChange}
+              onItemUpdate={handleItemUpdate}
             />
           ))}
         </div>

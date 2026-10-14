@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { 
   X, 
   Plus, 
@@ -76,6 +77,13 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType }: Creat
       };
     }
   }, [isOpen, onClose]);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   // Set type-specific defaults when type changes
   useEffect(() => {
@@ -213,7 +221,7 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType }: Creat
 
   const aspectClass = type === "game" ? "aspect-video md:aspect-[16/10]" : "aspect-[2/3]";
 
-  return (
+  return createPortal(
     <div 
       onClick={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md select-none transition-all duration-300"
@@ -425,6 +433,7 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType }: Creat
         </form>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

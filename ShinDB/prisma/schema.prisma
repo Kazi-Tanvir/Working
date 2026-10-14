@@ -44,10 +44,16 @@ model MediaEntry {
   genres          Json
   // Structured numeric rating (0.0 to 10.0, null if unrated / "N/A")
   rating          Float?
+  // External verified rating (IMDb, TMDB, MAL out of 10)
+  externalRating  Float?
   // Structured numeric progress (replaces "18/28 EP" and "S1E06" regex parsing)
   progressCurrent Int           @default(0)
   progressTotal   Int?
   progressUnit    ProgressUnit  @default(ep)
+  // Structured season breakdown for multi-season series and anime:
+  // Array of { seasonNumber: number, title?: string, episodeCount: number, episodesWatched: number, isCompleted: boolean }
+  seasons         Json?
+  currentSeason   Int           @default(1)
   // Extended tracking metadata
   notes           String?       @db.Text
   isFavorite      Boolean       @default(false)

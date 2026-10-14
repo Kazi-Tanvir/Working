@@ -2,6 +2,13 @@
 import { prisma } from "@/lib/prisma";
 import { MediaType, MediaEntry } from "@prisma/client";
 import { MediaItem } from "@/components/common/MediaCard";
+import {
+  SeasonData,
+  generateDefaultSeasons,
+  getActiveSeasonNumber,
+  formatStructuredProgress,
+  getCanonicalExternalRating,
+} from "@/utils/seasonHelpers";
 
 // Convert Prisma MySQL model to UI MediaItem interface
 export function toMediaItem(entry: MediaEntry): MediaItem {
@@ -20,12 +27,41 @@ export function toMediaItem(entry: MediaEntry): MediaItem {
         : "Plan to Watch",
   };
 
+  // Structured seasons resolution
+  let parsedSeasons: SeasonData[] | undefined = undefined;
+  if (Array.isArray(entry.seasons) && entry.seasons.length > 0) {
+    parsedSeasons = entry.seasons as unknown as SeasonData[];
+  } else if (entry.type === "series") {
+    parsedSeasons = generateDefaultSeasons(entry.title, entry.progressTotal, entry.progressCurrent);
+  }
+
+  // Calculate structured progress
   let progressStr = `${entry.progressCurrent} ${entry.progressUnit}`;
-  if (entry.type === "anime" || entry.type === "manga") {
+  let currentSeason = entry.currentSeason || 1;
+
+  if (parsedSeasons && parsedSeasons.length > 0) {
+    currentSeason = getActiveSeasonNumber(parsedSeasons, entry.currentSeason);
+    progressStr = formatStructuredProgress(
+      parsedSeasons,
+      currentSeason,
+      entry.progressCurrent,
+      entry.progressTotal,
+      entry.progressUnit
+    );
+  } else if (entry.type === "anime" || entry.type === "manga") {
     const total = entry.progressTotal ?? "?";
     progressStr = `${entry.progressCurrent}/${total} ${entry.progressUnit.toUpperCase()}`;
   } else if (entry.type === "series") {
-    progressStr = `S1E${String(entry.progressCurrent).padStart(2, "0")}`;
+    const total = entry.progressTotal ?? "?";
+    progressStr = `${entry.progressCurrent}/${total} EP`;
+  }
+
+  // External rating resolution
+  let externalRatingFormatted: string | null = null;
+  const canonicalExt = entry.externalRating ?? getCanonicalExternalRating(entry.title);
+  if (canonicalExt !== null && canonicalExt !== undefined) {
+    const sourceLabel = entry.type === "anime" || entry.type === "manga" ? "MAL" : "IMDb";
+    externalRatingFormatted = `${sourceLabel} ${canonicalExt.toFixed(1)}/10`;
   }
 
   // Safely parse MySQL JSON column into string[]
@@ -38,11 +74,19 @@ export function toMediaItem(entry: MediaEntry): MediaItem {
     title: entry.title,
     type: entry.type,
     status: statusDisplayMap[entry.status] || "Plan to Watch",
-    rating: entry.rating !== null ? `${entry.rating.toFixed(1)}/10` : "N/A",
+    rating: entry.rating !== null ? `${entry.rating.toFixed(1)}/10` : "Unrated",
+    externalRating: externalRatingFormatted,
     progress: progressStr,
+    progressCurrent: entry.progressCurrent,
+    progressTotal: entry.progressTotal,
+    progressUnit: entry.progressUnit,
+    currentSeason,
+    seasons: parsedSeasons,
     coverImage: entry.coverImage,
     genres: parsedGenres,
     releaseYear: entry.releaseYear,
+    notes: entry.notes || "",
+    isFavorite: entry.isFavorite,
   };
 }
 

@@ -3,7 +3,7 @@
 > **Version**: 1.0.0-draft  
 > **Last Updated**: 2026-06-14  
 > **Status**: Draft  
-> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md) · [DESIGN.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md) · [SYS_Tracker.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/SYS_Tracker.md)
+> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) · [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md) · [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md)
 
 ---
 
@@ -99,7 +99,7 @@ Relaxed strict mode for v1.0 — prioritizing development velocity over exhausti
 
 ### Monorepo Structure
 
-ShinDB is a **Turborepo-powered monorepo** with 6 deployable apps and 6 shared packages. The complete folder structure is documented in [SYS_Tracker.md §4](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/SYS_Tracker.md#L315).
+ShinDB is a **Turborepo-powered monorepo** with 6 deployable apps and 6 shared packages. The complete folder structure is documented in [SYS_Tracker.md §4](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md#L315).
 
 ```
 sys-tracker/
@@ -1809,4 +1809,4 @@ NODE_ENV="development"
 
 ---
 
-> **This TechSpec is the engineering companion to the [PRD](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md). It should be updated whenever architectural decisions change, and serves as the reference for all implementation work.**
+> **This TechSpec is the engineering companion to the [PRD](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md). It should be updated whenever architectural decisions change, and serves as the reference for all implementation work.**

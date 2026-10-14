@@ -1,6 +1,6 @@
 # ShinDB — Tracker
 
-> **Last Updated**: 2026-06-14
+> **Last Updated**: 2026-10-14
 
 ---
 
@@ -13,7 +13,8 @@
 - [x] Schema.md
 - [x] ImplementationPlan.md
 - [x] Tracker.md
-- [ ] Rules.md
+- [x] Rules.md
+- [x] Architecture Harmonization Pass (all 8 spec documents synchronized: ShinDB brand, Hono runtime, Prisma 6-model schema, and link integrity)
 
 ---
 

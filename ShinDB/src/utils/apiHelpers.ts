@@ -1,5 +1,7 @@
-import fs from "fs/promises";
-import path from "path";
+import { prisma } from "@/lib/prisma";
+import { MediaType } from "@prisma/client";
+import { toMediaItem } from "@/lib/media";
+
 
 export interface SearchResultItem {
   id: string;
@@ -168,47 +170,45 @@ function queryFallbackMock(query: string, type?: string): SearchResultItem[] {
 // LOCAL JSON DATABASE SEARCH HELPER
 // ----------------------------------------------------
 async function searchLocalDatabase(query: string, type: string): Promise<SearchResultItem[]> {
-  const collections = ["anime", "manga", "games", "movies", "series"];
-  const normQuery = query.toLowerCase().trim();
-  const results: SearchResultItem[] = [];
+  const normQuery = query.trim();
+  const validTypes = ["anime", "manga", "game", "movie", "series"];
+  const typeFilter =
+    type !== "all" && validTypes.includes(type.toLowerCase())
+      ? (type.toLowerCase() as MediaType)
+      : undefined;
 
-  for (const col of collections) {
-    let colType: 'anime' | 'manga' | 'game' | 'movie' | 'series' = 'anime';
-    if (col === "games") colType = "game";
-    else if (col === "series") colType = "series";
-    else if (col === "movies") colType = "movie";
-    else if (col === "manga") colType = "manga";
+  try {
+    // Note: MySQL default collation (utf8mb4_0900_ai_ci) is case-insensitive automatically
+    const entries = await prisma.mediaEntry.findMany({
+      where: {
+        ...(typeFilter && { type: typeFilter }),
+        title: {
+          contains: normQuery,
+        },
+      },
+      take: 8,
+      orderBy: { updatedAt: "desc" },
+    });
 
-    if (type !== "all" && type.toLowerCase() !== colType) {
-      continue;
-    }
-
-    try {
-      const filePath = path.join(process.cwd(), "src", "database", `${col}.json`);
-      const fileContent = await fs.readFile(filePath, "utf-8");
-      const items = JSON.parse(fileContent);
-
-      for (const item of items) {
-        if (item.title.toLowerCase().includes(normQuery)) {
-          results.push({
-            id: `local-${colType}-${item.id}`,
-            title: item.title,
-            type: colType,
-            releaseYear: String(item.releaseYear),
-            coverImage: item.coverImage,
-            rating: item.rating,
-            isLocal: true,
-            localStatus: item.status
-          });
-        }
-      }
-    } catch (e) {
-      console.warn(`[SYS_WARN] Local database lookup failed for col ${col}:`, e);
-    }
+    return entries.map((entry) => {
+      const uiItem = toMediaItem(entry);
+      return {
+        id: `local-${entry.type}-${entry.id}`,
+        title: uiItem.title,
+        type: uiItem.type,
+        releaseYear: String(uiItem.releaseYear),
+        coverImage: uiItem.coverImage,
+        rating: uiItem.rating !== "N/A" ? uiItem.rating : undefined,
+        isLocal: true,
+        localStatus: uiItem.status,
+      };
+    });
+  } catch (e) {
+    console.warn("[SYS_WARN] Local MySQL lookup failed:", e);
+    return [];
   }
-
-  return results;
 }
+
 
 // ----------------------------------------------------
 // ANILIST INTEGRATION (Anime & Manga)

@@ -95,18 +95,18 @@ ShinDB is a **centralized, self-hostable personal media tracker** that unifies a
 
 ### Design Identity
 
-ShinDB uses the **"Obsidian Terminal"** design language — a cyberpunk-inspired, dark-mode-only interface that feels like a personal command console for archiving media. The full design system is documented in [DESIGN.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md).
+ShinDB uses the **"Obsidian Terminal"** design language — a cyberpunk-inspired, dark-mode-only interface that feels like a personal command console for archiving media. The full design system is documented in [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md).
 
 ### Technical Architecture
 
-ShinDB is built as a **Turborepo-powered monorepo** with microservices architecture. The complete architecture is documented in [SYS_Tracker.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/SYS_Tracker.md).
+ShinDB is built as a **Turborepo-powered monorepo** with microservices architecture. The complete architecture is documented in [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md).
 
 | Layer | Technology |
 |-------|-----------|
 | **Frontend** | Next.js (App Router) |
-| **API Gateway** | Express/Hono |
+| **API Gateway** | Hono |
 | **Backend Services** | 4 microservices (auth, tracker, user, search) |
-| **Database** | PostgreSQL (Drizzle ORM) |
+| **Database** | PostgreSQL (Prisma ORM) |
 | **Cache** | Redis (sessions + search cache) |
 | **Package Manager** | pnpm (workspaces) |
 | **Build System** | Turborepo |
@@ -481,9 +481,9 @@ interface SearchResult {
 ### Database
 
 - **Engine**: PostgreSQL 16+
-- **ORM**: Drizzle ORM
-- **Migrations**: Drizzle Kit (auto-generated from schema)
-- **Schema**: Defined in `@sys-tracker/db` package (see [SYS_Tracker.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/SYS_Tracker.md) §3.5 for ER diagram)
+- **ORM**: Prisma 6.x
+- **Migrations**: Prisma Migrate (auto-generated from schema)
+- **Schema**: Defined in `@sys-tracker/db` package (see [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md) §3.5 for ER diagram)
 
 ### Key Tables
 
@@ -614,7 +614,7 @@ The v1.0 release is considered **ready** when ALL of the following are true:
 | Task | Details |
 |------|---------|
 | Turborepo scaffold | Initialize monorepo, create all app/package directories |
-| Database setup | PostgreSQL via Docker, Drizzle schema, migrations |
+| Database setup | PostgreSQL via Docker, Prisma schema, migrations |
 | `@sys-tracker/types` | Define all shared TypeScript types |
 | `@sys-tracker/db` | Database client, schema, seed script |
 | `@sys-tracker/utils` | Formatters, validators, constants |
@@ -787,4 +787,4 @@ ShinDB follows **Semantic Versioning 2.0.0** (`MAJOR.MINOR.PATCH`):
 
 ---
 
-> **This PRD is the single source of truth for what ShinDB v1.0 must deliver. All design decisions reference [DESIGN.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md), and all architecture decisions reference [SYS_Tracker.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/SYS_Tracker.md).**
+> **This PRD is the single source of truth for what ShinDB v1.0 must deliver. All design decisions reference [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md), and all architecture decisions reference [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md).**

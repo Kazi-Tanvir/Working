@@ -1,44 +1,24 @@
 import React from "react";
-import fs from "fs/promises";
-import path from "path";
 import { Terminal, Shield } from "lucide-react";
 import ProfileHeader from "@/components/sections/ProfileHeader";
 import CurrentlyConsuming from "@/components/sections/CurrentlyConsuming";
 import RecentlyCompleted from "@/components/sections/RecentlyCompleted";
 import SearchBar from "@/components/common/SearchBar";
 import Badge from "@/components/common/Badge";
-import { MediaItem } from "@/components/common/MediaCard";
 import CategoryStats from "@/components/sections/CategoryStats";
+import { getAllMediaGrouped } from "@/lib/media";
 
-
-// Server helper to load JSON datasets safely
-async function loadCollection(filename: string): Promise<MediaItem[]> {
-  try {
-    const filePath = path.join(process.cwd(), "src", "database", filename);
-    const fileContent = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(fileContent) as MediaItem[];
-  } catch (e) {
-    console.error(`[SYS_ERROR] Failed to load local database file ${filename}:`, e);
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  // Load database collections in parallel on the server
-  const [animeList, mangaList, gamesList, moviesList, seriesList] = await Promise.all([
-    loadCollection("anime.json"),
-    loadCollection("manga.json"),
-    loadCollection("games.json"),
-    loadCollection("movies.json"),
-    loadCollection("series.json"),
-  ]);
+  const { animeList, mangaList, gamesList, moviesList, seriesList } = await getAllMediaGrouped();
 
   // Aggregate active and completed items across all classes
   const allMedia = [...animeList, ...mangaList, ...gamesList, ...moviesList, ...seriesList];
   
-  const activeItems = allMedia.filter(
-    (item) => item.status === "Watching" || item.status === "Reading" || item.status === "Playing"
-  );
+  const activeItems = allMedia
+    .filter((item) => ["Watching", "Reading", "Playing"].includes(item.status))
+    .slice(0, 16); // Cap to 16 most recently updated active items on Dashboard
   
   const completedItems = allMedia.filter((item) => item.status === "Completed");
 

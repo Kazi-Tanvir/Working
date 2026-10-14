@@ -1,6 +1,6 @@
-# SYS_TRACKER — Design Specification
+# ShinDB — Design Specification
 
-> Complete visual design system, layout architecture, and interaction guide for the **SYS_Tracker** personal media tracking application.
+> Complete visual design system, layout architecture, and interaction guide for the **ShinDB** personal media tracking application.
 
 ---
 
@@ -43,7 +43,7 @@ SYS_Tracker's design is inspired by **advanced obsidian systems** — a fusion o
 
 ### Logo & App Name
 
-- **Name**: `[SYS_TRACKER::MVP]` — displayed in monospace, uppercase, with bracket notation
+- **Name**: `[ShinDB::MVP]` — displayed in monospace, uppercase, with bracket notation
 - **Logo Icon**: A small purple/lavender `>_` terminal prompt icon (resembling a command cursor) placed to the left of the name
 - **Logo Color**: Lavender/soft purple (`#b388ff` / `#a78bfa`)
 - **Logo Background**: Subtle rounded-rectangle badge behind the icon
@@ -54,7 +54,7 @@ The entire interface speaks in a "system operator" voice:
 
 | UI Element | Example Text |
 |-----------|-------------|
-| Welcome banner | `SYS_OPERATOR::CENTRAL_CONSOLE` |
+| Welcome banner | `ShinDB::CENTRAL_CONSOLE` |
 | Subtitle | `OBSIDIAN CORE TRACKING ENVIRONMENT // V1.0.0 STABLE` |
 | User role badge | `[SYS_OPERATOR::ELITE]` |
 | Status indicator | `>_ STATUS: SYNC_COMPLETE // OK` |
@@ -143,7 +143,7 @@ The stat cards on the dashboard use **thick colored top borders** (3-4px) with t
 
 | Element | Size | Weight | Transform | Letter-Spacing | Font |
 |---------|------|--------|-----------|----------------|------|
-| App name `[SYS_TRACKER::MVP]` | 16px | 600 | uppercase | 1px | Mono |
+| App name `[ShinDB::MVP]` | 16px | 600 | uppercase | 1px | Mono |
 | System banner title | 20px | 600 | uppercase | 1.5px | Mono |
 | System banner subtitle | 12px | 400 | uppercase | 2px | Mono |
 | Dashboard stat numbers | 48-56px | 700 | none | -1px | Mono |
@@ -173,7 +173,7 @@ Nearly all UI text uses **UPPERCASE** to maintain the terminal/system aesthetic.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  [>_] [SYS_TRACKER::MVP]          ✧ DASHBOARD  ◎ ANIME  □ MANGA  ⊞ GAMES  ◫ MOVIES  ◫ SERIES │
+│  [>_] [ShinDB::MVP]          ✧ DASHBOARD  ◎ ANIME  □ MANGA  ⊞ GAMES  ◫ MOVIES  ◫ SERIES │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -215,7 +215,7 @@ The dashboard is the central command console. It has these sections stacked vert
 #### A. System Banner
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  ⊙ SYS_OPERATOR::CENTRAL_CONSOLE                    NODE_STATE: SECURE │
+│  ⊙ ShinDB::CENTRAL_CONSOLE                          NODE_STATE: SECURE │
 │    OBSIDIAN CORE TRACKING ENVIRONMENT // V1.0.0 STABLE    >_ SESSION: ACTIVE_DEV │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -240,7 +240,7 @@ The dashboard is the central command console. It has these sections stacked vert
 ```
 ┌─────────────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
 │  [avatar]        │  │ TOTAL    │  │ TOTAL    │  │ TOTAL    │  │ MOVIES+  │
-│  [SYS_OP::ELITE]│  │ ANIME    │  │ MANGA    │  │ GAMES    │  │ SERIES   │
+│  [ShinDB::ELITE]│  │ ANIME    │  │ MANGA    │  │ GAMES    │  │ SERIES   │
 │  SENPAI_09       │  │          │  │          │  │          │  │          │
 │  IP: 127.0.0.1   │  │   211    │  │   10     │  │   26     │  │   116    │
 │  ...bio text...  │  │[REC_LOG] │  │[REC_LOG] │  │[REC_LOG] │  │[REC_LOG] │
@@ -250,7 +250,7 @@ The dashboard is the central command console. It has these sections stacked vert
 
 - **Profile Card**: Left column (~35% width), contains:
   - Glitchy/static avatar image (small, centered)
-  - Role badge: `[SYS_OPERATOR::ELITE]` in a purple bordered pill
+  - Role badge: `[ShinDB::ELITE]` in a purple bordered pill
   - Username: `SENPAI_09` in bold mono
   - IP address and node type
   - Bio text (dashed separator above)
@@ -496,7 +496,7 @@ All 5 media category pages share an identical layout structure with only the con
 ### 7.8 User Role Badge
 
 ```
-[SYS_OPERATOR::ELITE]
+[ShinDB::ELITE]
 ```
 | Property | Value |
 |----------|-------|
@@ -783,4 +783,4 @@ The design was prototyped as a fully functional HTML/CSS page. Key visual refere
 
 ---
 
-> **This document should serve as the single source of truth for implementing the SYS_Tracker frontend. All components, colors, typography, and layout decisions are derived from the working prototype.**
+> **This document should serve as the single source of truth for implementing the ShinDB frontend. All components, colors, typography, and layout decisions are derived from the working prototype.**

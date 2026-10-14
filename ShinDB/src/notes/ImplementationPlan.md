@@ -1,10 +1,10 @@
 # ShinDB — Implementation Plan
 
-> **Version**: 1.0.0-draft  
-> **Last Updated**: 2026-06-14  
-> **Status**: Draft  
+> **Version**: 1.1.0-harmonized  
+> **Last Updated**: 2026-10-14  
+> **Status**: Active (Phase 0 Complete, Phase 1 Foundation Underway)  
 > **Target Release**: v1.0.0  
-> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md) · [TechSpec.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md) · [AppFlow.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md) · [Schema.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/Schema.md) · [DESIGN.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md)
+> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) · [TechSpec.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md) · [AppFlow.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md) · [Schema.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md) · [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md) · [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md) · [Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Tracker.md) · [Rules.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Rules.md)
 
 ---
 
@@ -21,6 +21,7 @@
 9. [Risk Assessment & Mitigation](#9-risk-assessment--mitigation)
 10. [Dependency Map](#10-dependency-map)
 11. [Definition of Done](#11-definition-of-done)
+12. [Architecture Harmonization & Revision History](#12-architecture-harmonization--revision-history)
 
 ---
 
@@ -105,22 +106,47 @@ gantt
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [PRD.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md) | ✅ Complete | Product requirements, feature scope, success criteria |
-| [TechSpec.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md) | ✅ Complete | Tech stack, API design, architecture decisions |
-| [AppFlow.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md) | ✅ Complete | User journeys, screen flows, interaction patterns |
-| [DESIGN.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md) | ✅ Complete | Visual design system, tokens, components |
-| [Schema.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/Schema.md) | ✅ Complete | Database schema, relationships, indexes |
-| [SYS_Tracker.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/SYS_Tracker.md) | ✅ Complete | Monorepo architecture, folder structure |
-| ImplementationPlan.md | ✅ Complete | This document |
-| Tracker.md | 📝 To create | Task tracking board |
-| Rules.md | 📝 To create | AI coding guardrails |
+| [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) | ✅ Complete | Product requirements, feature scope, success criteria |
+| [TechSpec.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md) | ✅ Complete | Tech stack, API design, architecture decisions |
+| [AppFlow.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md) | ✅ Complete | User journeys, screen flows, interaction patterns |
+| [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md) | ✅ Complete | Visual design system, tokens, components |
+| [Schema.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md) | ✅ Complete | Database schema, relationships, indexes (single source of truth) |
+| [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md) | ✅ Complete | Monorepo architecture, folder structure, fresh-build framing |
+| [ImplementationPlan.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/ImplementationPlan.md) | ✅ Complete | Master execution roadmap & architecture changelog (this document) |
+| [Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Tracker.md) | ✅ Complete | Task tracking board |
+| [Rules.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Rules.md) | ✅ Complete | User AI coding guardrails |
+
+### Architecture Harmonization (Post-Draft Consistency Pass)
+
+During pre-development review, all specification documents were audited and unified to eliminate inconsistencies that accumulated across iterative planning stages:
+
+1. **Brand & Naming Alignment**:
+   - Standardized application name to **ShinDB** across all specs (with internal codename `[ShinDB::MVP]`).
+   - Deprecated legacy working titles (`SYS_TRACKER`, `imdb-gemini`).
+2. **Backend Framework Decision**:
+   - Standardized on **Hono** for all 4 microservices (`auth`, `tracker`, `user`, `search`) and the API Gateway.
+   - Removed Express ambiguity from architecture diagrams and service descriptions.
+3. **Database & ORM Decision**:
+   - Standardized on **PostgreSQL 16+** and **Prisma 6.x** as the sole ORM across all specifications and packages (`@sys-tracker/db`).
+   - Cleaned up legacy Drizzle ORM artifacts, keeping Drizzle documented strictly in TechSpec ADR §1.3 as a considered alternative.
+4. **Authoritative 6-Model Schema**:
+   - Established [Schema.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md) as the single source of truth for the database schema.
+   - Replaced fragmented 4-table schemas with the full 6-model relational structure: `User`, `MediaEntry`, `MediaExternalId`, `ActivityLog`, `Friendship`, and `ProgressHistory`.
+5. **Path & Link Resolution**:
+   - Corrected all stale documentation links from previous scratch directories (`d:/02_CODE/04_TEST/VSHIN/imdb-gemini/`) to current project structure (`d:/02_CODE/04_WORKING/ShinDB/`).
+6. **Project Framing**:
+   - Realigned SYS_Tracker from "migration from monolith" to clean "fresh build" Turborepo architecture.
+7. **Consolidated UI Architecture**:
+   - Standardized media list views across all 5 formats onto a unified `MediaCollectionView` component.
 
 ### Exit Criteria
 - [x] All 8 spec documents created and reviewed
+- [x] Cross-document consistency audit complete (naming, tech stack, schema, links, framing)
 - [x] Tech stack finalized (Hono, Prisma, TanStack Query, Tailwind v3, Vitest)
-- [x] Database schema finalized (6 tables, Prisma schema ready)
-- [x] API endpoints defined (4 services, all routes mapped)
+- [x] Database schema finalized (6 tables, Prisma schema ready in Schema.md)
+- [x] API endpoints defined (4 services + Gateway, all routes mapped)
 - [x] Design system documented (tokens, components, layout)
+- [x] Tracker.md and Rules.md initialized
 
 ---
 
@@ -134,7 +160,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: None  
-> **Reference**: [SYS_Tracker.md §4](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/SYS_Tracker.md)
+> **Reference**: [SYS_Tracker.md §4](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md)
 
 | Task | Details |
 |------|---------|
@@ -155,7 +181,7 @@ gantt
 
 > **Duration**: ~3 days  
 > **Dependencies**: Step 1.1  
-> **Reference**: [TechSpec.md §1](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md), [Schema.md §3](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/Schema.md)
+> **Reference**: [TechSpec.md §1](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md), [Schema.md §3](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md)
 
 #### `@sys-tracker/config`
 | Task | Details |
@@ -200,7 +226,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: Step 1.2  
-> **Reference**: [Schema.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/Schema.md)
+> **Reference**: [Schema.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md)
 
 #### `@sys-tracker/db`
 | Task | Details |
@@ -222,7 +248,7 @@ gantt
 
 > **Duration**: ~4 days  
 > **Dependencies**: Step 1.3  
-> **Reference**: [TechSpec.md §4, §6.2](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md)
+> **Reference**: [TechSpec.md §4, §6.2](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
 
 | Task | Details |
 |------|---------|
@@ -262,7 +288,7 @@ gantt
 
 > **Duration**: ~4 days (parallel with Step 1.4)  
 > **Dependencies**: Step 1.2  
-> **Reference**: [TechSpec.md §9](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md)
+> **Reference**: [TechSpec.md §9](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
 
 | Task | Details |
 |------|---------|
@@ -295,7 +321,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: Steps 1.4, 1.5  
-> **Reference**: [TechSpec.md §5](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md)
+> **Reference**: [TechSpec.md §5](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
 
 | Task | Details |
 |------|---------|
@@ -317,7 +343,7 @@ gantt
 
 > **Duration**: ~5 days  
 > **Dependencies**: Step 1.6  
-> **Reference**: [AppFlow.md §4](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md), [DESIGN.md §6.1](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md)
+> **Reference**: [AppFlow.md §4](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md), [DESIGN.md §6.1](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md)
 
 | Task | Details |
 |------|---------|
@@ -353,11 +379,11 @@ gantt
 
 > **Duration**: ~4 days  
 > **Dependencies**: Step 1.7  
-> **Reference**: [AppFlow.md §6](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md), [DESIGN.md §6.2](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md)
+> **Reference**: [AppFlow.md §6](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md), [DESIGN.md §6.2](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md)
 
 | Task | Details |
 |------|---------|
-| **Shared media list page** | Single component used by all 5 routes (`/anime`, `/manga`, `/movies`, `/series`, `/games`) |
+| **Shared media list page** | Unified `MediaCollectionView` component used by all 5 routes (`/anime`, `/manga`, `/movies`, `/series`, `/games`) |
 | Page header | Category icon, title, result count, toolbar |
 | Filter pills | Status-based filters, accent-colored active state |
 | Sort dropdown | Title, rating, date added, progress, year — with direction toggle |
@@ -396,7 +422,7 @@ gantt
 
 > **Duration**: ~3 days  
 > **Dependencies**: Step 1.8  
-> **Reference**: [AppFlow.md §5](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md)
+> **Reference**: [AppFlow.md §5](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md)
 
 | Task | Details |
 |------|---------|
@@ -446,7 +472,7 @@ gantt
 
 > **Duration**: ~4 days  
 > **Dependencies**: Phase 1 complete  
-> **Reference**: [TechSpec.md §7](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md)
+> **Reference**: [TechSpec.md §7](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
 
 | Task | Details |
 |------|---------|
@@ -478,7 +504,7 @@ gantt
 
 > **Duration**: ~3 days  
 > **Dependencies**: Step 2.1  
-> **Reference**: [TechSpec.md §7.5](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md)
+> **Reference**: [TechSpec.md §7.5](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
 
 | Task | Details |
 |------|---------|
@@ -501,7 +527,7 @@ gantt
 
 > **Duration**: ~3 days (parallel with Step 2.2)  
 > **Dependencies**: Step 2.1  
-> **Reference**: [AppFlow.md §3](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md)
+> **Reference**: [AppFlow.md §3](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md)
 
 | Task | Details |
 |------|---------|
@@ -529,7 +555,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: Steps 2.1, 2.3  
-> **Reference**: [TechSpec.md §5.3](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md), [AppFlow.md §1.3](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md)
+> **Reference**: [TechSpec.md §5.3](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md), [AppFlow.md §1.3](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md)
 
 | Task | Details |
 |------|---------|
@@ -550,7 +576,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: Step 2.4  
-> **Reference**: [AppFlow.md §3.1](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md)
+> **Reference**: [AppFlow.md §3.1](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md)
 
 | Task | Details |
 |------|---------|
@@ -590,7 +616,7 @@ gantt
 
 > **Duration**: ~3 days  
 > **Dependencies**: Phase 2 complete  
-> **Reference**: [TechSpec.md §6.3](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md), [Schema.md §4.5](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/Schema.md)
+> **Reference**: [TechSpec.md §6.3](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md), [Schema.md §4.5](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md)
 
 | Task | Details |
 |------|---------|
@@ -623,7 +649,7 @@ gantt
 
 > **Duration**: ~3 days  
 > **Dependencies**: Step 3.1  
-> **Reference**: [AppFlow.md §8](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md)
+> **Reference**: [AppFlow.md §8](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md)
 
 | Task | Details |
 |------|---------|
@@ -643,7 +669,7 @@ gantt
 
 > **Duration**: ~3 days  
 > **Dependencies**: Step 3.2  
-> **Reference**: [AppFlow.md §8.4, §9.1](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md)
+> **Reference**: [AppFlow.md §8.4, §9.1](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md)
 
 | Task | Details |
 |------|---------|
@@ -661,7 +687,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: Step 3.3  
-> **Reference**: [AppFlow.md §9.2](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md)
+> **Reference**: [AppFlow.md §9.2](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md)
 
 | Task | Details |
 |------|---------|
@@ -680,7 +706,7 @@ gantt
 
 > **Duration**: ~1 day  
 > **Dependencies**: Step 3.4  
-> **Reference**: [PRD.md §5.10](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md)
+> **Reference**: [PRD.md §5.10](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md)
 
 | Task | Details |
 |------|---------|
@@ -716,7 +742,7 @@ gantt
 
 > **Duration**: ~3 days  
 > **Dependencies**: Phase 3 complete  
-> **Reference**: [DESIGN.md §10](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md)
+> **Reference**: [DESIGN.md §10](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md)
 
 | Task | Details |
 |------|---------|
@@ -736,7 +762,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: Step 4.1  
-> **Reference**: [DESIGN.md §9](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md)
+> **Reference**: [DESIGN.md §9](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md)
 
 | Task | Details |
 |------|---------|
@@ -759,7 +785,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: Step 4.2  
-> **Reference**: [AppFlow.md §11, §12](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md)
+> **Reference**: [AppFlow.md §11, §12](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md)
 
 | Task | Details |
 |------|---------|
@@ -777,7 +803,7 @@ gantt
 
 > **Duration**: ~1 day  
 > **Dependencies**: Step 4.3  
-> **Reference**: [AppFlow.md §13](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/AppFlow.md), [TechSpec.md §11](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md)
+> **Reference**: [AppFlow.md §13](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md), [TechSpec.md §11](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
 
 | Task | Details |
 |------|---------|
@@ -852,7 +878,7 @@ gantt
 
 > **Duration**: ~2 days  
 > **Dependencies**: Phase 4 complete  
-> **Reference**: [TechSpec.md §16](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md)
+> **Reference**: [TechSpec.md §16](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
 
 | Task | Details |
 |------|---------|
@@ -1090,7 +1116,7 @@ Every feature/step is considered "done" when:
 
 ### v1.0 Launch Checklist
 
-All success criteria from [PRD.md §11](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md):
+All success criteria from [PRD.md §11](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md):
 
 - [ ] All 5 media types trackable with full CRUD
 - [ ] External search works for all 3 APIs (AniList, TMDB, RAWG)
@@ -1105,4 +1131,27 @@ All success criteria from [PRD.md §11](file:///d:/02_CODE/04_TEST/VSHIN/imdb-ge
 
 ---
 
-> **This implementation plan is a living document. Update the [Tracker.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/Tracker.md) as tasks progress. If scope changes arise, update [PRD.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md) first, then adjust this plan accordingly.**
+## 12. Architecture Harmonization & Revision History
+
+### Revision Log
+
+| Revision | Date | Status | Summary of Changes |
+|----------|------|--------|--------------------|
+| **1.0.0-draft** | 2026-06-14 | Archived | Initial draft created across 8 specification files (PRD, TechSpec, Schema, AppFlow, DESIGN, SYS_Tracker, ImplementationPlan, Tracker). |
+| **1.1.0-harmonized** | 2026-10-14 | Active | Comprehensive architectural harmonization audit across all specification guides to guarantee cross-spec consistency and serve as an authoritative guide for development. |
+
+### Harmonization Matrix
+
+| Architecture Dimension | Previous / Inconsistent State | Harmonized Standard (v1.1.0) | Authoritative Source |
+|-----------------------|-------------------------------|------------------------------|----------------------|
+| **Project Identity** | Split between `SYS_TRACKER`, `imdb-gemini`, and `ShinDB` | **ShinDB** as official title; `[ShinDB::MVP]` as terminal system codename | [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md), [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) |
+| **Backend Runtime** | Ambiguous `Hono/Express` or Express references in diagrams and text | Standardized solely on **Hono** for all 4 microservices + API Gateway | [TechSpec.md §1.2](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md), [SYS_Tracker.md §3](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md) |
+| **Database ORM** | Stale mentions of `Drizzle ORM` in PRD tables and SYS_Tracker code examples | Standardized on **PostgreSQL 16+** and **Prisma 6.x**; Drizzle kept only in TechSpec ADR §1.3 | [Schema.md §10](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md), [TechSpec.md §1.3](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md) |
+| **Database Schema SSOT** | Outdated 4-table ERD with inline `external_id` and float rating in SYS_Tracker | Full **6-model relational schema** (`users`, `media_entries`, `media_external_ids`, `activity_log`, `friendships`, `progress_history`) | [Schema.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md) |
+| **Project Framing** | SYS_Tracker framed as "migrating from an existing monolith `imdb-gemini`" | Standardized as a fresh **Turborepo monorepo** with dedicated service and package boundaries | [SYS_Tracker.md §1](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md) |
+| **Cross-Doc Hyperlinks** | Hardcoded links referenced old path `d:/02_CODE/04_TEST/VSHIN/imdb-gemini/` | All cross-spec links verified to point to `d:/02_CODE/04_WORKING/ShinDB/src/notes/` | All 8 notes documents |
+| **Media List UI Architecture** | 5 separate client views with duplicate logic (`AnimeClientView`, `MangaClientView`, etc.) | Consolidated into reusable **`MediaCollectionView`** component feeding all media category routes | [AppFlow.md §6](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/AppFlow.md), [ImplementationPlan.md §3.8](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/ImplementationPlan.md) |
+
+---
+
+> **This implementation plan is a living document. Update the [Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Tracker.md) as tasks progress. If scope changes arise, update [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) first, then adjust this plan accordingly.**

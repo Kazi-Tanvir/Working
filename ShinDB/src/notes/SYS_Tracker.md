@@ -1,6 +1,6 @@
-# SYS_TRACKER — Turborepo Monorepo Architecture
+# ShinDB — Turborepo Monorepo Architecture
 
-> Migrating the current Next.js monolith into a **Turborepo-powered monorepo** with clear service boundaries, shared packages, and a microservices-ready backend.
+> Architecture specification for the **ShinDB** Turborepo-powered monorepo — microservices backend, shared packages, and a Next.js frontend built fresh as a unified personal media tracker.
 
 ---
 
@@ -23,7 +23,7 @@
 
 ### Why Turborepo?
 
-The current project is a single Next.js app (`imdb-gemini`) that handles everything: UI rendering, API routes, data storage (JSON files), external API calls, and business logic — all tangled together. Turborepo lets us split this into **focused, independently deployable services** while sharing code through internal packages.
+ShinDB is a fresh project built as a **Turborepo-powered monorepo** from the start. Each service owns its domain, shared code lives in internal packages, and the entire stack is orchestrated by a single `pnpm dev` command.
 
 ### Core Principles
 
@@ -52,11 +52,11 @@ The current project is a single Next.js app (`imdb-gemini`) that handles everyth
 | App | Type | Purpose | Port |
 |-----|------|---------|------|
 | `web` | Next.js (Frontend) | The main dashboard UI — all pages, components, and client-side logic | `3000` |
-| `api-gateway` | Express/Hono | Central API gateway — routes requests to the right microservice, handles CORS, rate limiting | `4000` |
-| `auth-service` | Express/Hono | Authentication — signup, login, sessions, OAuth, JWT issuance | `4001` |
-| `tracker-service` | Express/Hono | Core media tracking — CRUD for media entries, progress updates, favorites | `4002` |
-| `user-service` | Express/Hono | User profiles, friends list, friend requests, profile settings | `4003` |
-| `search-service` | Express/Hono | External API aggregation — AniList, TMDB, RAWG search proxying and caching | `4004` |
+| `api-gateway` | Hono | Central API gateway — routes requests to the right microservice, handles JWT auth and CORS | `4000` |
+| `auth-service` | Hono | Authentication — signup, login, sessions, OAuth, JWT issuance | `4001` |
+| `tracker-service` | Hono | Core media tracking — CRUD for media entries, progress updates, favorites | `4002` |
+| `user-service` | Hono | User profiles, friends list, friend requests, profile settings | `4003` |
+| `search-service` | Hono | External API aggregation — AniList, TMDB, RAWG search proxying and caching | `4004` |
 ### Packages (Shared Internal Libraries)
 
 | Package | Purpose |
@@ -64,7 +64,7 @@ The current project is a single Next.js app (`imdb-gemini`) that handles everyth
 | `@sys-tracker/ui` | Shared React component library (buttons, cards, modals, badges, skeletons) |
 | `@sys-tracker/types` | Shared TypeScript types/interfaces — `MediaEntry`, `User`, `FriendRequest`, API contracts |
 | `@sys-tracker/utils` | Shared utility functions — formatters, validators, constants, helpers |
-| `@sys-tracker/db` | Database client, schema definitions (Prisma/Drizzle), migrations |
+| `@sys-tracker/db` | Prisma client, schema definitions, and migrations (see Schema.md for full Prisma schema) |
 | `@sys-tracker/config` | Shared config — ESLint, TypeScript, Tailwind configs |
 | `@sys-tracker/api-client` | Type-safe API client for frontend ↔ gateway communication |
 ---
@@ -80,7 +80,7 @@ graph TB
     end
     subgraph Apps ["📦 Apps (Turborepo)"]
         Web["web<br/>Next.js Frontend<br/>:3000"]
-        Gateway["api-gateway<br/>Hono/Express<br/>:4000"]
+        Gateway["api-gateway<br/>Hono<br/>:4000"]
     end
     subgraph Services ["⚙️ Microservices"]
         Auth["auth-service<br/>:4001"]
@@ -246,69 +246,18 @@ graph LR
 
 ### 3.5 Database Schema (Entity Relationship)
 
-```mermaid
-erDiagram
-    users {
-        uuid id PK
-        string username UK
-        string email UK
-        string password_hash
-        string avatar_url
-        string bio
-        string display_name
-        timestamp created_at
-        timestamp updated_at
-    }
+> **See [Schema.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md) for the complete, authoritative 6-table Prisma schema** including full ER diagram, all constraints, indexes, enums, and migration strategy.
 
-    media_entries {
-        uuid id PK
-        uuid user_id FK
-        string title
-        enum type "anime|manga|movie|series|game"
-        enum status "watching|reading|playing|completed|on_hold|dropped|plan_to_consume"
-        float rating "nullable 0-10"
-        string cover_image
-        int release_year
-        string[] genres
-        int progress_current
-        int progress_total "nullable"
-        string progress_unit "ep|ch|hrs|mins"
-        string notes
-        boolean is_favorite
-        string[] tags
-        date start_date
-        date end_date
-        int rewatch_count
-        string external_id
-        string external_source
-        timestamp created_at
-        timestamp updated_at
-    }
+**Tables summary:**
 
-    friendships {
-        uuid id PK
-        uuid requester_id FK
-        uuid addressee_id FK
-        enum status "pending|accepted|blocked"
-        timestamp created_at
-        timestamp updated_at
-    }
-
-    activity_log {
-        uuid id PK
-        uuid user_id FK
-        uuid media_entry_id FK
-        string action "added|updated|completed|rated|dropped|started"
-        jsonb metadata "old/new values"
-        timestamp created_at
-    }
-
-    users ||--o{ media_entries : "tracks"
-    users ||--o{ friendships : "requester"
-    users ||--o{ friendships : "addressee"
-    users ||--o{ activity_log : "performs"
-    media_entries ||--o{ activity_log : "about"
-```
+| Table | Owner Service | Description |
+|-------|--------------|-------------|
+| `users` | auth-service | User accounts and credentials |
+| `media_entries` | tracker-service | Core tracking records (soft-deletable) |
+| `media_external_ids` | tracker-service | Links entries to AniList/TMDB/RAWG IDs |
+| `progress_history` | tracker-service | Audit log of all progress changes |
+| `friendships` | user-service | Friend requests and relationships |
+| `activity_log` | tracker-service | User action audit trail |
 
 ---
 
@@ -611,7 +560,8 @@ sys-tracker/                          # Root monorepo
 │   ├── db/                           # ═══ @sys-tracker/db ═══
 │   │   ├── package.json
 │   │   ├── tsconfig.json
-│   │   ├── drizzle.config.ts          # Drizzle ORM config (or prisma/schema.prisma)
+│   │   ├── prisma/
+│   │   │   └── schema.prisma      # Prisma schema (see Schema.md for full definition)
 │   │   └── src/
 │   │       ├── index.ts               # DB client export
 │   │       ├── client.ts              # Database connection
@@ -797,66 +747,36 @@ export interface ErrorResponse {
 
 ### `@sys-tracker/db` — Schema Definition
 
-Using Drizzle ORM with PostgreSQL:
+> **Note:** The authoritative schema is in [Schema.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/Schema.md) (6 tables, full Prisma schema). The folder layout below uses `prisma/schema.prisma`.
 
-```typescript
-// packages/db/src/schema/users.ts
+Using **Prisma ORM** with PostgreSQL:
 
-import { pgTable, uuid, varchar, text, timestamp } from "drizzle-orm/pg-core";
+```prisma
+// packages/db/prisma/schema.prisma
+// Abbreviated — see Schema.md §10 for the complete 6-model Prisma schema
 
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  username: varchar("username", { length: 30 }).unique().notNull(),
-  email: varchar("email", { length: 255 }).unique().notNull(),
-  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  displayName: varchar("display_name", { length: 50 }).notNull(),
-  avatarUrl: text("avatar_url"),
-  bio: text("bio").default(""),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-```
+model User {
+  id           String        @id @default(uuid()) @db.Uuid
+  username     String        @unique @db.VarChar(30)
+  email        String        @unique @db.VarChar(255)
+  passwordHash String?       @map("password_hash") @db.VarChar(255)
+  displayName  String        @map("display_name") @db.VarChar(50)
+  avatarUrl    String?       @map("avatar_url")
+  bio          String        @default("")
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz
 
-```typescript
-// packages/db/src/schema/media-entries.ts
+  mediaEntries    MediaEntry[]
+  friendRequests  Friendship[] @relation("FriendRequester")
+  friendAddresses Friendship[] @relation("FriendAddressee")
+  activityLogs    ActivityLog[]
+  progressHistory ProgressHistory[]
 
-import { pgTable, uuid, varchar, text, integer, real,
-         boolean, timestamp, date, pgEnum } from "drizzle-orm/pg-core";
-import { users } from "./users";
+  @@map("users")
+}
 
-export const mediaTypeEnum = pgEnum("media_type",
-  ["anime", "manga", "game", "movie", "series"]);
-
-export const mediaStatusEnum = pgEnum("media_status",
-  ["watching", "reading", "playing", "completed", "on_hold", "dropped", "plan_to_consume"]);
-
-export const progressUnitEnum = pgEnum("progress_unit",
-  ["ep", "ch", "hrs", "mins"]);
-
-export const mediaEntries = pgTable("media_entries", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => users.id).notNull(),
-  title: varchar("title", { length: 300 }).notNull(),
-  type: mediaTypeEnum("type").notNull(),
-  status: mediaStatusEnum("status").notNull().default("plan_to_consume"),
-  coverImage: text("cover_image").default(""),
-  releaseYear: integer("release_year"),
-  genres: text("genres").array().default([]),
-  rating: real("rating"),
-  progressCurrent: integer("progress_current").default(0).notNull(),
-  progressTotal: integer("progress_total"),
-  progressUnit: progressUnitEnum("progress_unit").default("ep").notNull(),
-  notes: text("notes").default(""),
-  isFavorite: boolean("is_favorite").default(false).notNull(),
-  tags: text("tags").array().default([]),
-  startDate: date("start_date"),
-  endDate: date("end_date"),
-  rewatchCount: integer("rewatch_count").default(0).notNull(),
-  externalId: varchar("external_id", { length: 100 }),
-  externalSource: varchar("external_source", { length: 20 }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+// Full schema (MediaEntry, MediaExternalId, ProgressHistory, Friendship, ActivityLog)
+// → see Schema.md §10 for all 6 models with full fields, relations, and indexes
 ```
 
 ---
@@ -1182,9 +1102,9 @@ volumes:
 | Redis | Upstash (serverless Redis, free tier) |
 ---
 
-## Migration Checklist: Current → Turborepo
+## Development Checklist
 
-Here's how to migrate from the current monolith step by step:
+High-level build order for the ShinDB monorepo (see [ImplementationPlan.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/ImplementationPlan.md) for detailed phase breakdown):
 
 ### Phase 1: Scaffold
 
@@ -1203,7 +1123,7 @@ Here's how to migrate from the current monolith step by step:
 ### Phase 3: Database
 
 - [ ] Set up PostgreSQL via Docker Compose
-- [ ] Define schemas in `packages/db/` using Drizzle
+- [ ] Define schemas in `packages/db/` using Prisma
 - [ ] Write migration scripts
 - [ ] Create a seed script from current JSON data
 

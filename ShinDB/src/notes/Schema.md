@@ -5,7 +5,7 @@
 > **Status**: Draft  
 > **ORM**: Prisma 6.x  
 > **Database**: PostgreSQL 16+  
-> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md) · [TechSpec.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md) · [SYS_Tracker.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/SYS_Tracker.md)
+> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) · [TechSpec.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md) · [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md)
 
 ---
 

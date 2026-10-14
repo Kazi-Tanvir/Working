@@ -3,7 +3,7 @@
 > **Version**: 1.0.0-draft  
 > **Last Updated**: 2026-06-14  
 > **Status**: Draft  
-> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/PRD.md) · [DESIGN.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md) · [TechSpec.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md)
+> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) · [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md) · [TechSpec.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
 
 ---
 
@@ -1471,4 +1471,4 @@ Login page shows:
 
 ---
 
-> **This AppFlow document maps every user journey, screen, and interaction in ShinDB v1.0. It should be used alongside [DESIGN.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/DESIGN.md) for visual specifications and [TechSpec.md](file:///d:/02_CODE/04_TEST/VSHIN/imdb-gemini/src/notes/TechSpec.md) for implementation details.**
+> **This AppFlow document maps every user journey, screen, and interaction in ShinDB v1.0. It should be used alongside [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md) for visual specifications and [TechSpec.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md) for implementation details.**

@@ -929,17 +929,17 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                   type="button"
                   onClick={() => setIsEditing(false)}
                   disabled={isSubmitting}
-                  className="px-4 py-2 border border-white/20 text-gray-300 font-bold hover:text-white hover:border-white transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="h-10 px-6 border border-white/20 text-gray-300 font-mono text-xs uppercase tracking-wider font-bold hover:text-white hover:border-white transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                 >
-                  <Undo className="w-4 h-4" /> Cancel
+                  <Undo className="w-3.5 h-3.5" /> Cancel
                 </button>
                 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 bg-white text-black border-2 border-white hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(139,92,246,1)] font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="h-10 px-6 bg-white text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(139,92,246,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                 >
-                  <Save className="w-4 h-4" /> {isSubmitting ? "Saving..." : "Save Changes"}
+                  <Save className="w-3.5 h-3.5" /> {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
 
@@ -1190,28 +1190,18 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
 
               {/* View Mode Actions */}
               <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4 mt-2">
-                {(item.type === "anime" || item.type === "manga" || item.type === "series") && (
-                  <button
-                    onClick={handleSyncMetadata}
-                    disabled={isSyncing}
-                    className="px-4 py-2 border border-white/20 text-gray-300 font-bold hover:text-white hover:border-white transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                    title="Fetch latest total episodes or chapters from external API"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`} />
-                    {isSyncing ? "Syncing..." : "Sync Metadata"}
-                  </button>
-                )}
                 <button
                   onClick={onClose}
-                  className="px-6 py-2 border border-white/20 text-gray-300 font-bold hover:text-white hover:border-white transition-all cursor-pointer"
+                  className="h-10 px-6 border border-white/20 text-gray-300 font-mono text-xs uppercase tracking-wider font-bold hover:text-white hover:border-white transition-all cursor-pointer whitespace-nowrap inline-flex items-center justify-center"
                 >
                   Close
                 </button>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-6 py-2 bg-white text-black border-2 border-white hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="h-10 px-6 bg-white text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                 >
-                  <Edit2 className="w-4 h-4" /> Edit Record
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>Edit Record</span>
                 </button>
               </div>
 

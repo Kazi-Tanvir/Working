@@ -1,8 +1,8 @@
 # ShinDB — Technical Specification
 
-> **Version**: 1.0.0-draft  
-> **Last Updated**: 2026-06-14  
-> **Status**: Draft  
+> **Version**: 1.1.0-phase1-complete  
+> **Last Updated**: 2026-10-15  
+> **Status**: Active (Phase 1 Complete & Verified)  
 > **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) · [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md) · [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md)
 
 ---
@@ -161,8 +161,16 @@ sys-tracker/
 | **CSS** | Tailwind v3 | v3 is the stable, battle-tested version. v4 is too new and has breaking config changes. Tailwind utilities mapped to DESIGN.md tokens via a shared preset |
 | **API protocol** | REST (JSON) | Simple, debuggable, well-understood. The app has predictable CRUD operations — no need for GraphQL's query flexibility or tRPC's tight coupling |
 | **No real-time** | Polling/manual refresh | For 5-20 users, real-time adds complexity (WebSocket servers, connection management) with minimal benefit. Dashboard data refreshes via TanStack Query's `refetchInterval` |
-| **Single database** | All services share PostgreSQL | At 5-20 users, database-per-service is over-engineering. Logical separation via table ownership (see §8) achieves the same boundaries without operational complexity |
+| **Single database** | All services share database | At 5-20 users, database-per-service is over-engineering. Logical separation via table ownership (see §8) achieves the same boundaries without operational complexity |
 | **No CI/CD** | Manual deployments | For v1.0, manual deploys are acceptable. CI/CD can be added in v1.1 via GitHub Actions |
+
+### 2.5 Phase 1 Foundation Architecture & Single-Process Runtime
+
+In Phase 1 development, the application was instantiated as a unified **Next.js 16 full-stack runtime with Prisma ORM / MySQL**, achieving complete functional parity with the designed microservice contracts:
+- **Core Tracking API (`/api/track`)**: Full REST handler for GET, POST, PUT, DELETE with structured multi-season calculations and automatic canonical ratings.
+- **Search Provider Engine (`/api/search`)**: Aggregates AniList GraphQL, RAWG REST, and TVmaze APIs with normalized output.
+- **Airing Sync Engine (`/api/track/sync`)**: Background HTTP metadata syncer querying Kitsu REST and TVmaze for updating unannounced totals.
+- **Microservices Path**: The modular separation into distinct helper modules (`seasonHelpers`, `apiHelpers`, `syncHelpers`, `media`) ensures that individual services can be cleanly extracted into independent Hono containers when multi-user social scaling (Phase 3+) demands distributed deployment.
 
 ---
 

@@ -50,7 +50,7 @@ export default function Navbar() {
               <Terminal className="w-4 h-4 text-white animate-pulse" />
             </div>
             <span className="font-extrabold text-sm tracking-widest text-white uppercase group-hover:text-cyber-cyan transition-colors">
-              [SYS_TRACKER::MVP]
+              [ShinDB::MVP]
             </span>
           </Link>
 

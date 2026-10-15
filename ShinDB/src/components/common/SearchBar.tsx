@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Search, Loader2, Plus, Check, Film, Tv, BookOpen, Gamepad2, X } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { SearchResultItem } from "@/utils/apiHelpers";
 import Badge from "./Badge";
 
-export default function SearchBar() {
+export default function SearchBar({ className }: { className?: string }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [searchType, setSearchType] = useState("all");
   const [results, setResults] = useState<SearchResultItem[]>([]);
@@ -18,6 +20,27 @@ export default function SearchBar() {
 
   const debouncedQuery = useDebounce(query, 400);
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcut '/' to focus search, and Escape to close
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (
+        event.key === "/" &&
+        document.activeElement !== inputRef.current &&
+        !(document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement)
+      ) {
+        event.preventDefault();
+        inputRef.current?.focus();
+        setIsOpen(true);
+      } else if (event.key === "Escape") {
+        setIsOpen(false);
+        inputRef.current?.blur();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Close search dropdown on click outside
   useEffect(() => {
@@ -89,9 +112,11 @@ export default function SearchBar() {
       if (data.success) {
         // Permanently mark as added
         setAddedIds(prev => ({ ...prev, [item.id]: true }));
+        router.refresh();
       } else if (res.status === 409) {
         // Already exists — mark as added anyway
         setAddedIds(prev => ({ ...prev, [item.id]: true }));
+        router.refresh();
       } else {
         setErrorIds(prev => ({ ...prev, [item.id]: data.error || "Failed to add" }));
         // Clear error after 4s
@@ -126,11 +151,12 @@ export default function SearchBar() {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-xl font-mono z-50">
+    <div ref={searchRef} className={`relative w-full font-mono z-50 ${className || ""}`}>
       {/* Search Input Box */}
       <div className="relative flex items-center bg-black border-2 border-white shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] focus-within:shadow-[4px_4px_0px_0px_var(--cyber-purple)] transition-all z-10">
         <Search className="absolute left-3 w-5 h-5 text-gray-400" />
         <input
+          ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => {

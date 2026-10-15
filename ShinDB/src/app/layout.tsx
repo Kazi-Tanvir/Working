@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import Toast from "@/components/common/Toast";
 
 export const metadata: Metadata = {
-  title: "SYS_TRACKER // obsidian-style media tracker",
+  title: "ShinDB // obsidian-style media tracker",
   description: "A premium, high-contrast cyber-neobrutalist dashboard for tracking Anime, Manga, Video Games, Movies, and TV Series.",
   keywords: ["anime tracker", "manga tracker", "backloggd tracker", "obsidian media dashboard", "cyberpunk myanimelist"],
   authors: [{ name: "NEO_DEVELOPER" }],

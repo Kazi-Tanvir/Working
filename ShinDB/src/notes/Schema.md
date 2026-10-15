@@ -1,10 +1,10 @@
 # ShinDB — Database Schema
 
-> **Version**: 1.0.0-draft  
-> **Last Updated**: 2026-06-14  
-> **Status**: Draft  
+> **Version**: 1.1.0-phase1-complete  
+> **Last Updated**: 2026-10-15  
+> **Status**: Active (Phase 1 Implemented & Seeded)  
 > **ORM**: Prisma 6.x  
-> **Database**: PostgreSQL 16+  
+> **Active Datasource**: MySQL (Local) // Target Multi-tenant: PostgreSQL 16+  
 > **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) · [TechSpec.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md) · [SYS_Tracker.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/SYS_Tracker.md)
 
 ---

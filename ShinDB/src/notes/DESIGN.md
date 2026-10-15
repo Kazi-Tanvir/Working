@@ -1,5 +1,8 @@
 # ShinDB — Design Specification
 
+> **Version**: 1.1.0-phase1-complete  
+> **Last Updated**: 2026-10-15  
+> **Status**: Active (Phase 1 Implemented & Refined)  
 > Complete visual design system, layout architecture, and interaction guide for the **ShinDB** personal media tracking application.
 
 ---

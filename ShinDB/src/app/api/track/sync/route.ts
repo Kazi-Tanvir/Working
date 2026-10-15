@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
     const filterType =
       type && ["anime", "manga", "series"].includes(type) ? (type as MediaType) : undefined;
 
-    const entriesToSync = await prisma.mediaEntry.findMany({
+    const entriesToSync = await prisma.media.findMany({
       where: {
         ...(filterType && { type: filterType }),
-        progressTotal: null,
+        totalEpisodes: null,
       },
       select: { id: true, title: true, type: true },
       take: 20, // process batch of airing/unknown entries

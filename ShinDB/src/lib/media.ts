@@ -1,6 +1,6 @@
 // src/lib/media.ts
 import { prisma } from "@/lib/prisma";
-import { MediaType, MediaEntry } from "@prisma/client";
+import { MediaType, Media, UserMediaEntry } from "@prisma/client";
 import { MediaItem } from "@/components/common/MediaCard";
 import {
   SeasonData,
@@ -10,33 +10,41 @@ import {
   getCanonicalExternalRating,
 } from "@/utils/seasonHelpers";
 
-// Convert Prisma MySQL model to UI MediaItem interface
-export function toMediaItem(entry: MediaEntry): MediaItem {
-  const statusDisplayMap: Record<string, string> = {
-    watching: "Watching",
-    reading: "Reading",
-    playing: "Playing",
-    completed: "Completed",
-    on_hold: "On Hold",
-    dropped: "Dropped",
-    plan_to_consume:
-      entry.type === "manga"
-        ? "Plan to Read"
-        : entry.type === "game"
-        ? "Plan to Play"
-        : "Plan to Watch",
-  };
+const statusDisplayMap: Record<string, string> = {
+  watching: "Watching",
+  reading: "Reading",
+  playing: "Playing",
+  completed: "Completed",
+  on_hold: "On Hold",
+  dropped: "Dropped",
+  plan_to_consume: "Plan to Consume",
+};
 
-  // Structured seasons resolution
+function getDisplayStatus(rawStatus: string, type: MediaType): string {
+  if (rawStatus === "plan_to_consume") {
+    return type === "manga" ? "Plan to Read" : type === "game" ? "Plan to Play" : "Plan to Watch";
+  }
+  return statusDisplayMap[rawStatus] || "Plan to Watch";
+}
+
+// Convert UserMediaEntry joined with Media into UI MediaItem
+export function toMediaItem(
+  entry: UserMediaEntry & { media: Media }
+): MediaItem {
+  const { media } = entry;
+
+  // Seasons breakdown resolution
   let parsedSeasons: SeasonData[] | undefined = undefined;
   if (Array.isArray(entry.seasons) && entry.seasons.length > 0) {
     parsedSeasons = entry.seasons as unknown as SeasonData[];
-  } else if (entry.type === "series") {
-    parsedSeasons = generateDefaultSeasons(entry.title, entry.progressTotal, entry.progressCurrent);
+  } else if (Array.isArray(media.defaultSeasons) && media.defaultSeasons.length > 0) {
+    parsedSeasons = media.defaultSeasons as unknown as SeasonData[];
+  } else if (media.type === "series") {
+    parsedSeasons = generateDefaultSeasons(media.title, media.totalEpisodes, entry.progressCurrent);
   }
 
-  // Calculate structured progress
-  let progressStr = `${entry.progressCurrent} ${entry.progressUnit}`;
+  // Format progress string
+  let progressStr = `${entry.progressCurrent} ${media.progressUnit}`;
   let currentSeason = entry.currentSeason || 1;
 
   if (parsedSeasons && parsedSeasons.length > 0) {
@@ -45,71 +53,144 @@ export function toMediaItem(entry: MediaEntry): MediaItem {
       parsedSeasons,
       currentSeason,
       entry.progressCurrent,
-      entry.progressTotal,
-      entry.progressUnit
+      media.totalEpisodes,
+      media.progressUnit
     );
-  } else if (entry.type === "anime" || entry.type === "manga") {
-    const total = entry.progressTotal ?? "?";
-    progressStr = `${entry.progressCurrent}/${total} ${entry.progressUnit.toUpperCase()}`;
-  } else if (entry.type === "series") {
-    const total = entry.progressTotal ?? "?";
-    progressStr = `${entry.progressCurrent}/${total} EP`;
+  } else if (media.type === "anime" || media.type === "manga" || media.type === "series") {
+    const total = media.totalEpisodes ?? "?";
+    progressStr = `${entry.progressCurrent}/${total} ${media.progressUnit.toUpperCase()}`;
   }
 
-  // External rating resolution
+  // External Rating
   let externalRatingFormatted: string | null = null;
-  const canonicalExt = entry.externalRating ?? getCanonicalExternalRating(entry.title);
+  const canonicalExt = media.externalRating ?? getCanonicalExternalRating(media.title);
   if (canonicalExt !== null && canonicalExt !== undefined) {
-    const sourceLabel = entry.type === "anime" || entry.type === "manga" ? "MAL" : "IMDb";
+    const sourceLabel = media.type === "anime" || media.type === "manga" ? "MAL" : "IMDb";
     externalRatingFormatted = `${sourceLabel} ${canonicalExt.toFixed(1)}/10`;
   }
 
-  // Safely parse MySQL JSON column into string[]
-  const parsedGenres = Array.isArray(entry.genres)
-    ? entry.genres.map((g) => String(g))
+  const parsedGenres = Array.isArray(media.genres)
+    ? (media.genres as any[]).map((g) => String(g))
     : [];
 
   return {
     id: entry.id,
-    title: entry.title,
-    type: entry.type,
-    status: statusDisplayMap[entry.status] || "Plan to Watch",
+    mediaId: media.id,
+    title: media.title,
+    type: media.type,
+    status: getDisplayStatus(entry.status, media.type),
     rating: entry.rating !== null ? `${entry.rating.toFixed(1)}/10` : "Unrated",
     externalRating: externalRatingFormatted,
     progress: progressStr,
     progressCurrent: entry.progressCurrent,
-    progressTotal: entry.progressTotal,
-    progressUnit: entry.progressUnit,
+    progressTotal: media.totalEpisodes,
+    progressUnit: media.progressUnit,
     currentSeason,
     seasons: parsedSeasons,
-    coverImage: entry.coverImage,
+    coverImage: media.coverImage,
     genres: parsedGenres,
-    releaseYear: entry.releaseYear,
+    releaseYear: media.releaseYear,
     notes: entry.notes || "",
     isFavorite: entry.isFavorite,
+    isUserTracked: true,
   };
 }
 
-export async function getMediaByType(type: MediaType): Promise<MediaItem[]> {
-  const entries = await prisma.mediaEntry.findMany({
-    where: { type },
-    orderBy: { updatedAt: "desc" },
-  });
-  return entries.map(toMediaItem);
-}
+// Convert Master Catalog Media into UI MediaItem
+export function catalogToMediaItem(
+  media: Media,
+  userEntry?: UserMediaEntry | null
+): MediaItem {
+  if (userEntry) {
+    return toMediaItem({ ...userEntry, media });
+  }
 
-export async function getAllMediaGrouped() {
-  const entries = await prisma.mediaEntry.findMany({
-    orderBy: { updatedAt: "desc" },
-  });
+  let externalRatingFormatted: string | null = null;
+  const canonicalExt = media.externalRating ?? getCanonicalExternalRating(media.title);
+  if (canonicalExt !== null && canonicalExt !== undefined) {
+    const sourceLabel = media.type === "anime" || media.type === "manga" ? "MAL" : "IMDb";
+    externalRatingFormatted = `${sourceLabel} ${canonicalExt.toFixed(1)}/10`;
+  }
 
-  const items = entries.map(toMediaItem);
+  let progressStr = `0/${media.totalEpisodes ?? "?"} ${media.progressUnit.toUpperCase()}`;
+  if (media.progressUnit === "hrs") progressStr = `0 hrs`;
+  if (media.progressUnit === "mins") progressStr = `${media.totalEpisodes ?? 0} mins`;
+
+  const parsedGenres = Array.isArray(media.genres)
+    ? (media.genres as any[]).map((g) => String(g))
+    : [];
 
   return {
-    animeList: items.filter((i) => i.type === "anime"),
-    mangaList: items.filter((i) => i.type === "manga"),
-    gamesList: items.filter((i) => i.type === "game"),
-    moviesList: items.filter((i) => i.type === "movie"),
-    seriesList: items.filter((i) => i.type === "series"),
+    id: media.id,
+    mediaId: media.id,
+    title: media.title,
+    type: media.type,
+    status: "Not Tracked",
+    rating: "Unrated",
+    externalRating: externalRatingFormatted,
+    progress: progressStr,
+    progressCurrent: 0,
+    progressTotal: media.totalEpisodes,
+    progressUnit: media.progressUnit,
+    currentSeason: 1,
+    coverImage: media.coverImage,
+    genres: parsedGenres,
+    releaseYear: media.releaseYear,
+    notes: "",
+    isFavorite: false,
+    isUserTracked: false,
+  };
+}
+
+export async function getDefaultUserId(): Promise<string | null> {
+  return null;
+}
+
+export async function getMediaByType(
+  type: MediaType,
+  userId?: string | null
+): Promise<MediaItem[]> {
+  // If user is provided, get their personal library for this category
+  if (userId) {
+    const userEntries = await prisma.userMediaEntry.findMany({
+      where: {
+        userId,
+        media: { type },
+      },
+      include: { media: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    return userEntries.map(toMediaItem);
+  }
+
+  // Without a user, return empty list (individual personal library)
+  return [];
+}
+
+export async function getAllMediaGrouped(userId?: string | null) {
+  if (userId) {
+    const userEntries = await prisma.userMediaEntry.findMany({
+      where: { userId },
+      include: { media: true },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    const items = userEntries.map(toMediaItem);
+    return {
+      animeList: items.filter((i) => i.type === "anime"),
+      mangaList: items.filter((i) => i.type === "manga"),
+      gamesList: items.filter((i) => i.type === "game"),
+      moviesList: items.filter((i) => i.type === "movie"),
+      seriesList: items.filter((i) => i.type === "series"),
+    };
+  }
+
+  // Unauthenticated visitors have empty lists
+  return {
+    animeList: [],
+    mangaList: [],
+    gamesList: [],
+    moviesList: [],
+    seriesList: [],
   };
 }

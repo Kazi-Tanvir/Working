@@ -1,6 +1,8 @@
 import { PrismaClient, MediaType, MediaStatus, ProgressUnit } from "@prisma/client";
 import fs from "fs/promises";
 import path from "path";
+import bcrypt from "bcryptjs";
+import { generateDefaultSeasons, getCanonicalExternalRating } from "../src/utils/seasonHelpers";
 
 const prisma = new PrismaClient();
 
@@ -36,7 +38,6 @@ function parseProgress(
     const total = totalMatch ? parseInt(totalMatch[0], 10) : null;
     const unit: ProgressUnit = type === "manga" ? "ch" : "ep";
 
-    // Fix bug in anime.json where Completed items have "0/28 EP"
     if (status === "completed" && total && current === 0) {
       current = total;
     }
@@ -89,7 +90,7 @@ function cleanGenres(genres: string[]): string[] {
   });
 }
 
-async function seedCollection(filename: string, type: MediaType) {
+async function seedCollection(filename: string, type: MediaType, baseUserId: string) {
   const filePath = path.join(process.cwd(), "src", "database", filename);
   const content = await fs.readFile(filePath, "utf-8");
   const items = JSON.parse(content);
@@ -100,51 +101,126 @@ async function seedCollection(filename: string, type: MediaType) {
     const rating = parseRating(item.rating);
     const { current, total, unit } = parseProgress(item.progress, type, status);
     const genres = cleanGenres(item.genres);
+    const title = item.title.trim().slice(0, 250);
+    const canonicalRating = getCanonicalExternalRating(title);
 
-    await prisma.mediaEntry.upsert({
+    // Default season breakdown for TV series
+    let defaultSeasons: any = null;
+    if (type === "series" || (type === "anime" && total && total > 24)) {
+      defaultSeasons = generateDefaultSeasons(title, total, current);
+    }
+
+    // 1. Upsert into Master Media Catalog (Shared across all users)
+    const media = await prisma.media.upsert({
       where: {
         title_type: {
-          title: item.title.trim().slice(0, 250),
+          title,
           type,
+        },
+      },
+      update: {
+        coverImage: item.coverImage || "",
+        releaseYear: Number(item.releaseYear) || 2026,
+        genres,
+        externalRating: canonicalRating,
+        totalEpisodes: total,
+        progressUnit: unit,
+        ...(defaultSeasons && { defaultSeasons }),
+      },
+      create: {
+        title,
+        type,
+        coverImage: item.coverImage || "",
+        releaseYear: Number(item.releaseYear) || 2026,
+        genres,
+        externalRating: canonicalRating,
+        totalEpisodes: total,
+        progressUnit: unit,
+        defaultSeasons,
+      },
+    });
+
+    // 2. Attach to base user (SENPAI_09) library
+    await prisma.userMediaEntry.upsert({
+      where: {
+        userId_mediaId: {
+          userId: baseUserId,
+          mediaId: media.id,
         },
       },
       update: {
         status,
         rating,
         progressCurrent: current,
-        progressTotal: total,
-        progressUnit: unit,
-        genres,
-        coverImage: item.coverImage || "",
-        releaseYear: Number(item.releaseYear) || 2026,
+        ...(defaultSeasons && { seasons: defaultSeasons }),
       },
       create: {
-        title: item.title.trim().slice(0, 250),
-        type,
+        userId: baseUserId,
+        mediaId: media.id,
         status,
         rating,
         progressCurrent: current,
-        progressTotal: total,
-        progressUnit: unit,
-        genres,
-        coverImage: item.coverImage || "",
-        releaseYear: Number(item.releaseYear) || 2026,
+        seasons: defaultSeasons,
       },
     });
+
     count++;
   }
 
-  console.log(`[SEED] Migrated ${count} items from ${filename} into MySQL`);
+  console.log(`[SEED] Master Catalog & User Library seeded: ${count} items from ${filename}`);
 }
 
 async function main() {
-  console.log("Starting JSON -> Localhost MySQL Prisma migration...");
-  await seedCollection("anime.json", "anime");
-  await seedCollection("manga.json", "manga");
-  await seedCollection("games.json", "game");
-  await seedCollection("movies.json", "movie");
-  await seedCollection("series.json", "series");
-  console.log("MySQL Migration complete!");
+  console.log("Seeding Master Media Catalog and Base Account (SENPAI_09)...");
+
+  // Create or verify base account: SENPAI_09
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash("password123", salt);
+
+  const baseUser = await prisma.user.upsert({
+    where: { username: "SENPAI_09" },
+    update: {
+      displayName: "SENPAI_09",
+      customBadge: "[SYS_OPERATOR::ELITE]",
+      bio: "Archiving media ephemera across multiple timelines. Obsidian-inspired central tracking environment.",
+      avatarUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=80",
+    },
+    create: {
+      username: "SENPAI_09",
+      email: "senpai@shindb.local",
+      displayName: "SENPAI_09",
+      passwordHash,
+      customBadge: "[SYS_OPERATOR::ELITE]",
+      bio: "Archiving media ephemera across multiple timelines. Obsidian-inspired central tracking environment.",
+      avatarUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=80",
+    },
+  });
+
+  // Also support shin as alternate demo account
+  await prisma.user.upsert({
+    where: { username: "shin" },
+    update: {},
+    create: {
+      username: "shin",
+      email: "shin@shindb.local",
+      displayName: "Shin Commander",
+      passwordHash,
+      customBadge: "[SYS_OPERATOR::ELITE]",
+      bio: "Commander Node // Tactical Database",
+      avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    },
+  });
+
+  console.log(`[SEED] Verified base user: ${baseUser.username} (${baseUser.id})`);
+
+  // Seed all 5 categories into Master Catalog and Base User Library
+  await seedCollection("anime.json", "anime", baseUser.id);
+  await seedCollection("manga.json", "manga", baseUser.id);
+  await seedCollection("games.json", "game", baseUser.id);
+  await seedCollection("movies.json", "movie", baseUser.id);
+  await seedCollection("series.json", "series", baseUser.id);
+
+  console.log("Master Media Catalog and SENPAI_09 Library setup complete!");
 }
 
 main()

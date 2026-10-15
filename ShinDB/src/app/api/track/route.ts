@@ -5,8 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { MediaType, MediaStatus, ProgressUnit } from "@prisma/client";
 import { toMediaItem } from "@/lib/media";
 import { getCanonicalExternalRating } from "@/utils/seasonHelpers";
+import { getUserFromRequest } from "@/lib/auth";
 
 const CreateTrackSchema = z.object({
+  mediaId: z.string().optional(),
   title: z.string().min(1).max(250),
   type: z.enum(["anime", "manga", "game", "movie", "series"]),
   releaseYear: z.union([z.number(), z.string()]).optional(),
@@ -101,6 +103,15 @@ function parseProgressInput(
 
 export async function POST(request: NextRequest) {
   try {
+    const sessionUser = await getUserFromRequest(request);
+    if (!sessionUser) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized. Please authenticate to track media." },
+        { status: 401 }
+      );
+    }
+    const userId = sessionUser.id;
+
     const body = await request.json();
     const parsed = CreateTrackSchema.safeParse(body);
 
@@ -111,44 +122,93 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, type, releaseYear, coverImage, rating, status, progress, genres } = parsed.data;
-    const prog = parseProgressInput(progress, type);
-    const canonicalRating = getCanonicalExternalRating(title.trim());
+    const {
+      mediaId,
+      title,
+      type,
+      releaseYear,
+      coverImage,
+      rating,
+      status,
+      progress,
+      genres,
+      seasons,
+      currentSeason,
+      progressCurrent,
+      notes,
+      isFavorite,
+    } = parsed.data;
 
-    const created = await prisma.mediaEntry.create({
+    const cleanTitle = title.trim();
+    const prog = parseProgressInput(progress, type);
+    const canonicalRating = getCanonicalExternalRating(cleanTitle);
+
+    // 1. Find or create canonical Media metadata
+    let media = mediaId
+      ? await prisma.media.findUnique({ where: { id: mediaId } })
+      : null;
+
+    if (!media) {
+      media = await prisma.media.findUnique({
+        where: { title_type: { title: cleanTitle, type } },
+      });
+    }
+
+    if (!media) {
+      media = await prisma.media.create({
+        data: {
+          title: cleanTitle,
+          type,
+          coverImage:
+            coverImage ||
+            "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
+          releaseYear: releaseYear ? Number(releaseYear) : new Date().getFullYear(),
+          genres: genres || [],
+          externalRating: canonicalRating,
+          totalEpisodes: prog.progressTotal,
+          progressUnit: prog.progressUnit,
+        },
+      });
+    }
+
+    // 2. Check if THIS user already tracks this media
+    const existingEntry = await prisma.userMediaEntry.findUnique({
+      where: {
+        userId_mediaId: {
+          userId,
+          mediaId: media.id,
+        },
+      },
+    });
+
+    if (existingEntry) {
+      return NextResponse.json(
+        { success: false, error: "Item is already tracked in your personal library" },
+        { status: 409 }
+      );
+    }
+
+    // 3. Create personal tracking entry for this user
+    const userEntry = await prisma.userMediaEntry.create({
       data: {
-        title: title.trim(),
-        type,
+        userId,
+        mediaId: media.id,
         status: normalizeStatusInput(status, type),
         rating: parseRatingInput(rating),
-        externalRating: canonicalRating,
-        progressCurrent: prog.progressCurrent,
-        progressTotal: prog.progressTotal,
-        progressUnit: prog.progressUnit,
-        genres: genres || [],
-        coverImage:
-          coverImage ||
-          "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
-        releaseYear: releaseYear ? Number(releaseYear) : new Date().getFullYear(),
+        progressCurrent: progressCurrent !== undefined ? progressCurrent : prog.progressCurrent,
+        currentSeason: currentSeason || 1,
+        seasons: seasons ? (seasons as any) : undefined,
+        notes: notes || null,
+        isFavorite: isFavorite || false,
       },
+      include: { media: true },
     });
 
     return NextResponse.json({
       success: true,
-      entry: toMediaItem(created),
+      entry: toMediaItem(userEntry),
     });
-  } catch (error: unknown) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
-      return NextResponse.json(
-        { success: false, error: "Item already exists in your MySQL database" },
-        { status: 409 }
-      );
-    }
+  } catch (error) {
     console.error("[TRACK_API_POST]", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
@@ -156,6 +216,15 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+    const sessionUser = await getUserFromRequest(request);
+    if (!sessionUser) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized. Please authenticate to update media." },
+        { status: 401 }
+      );
+    }
+    const userId = sessionUser.id;
+
     const body = await request.json();
     const parsed = UpdateTrackSchema.safeParse(body);
 
@@ -183,19 +252,41 @@ export async function PUT(request: NextRequest) {
       isFavorite,
     } = parsed.data;
 
-    const existing = await prisma.mediaEntry.findUnique({
-      where: { id },
+    // Look for user tracking entry by userEntry.id OR mediaId strictly for this user
+    let userEntry = await prisma.userMediaEntry.findFirst({
+      where: {
+        userId,
+        OR: [{ id }, { mediaId: id }],
+      },
+      include: { media: true },
     });
 
-    if (!existing) {
-      return NextResponse.json({ success: false, error: "Entry not found" }, { status: 404 });
+    // If item was not yet in user's library, create it for this user!
+    if (!userEntry) {
+      const media = await prisma.media.findUnique({ where: { id } });
+      if (media) {
+        userEntry = await prisma.userMediaEntry.create({
+          data: {
+            userId,
+            mediaId: media.id,
+            status: normalizeStatusInput(status, media.type),
+            rating: parseRatingInput(rating),
+            progressCurrent: progressCurrent || 0,
+            notes: notes || null,
+            isFavorite: isFavorite || false,
+          },
+          include: { media: true },
+        });
+      } else {
+        return NextResponse.json({ success: false, error: "Entry not found" }, { status: 404 });
+      }
     }
 
-    const mediaType = (type as MediaType) || existing.type;
+    const mediaType = (type as MediaType) || userEntry.media.type;
     const prog = progress !== undefined ? parseProgressInput(progress, mediaType) : undefined;
 
     // Structured season calculation
-    let calculatedWatched = existing.progressCurrent;
+    let calculatedWatched = userEntry.progressCurrent;
     let validatedSeasons: any = undefined;
     if (Array.isArray(seasons)) {
       validatedSeasons = seasons.map((s: any) => ({
@@ -207,28 +298,43 @@ export async function PUT(request: NextRequest) {
       }));
       calculatedWatched = (validatedSeasons as any[]).reduce((sum, s) => sum + s.episodesWatched, 0);
     } else if (progressCurrent !== undefined) {
-      calculatedWatched = Math.max(0, existing.progressTotal ? Math.min(existing.progressTotal, progressCurrent) : progressCurrent);
+      calculatedWatched = Math.max(
+        0,
+        userEntry.media.totalEpisodes
+          ? Math.min(userEntry.media.totalEpisodes, progressCurrent)
+          : progressCurrent
+      );
     } else if (prog !== undefined) {
       calculatedWatched = prog.progressCurrent;
     }
 
-    const updated = await prisma.mediaEntry.update({
-      where: { id },
+    // Update UserMediaEntry
+    const updated = await prisma.userMediaEntry.update({
+      where: { id: userEntry.id },
       data: {
-        ...(title !== undefined && { title: title.trim() }),
         ...(status !== undefined && { status: normalizeStatusInput(status, mediaType) }),
         ...(rating !== undefined && { rating: parseRatingInput(rating) }),
         progressCurrent: calculatedWatched,
-        ...(prog?.progressTotal !== undefined && prog.progressTotal !== null && { progressTotal: prog.progressTotal }),
         ...(validatedSeasons !== undefined && { seasons: validatedSeasons }),
         ...(currentSeason !== undefined && { currentSeason }),
-        ...(releaseYear !== undefined && { releaseYear: Number(releaseYear) }),
-        ...(genres !== undefined && { genres }),
-        ...(coverImage !== undefined && { coverImage }),
         ...(notes !== undefined && { notes }),
         ...(isFavorite !== undefined && { isFavorite }),
       },
+      include: { media: true },
     });
+
+    // Optionally update canonical media details if title, genres, coverImage were provided
+    if (title || releaseYear || genres || coverImage) {
+      await prisma.media.update({
+        where: { id: updated.mediaId },
+        data: {
+          ...(title && { title: title.trim() }),
+          ...(releaseYear && { releaseYear: Number(releaseYear) }),
+          ...(genres && { genres }),
+          ...(coverImage && { coverImage }),
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,
@@ -242,6 +348,12 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const sessionUser = await getUserFromRequest(request);
+    if (!sessionUser) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+    const userId = sessionUser.id;
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -249,15 +361,25 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Missing id parameter" }, { status: 400 });
     }
 
-    await prisma.mediaEntry.delete({
-      where: { id },
+    // Find user entry strictly for this user
+    const existing = await prisma.userMediaEntry.findFirst({
+      where: {
+        userId,
+        OR: [{ id }, { mediaId: id }],
+      },
     });
 
-    return NextResponse.json({ success: true, message: `Deleted entry ${id}` });
-  } catch (error: any) {
-    if (error?.code === "P2025") {
-      return NextResponse.json({ success: false, error: "Entry not found" }, { status: 404 });
+    if (!existing) {
+      return NextResponse.json({ success: false, error: "Entry not found in your library" }, { status: 404 });
     }
+
+    // Delete ONLY from this user's personal library
+    await prisma.userMediaEntry.delete({
+      where: { id: existing.id },
+    });
+
+    return NextResponse.json({ success: true, message: `Removed entry ${id} from your library` });
+  } catch (error) {
     console.error("[TRACK_API_DELETE]", error);
     return NextResponse.json({ success: false, error: "Failed to delete entry" }, { status: 500 });
   }
@@ -267,6 +389,11 @@ const VALID_MEDIA_TYPES: MediaType[] = ["anime", "manga", "game", "movie", "seri
 
 export async function GET(request: NextRequest) {
   try {
+    const sessionUser = await getUserFromRequest(request);
+    if (!sessionUser) {
+      return NextResponse.json({ success: true, items: [] });
+    }
+
     const { searchParams } = new URL(request.url);
     const typeParam = searchParams.get("type");
 
@@ -282,20 +409,22 @@ export async function GET(request: NextRequest) {
 
     const type = typeParam as MediaType | null;
 
-    const entries = await prisma.mediaEntry.findMany({
+    // Fetch this user's personal library entries
+    const userEntries = await prisma.userMediaEntry.findMany({
       where: {
-        ...(type ? { type } : {}),
+        userId: sessionUser.id,
+        ...(type ? { media: { type } } : {}),
       },
+      include: { media: true },
       orderBy: { updatedAt: "desc" },
     });
 
     return NextResponse.json({
       success: true,
-      items: entries.map(toMediaItem),
+      items: userEntries.map(toMediaItem),
     });
   } catch (error) {
     console.error("[TRACK_API_GET]", error);
     return NextResponse.json({ success: false, error: "Failed to fetch entries" }, { status: 500 });
   }
 }
-

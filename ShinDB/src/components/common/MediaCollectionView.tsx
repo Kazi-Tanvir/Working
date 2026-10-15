@@ -152,9 +152,21 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
   }, [initialItems]);
 
   const handleItemUpdate = (updatedItem: MediaItem) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === updatedItem.id ? updatedItem : item))
-    );
+    setItems((prev) => {
+      const exists = prev.some(
+        (i) => i.id === updatedItem.id || (updatedItem.mediaId && i.mediaId === updatedItem.mediaId)
+      );
+      if (exists) {
+        return prev.map((i) =>
+          i.id === updatedItem.id || (updatedItem.mediaId && i.mediaId === updatedItem.mediaId)
+            ? updatedItem
+            : i
+        );
+      }
+      return [updatedItem, ...prev];
+    });
+
+    showToast(`✓ Updated "${updatedItem.title}" in library!`, "success");
   };
 
   const handleItemAdded = (newItem: MediaItem) => {
@@ -196,8 +208,8 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
       sortBy === "default" ? "title" : sortBy === "title" ? "rating" : "default";
     setSortBy(nextSort);
 
-    setItems((prev) => {
-      const copy = [...prev];
+    const sortFn = (list: MediaItem[]) => {
+      const copy = [...list];
       if (nextSort === "title") {
         copy.sort((a, b) => a.title.localeCompare(b.title));
       } else if (nextSort === "rating") {
@@ -217,7 +229,9 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
         });
       }
       return copy;
-    });
+    };
+
+    setItems(sortFn(items));
   };
 
   const filteredItems = items.filter((item) => {
@@ -233,14 +247,20 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
       {/* Sticky Filter & Search Control Console */}
       <div className="sticky top-0 z-20 bg-black/95 backdrop-blur-md pt-2 pb-3 border-b border-white/20 flex flex-col gap-3">
         <section className="flex flex-wrap items-center justify-between gap-4 text-xs text-gray-400">
-          <div className="flex items-center gap-2 flex-wrap">
-            {config.icon}
-            <span className="font-sans font-bold text-white tracking-wide uppercase text-sm">
-              {config.label}
-            </span>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              {config.icon}
+              <span className="font-sans font-bold text-white tracking-wide uppercase text-sm">
+                {config.label}
+              </span>
+              <span className="px-2 py-0.5 border border-white/20 bg-white/5 text-[10px] text-gray-300 font-mono">
+                {items.length} {items.length === 1 ? "RECORD" : "RECORDS"}
+              </span>
+            </div>
+
             <ChevronsUpDown className="w-3.5 h-3.5 text-gray-500" />
-            <span className="text-[10px] text-gray-500 font-medium ml-1">
-              {filteredItems.length} / {items.length} records
+            <span className="text-[10px] text-gray-500 font-medium">
+              {filteredItems.length} / {items.length} shown
             </span>
 
             {/* Active Filter Badges with 1-click Clear */}
@@ -411,6 +431,36 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
               onItemUpdate={handleItemUpdate}
             />
           ))}
+        </div>
+      ) : items.length === 0 ? (
+        <div className="border-2 border-dashed border-cyber-purple/40 bg-black/60 p-12 text-center select-none flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto shadow-[4px_4px_0px_0px_rgba(157,0,255,0.2)]">
+          <div className="bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/60 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+            [SYS_STATUS: COLLECTION_EMPTY]
+          </div>
+          <h3 className="font-sans font-black text-base text-white uppercase tracking-wider">
+            No {config.label} tracked yet
+          </h3>
+          <p className="font-mono text-xs text-gray-400 max-w-md leading-relaxed">
+            Your personal {type} list is currently empty. Search external databases to add titles to your personal archive or create a custom entry.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+            <button
+              id="btn-empty-add-search"
+              onClick={() => setIsCreateOpen(true)}
+              className="bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[11px] py-2 px-4 border-2 border-white tracking-widest uppercase transition-all shadow-[3px_3px_0px_0px_#ffffff] cursor-pointer flex items-center gap-1.5"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>SEARCH & ADD TITLE</span>
+            </button>
+            <button
+              id="btn-empty-create-new"
+              onClick={() => setIsCreateOpen(true)}
+              className="bg-black hover:bg-white/10 text-white font-bold text-[11px] py-2 px-4 border border-white/40 tracking-widest uppercase transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>NEW CUSTOM ENTRY</span>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="border border-dashed border-gray-800 p-16 text-center select-none flex flex-col items-center justify-center gap-2">

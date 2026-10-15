@@ -5,6 +5,7 @@ import { toMediaItem } from "@/lib/media";
 
 export interface SearchResultItem {
   id: string;
+  mediaId?: string;
   title: string;
   type: 'anime' | 'manga' | 'game' | 'movie' | 'series';
   releaseYear?: string;
@@ -167,9 +168,13 @@ function queryFallbackMock(query: string, type?: string): SearchResultItem[] {
 }
 
 // ----------------------------------------------------
-// LOCAL JSON DATABASE SEARCH HELPER
+// USER LIBRARY & LOCAL MEDIA SEARCH HELPERS
 // ----------------------------------------------------
-async function searchLocalDatabase(query: string, type: string): Promise<SearchResultItem[]> {
+async function searchUserLibrary(
+  query: string,
+  type: string,
+  userId: string
+): Promise<SearchResultItem[]> {
   const normQuery = query.trim();
   const validTypes = ["anime", "manga", "game", "movie", "series"];
   const typeFilter =
@@ -178,14 +183,17 @@ async function searchLocalDatabase(query: string, type: string): Promise<SearchR
       : undefined;
 
   try {
-    // Note: MySQL default collation (utf8mb4_0900_ai_ci) is case-insensitive automatically
-    const entries = await prisma.mediaEntry.findMany({
+    const entries = await prisma.userMediaEntry.findMany({
       where: {
-        ...(typeFilter && { type: typeFilter }),
-        title: {
-          contains: normQuery,
+        userId,
+        ...(typeFilter && { media: { type: typeFilter } }),
+        media: {
+          title: {
+            contains: normQuery,
+          },
         },
       },
+      include: { media: true },
       take: typeFilter ? 8 : 4,
       orderBy: { updatedAt: "desc" },
     });
@@ -193,18 +201,65 @@ async function searchLocalDatabase(query: string, type: string): Promise<SearchR
     return entries.map((entry) => {
       const uiItem = toMediaItem(entry);
       return {
-        id: `local-${entry.type}-${entry.id}`,
+        id: entry.media.id,
+        mediaId: entry.media.id,
         title: uiItem.title,
         type: uiItem.type,
         releaseYear: String(uiItem.releaseYear),
         coverImage: uiItem.coverImage,
-        rating: uiItem.rating !== "N/A" ? uiItem.rating : undefined,
+        rating: uiItem.rating !== "N/A" && uiItem.rating !== "Unrated" ? uiItem.rating : undefined,
         isLocal: true,
         localStatus: uiItem.status,
       };
     });
   } catch (e) {
-    console.warn("[SYS_WARN] Local MySQL lookup failed:", e);
+    console.warn("[SYS_WARN] User library lookup failed:", e);
+    return [];
+  }
+}
+
+async function searchExistingMedia(
+  query: string,
+  type: string,
+  excludeMediaIds: Set<string>
+): Promise<SearchResultItem[]> {
+  const normQuery = query.trim();
+  const validTypes = ["anime", "manga", "game", "movie", "series"];
+  const typeFilter =
+    type !== "all" && validTypes.includes(type.toLowerCase())
+      ? (type.toLowerCase() as MediaType)
+      : undefined;
+
+  try {
+    const entries = await prisma.media.findMany({
+      where: {
+        ...(typeFilter && { type: typeFilter }),
+        title: {
+          contains: normQuery,
+        },
+        ...(excludeMediaIds.size > 0 && {
+          id: {
+            notIn: Array.from(excludeMediaIds),
+          },
+        }),
+      },
+      take: typeFilter ? 8 : 4,
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return entries.map((entry) => ({
+      id: entry.id,
+      mediaId: entry.id,
+      title: entry.title,
+      type: entry.type,
+      releaseYear: String(entry.releaseYear),
+      coverImage: entry.coverImage,
+      rating: entry.externalRating ? `${entry.externalRating.toFixed(1)}/10` : undefined,
+      isLocal: false,
+      localStatus: undefined,
+    }));
+  } catch (e) {
+    console.warn("[SYS_WARN] Existing media lookup failed:", e);
     return [];
   }
 }
@@ -357,17 +412,34 @@ async function searchRAWG(query: string): Promise<SearchResultItem[]> {
 // ----------------------------------------------------
 // UNIFIED SEARCH ROUTINE
 // ----------------------------------------------------
-export async function searchMedia(query: string, type: string): Promise<SearchResultItem[]> {
+export async function searchMedia(
+  query: string,
+  type: string,
+  userId?: string | null
+): Promise<SearchResultItem[]> {
   if (!query || query.trim() === "") {
     return [];
   }
 
   const normalizedType = type.toLowerCase();
 
-  // 1. Fetch matching records from local database collections first
-  const localResults = await searchLocalDatabase(query, normalizedType);
+  // 1. Fetch matching records already tracked by THIS user
+  const userTrackedResults = userId
+    ? await searchUserLibrary(query, normalizedType, userId)
+    : [];
 
-  // 2. Fetch records from external endpoints (or offline fallback list)
+  const trackedMediaIds = new Set<string>(
+    userTrackedResults.map((r) => r.mediaId || r.id)
+  );
+
+  // 2. Fetch existing media from database that THIS user hasn't tracked yet (isLocal: false)
+  const existingDbResults = await searchExistingMedia(
+    query,
+    normalizedType,
+    trackedMediaIds
+  );
+
+  // 3. Fetch records from external endpoints (or offline fallback list)
   let externalResults: SearchResultItem[] = [];
 
   switch (normalizedType) {
@@ -393,9 +465,9 @@ export async function searchMedia(query: string, type: string): Promise<SearchRe
         searchAniList(query, "MANGA"),
         searchTMDB(query, "movie"),
         searchTMDB(query, "tv"),
-        searchRAWG(query)
+        searchRAWG(query),
       ];
-      
+
       try {
         const fetchResults = await Promise.all(promises);
         externalResults = fetchResults.flat();
@@ -407,14 +479,19 @@ export async function searchMedia(query: string, type: string): Promise<SearchRe
     }
   }
 
-  // 3. Merge and de-duplicate by type + title (case-insensitive) to allow multi-format matches
-  const merged = [...localResults];
-  const keysSeen = new Set(localResults.map(r => `${r.type}:${r.title.toLowerCase().trim()}`));
+  // 4. Merge and de-duplicate by type + title (case-insensitive)
+  // Tracked results come first with isLocal: true
+  // Then existing DB results with isLocal: false
+  // Then external results with isLocal: false
+  const merged: SearchResultItem[] = [...userTrackedResults, ...existingDbResults];
+  const keysSeen = new Set(
+    merged.map((r) => `${r.type}:${r.title.toLowerCase().trim()}`)
+  );
 
   for (const item of externalResults) {
     const key = `${item.type}:${item.title.toLowerCase().trim()}`;
     if (!keysSeen.has(key)) {
-      merged.push(item);
+      merged.push({ ...item, isLocal: false });
       keysSeen.add(key);
     }
   }

@@ -4,25 +4,55 @@ import CurrentlyConsuming from "@/components/sections/CurrentlyConsuming";
 import RecentlyCompleted from "@/components/sections/RecentlyCompleted";
 import CategoryStats from "@/components/sections/CategoryStats";
 import SearchBar from "@/components/common/SearchBar";
+import LandingHero from "@/components/sections/LandingHero";
 import { getAllMediaGrouped } from "@/lib/media";
+import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const { animeList, mangaList, gamesList, moviesList, seriesList } = await getAllMediaGrouped();
+  const sessionUser = await getSessionUser();
 
-  // Aggregate active and completed items across all classes
+  // If unauthenticated visitor, display Cyber-Neobrutalist Landing Page
+  if (!sessionUser) {
+    const { prisma } = await import("@/lib/prisma");
+    const [animeCount, mangaCount, gameCount, movieCount, seriesCount] = await Promise.all([
+      prisma.media.count({ where: { type: "anime" } }),
+      prisma.media.count({ where: { type: "manga" } }),
+      prisma.media.count({ where: { type: "game" } }),
+      prisma.media.count({ where: { type: "movie" } }),
+      prisma.media.count({ where: { type: "series" } }),
+    ]);
+    const totalCount = animeCount + mangaCount + gameCount + movieCount + seriesCount;
+
+    return (
+      <LandingHero
+        totalCount={totalCount}
+        animeCount={animeCount}
+        mangaCount={mangaCount}
+        gameCount={gameCount}
+        movieCount={movieCount}
+        seriesCount={seriesCount}
+      />
+    );
+  }
+
+  // Load authenticated user's strictly scoped personal library
+  const { animeList, mangaList, gamesList, moviesList, seriesList } = await getAllMediaGrouped(
+    sessionUser.id
+  );
+
   const allMedia = [...animeList, ...mangaList, ...gamesList, ...moviesList, ...seriesList];
-  
+
+  // Active items for personal console
   const activeItems = allMedia
     .filter((item) => ["Watching", "Reading", "Playing"].includes(item.status))
-    .slice(0, 16); // Cap to 16 most recently updated active items on Dashboard
-  
+    .slice(0, 16);
+
   const completedItems = allMedia.filter((item) => item.status === "Completed");
 
   return (
     <div className="w-full flex flex-col gap-10 md:gap-14">
-      
       {/* Real-time Multi-Database Search Bar */}
       <section className="w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         <div className="flex-1 max-w-2xl">
@@ -45,6 +75,7 @@ export default async function DashboardPage() {
         gamesList={gamesList}
         moviesList={moviesList}
         seriesList={seriesList}
+        user={sessionUser}
       />
 
       {/* Stacked Advanced Media Category Statistics Widgets */}
@@ -61,7 +92,6 @@ export default async function DashboardPage() {
 
       {/* Recently Completed row layout (Sealed archives) */}
       <RecentlyCompleted completedItems={completedItems} />
-      
     </div>
   );
 }

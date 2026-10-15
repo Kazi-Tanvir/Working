@@ -33,40 +33,82 @@ enum ProgressUnit {
   mins
 }
 
-model MediaEntry {
-  id              String        @id @default(cuid())
-  title           String        @db.VarChar(250)
+// ----------------------------------------------------
+// 1. Users Table
+// ----------------------------------------------------
+model User {
+  id              String           @id @default(cuid())
+  username        String           @unique @db.VarChar(50)
+  email           String           @unique @db.VarChar(255)
+  passwordHash    String?          @map("password_hash") @db.VarChar(255)
+  displayName     String           @map("display_name") @db.VarChar(100)
+  avatarUrl       String?          @map("avatar_url") @db.VarChar(500)
+  bio             String?          @db.Text
+  customBadge     String?          @default("[SYS_OPERATOR::RECRUIT]") @map("custom_badge") @db.VarChar(50)
+  authProvider    String           @default("email") @map("auth_provider")
+  providerId      String?          @map("provider_id") @db.VarChar(100)
+  refreshToken    String?          @map("refresh_token") @db.Text
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  library         UserMediaEntry[]
+
+  @@map("users")
+}
+
+// ----------------------------------------------------
+// 2. Master Media Catalog (Shared across all users)
+// ----------------------------------------------------
+model Media {
+  id              String           @id @default(cuid())
+  title           String           @db.VarChar(250)
   type            MediaType
-  status          MediaStatus   @default(plan_to_consume)
-  coverImage      String        @default("") @db.VarChar(500)
-  releaseYear     Int           @default(2026)
-  // MySQL stores string arrays as a native JSON array e.g. ["Action", "Drama"]
+  coverImage      String           @default("") @map("cover_image") @db.VarChar(500)
+  releaseYear     Int              @default(2026) @map("release_year")
+  // MySQL stores string arrays as a native JSON array e.g. ["Action", "Sci-Fi"]
   genres          Json
-  // Structured numeric rating (0.0 to 10.0, null if unrated / "N/A")
-  rating          Float?
-  // External verified rating (IMDb, TMDB, MAL out of 10)
-  externalRating  Float?
-  // Structured numeric progress (replaces "18/28 EP" and "S1E06" regex parsing)
-  progressCurrent Int           @default(0)
-  progressTotal   Int?
-  progressUnit    ProgressUnit  @default(ep)
-  // Structured season breakdown for multi-season series and anime:
-  // Array of { seasonNumber: number, title?: string, episodeCount: number, episodesWatched: number, isCompleted: boolean }
-  seasons         Json?
-  currentSeason   Int           @default(1)
-  // Extended tracking metadata
-  notes           String?       @db.Text
-  isFavorite      Boolean       @default(false)
-  rewatchCount    Int           @default(0)
-  externalId      String?       @db.VarChar(100)
-  externalSource  String?       @db.VarChar(30) // "anilist" | "tmdb" | "rawg" | "local"
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  // Canonical external rating (IMDb, TMDB, MAL out of 10)
+  externalRating  Float?           @map("external_rating")
+  totalEpisodes   Int?             @map("total_episodes")
+  progressUnit    ProgressUnit     @default(ep) @map("progress_unit")
+  // Canonical default seasons structure for TV series and multi-season anime
+  defaultSeasons  Json?            @map("default_seasons")
+  externalId      String?          @map("external_id") @db.VarChar(100)
+  externalSource  String?          @map("external_source") @db.VarChar(30)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  userEntries     UserMediaEntry[]
 
   @@unique([title, type])
   @@index([type])
-  @@index([status])
-  @@index([type, status])
-  @@index([updatedAt])
-  @@map("media_entries")
+  @@map("media_catalog")
+}
+
+// ----------------------------------------------------
+// 3. User Media Entries (Personal Progress per User)
+// ----------------------------------------------------
+model UserMediaEntry {
+  id              String        @id @default(cuid())
+  userId          String        @map("user_id")
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId         String        @map("media_id")
+  media           Media         @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  
+  status          MediaStatus   @default(plan_to_consume)
+  rating          Float?
+  progressCurrent Int           @default(0) @map("progress_current")
+  currentSeason   Int           @default(1) @map("current_season")
+  seasons         Json?
+  notes           String?       @db.Text
+  isFavorite      Boolean       @default(false) @map("is_favorite")
+  rewatchCount    Int           @default(0) @map("rewatch_count")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@unique([userId, mediaId])
+  @@index([userId])
+  @@index([mediaId])
+  @@index([userId, status])
+  @@map("user_media_entries")
 }

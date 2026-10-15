@@ -12,6 +12,7 @@ import {
   Clock 
 } from "lucide-react";
 import { MediaItem } from "@/components/common/MediaCard";
+import { SafeUser } from "@/lib/auth";
 
 function useAnimatedCount(target: number, durationMs = 800) {
   const [count, setCount] = useState(0);
@@ -45,6 +46,7 @@ interface ProfileHeaderProps {
   gamesList: MediaItem[];
   moviesList: MediaItem[];
   seriesList: MediaItem[];
+  user?: SafeUser | null;
 }
 
 export default function ProfileHeader({
@@ -53,6 +55,7 @@ export default function ProfileHeader({
   gamesList,
   moviesList,
   seriesList,
+  user,
 }: ProfileHeaderProps) {
   // Aggregate statistics dynamically
   const allMedia = [...animeList, ...mangaList, ...gamesList, ...moviesList, ...seriesList];
@@ -75,6 +78,14 @@ export default function ProfileHeader({
   const animCompleted = useAnimatedCount(completedCount);
   const animPlan = useAnimatedCount(planToWatchCount);
 
+  // Dynamic profile metadata
+  const username = user?.username || "SENPAI_09";
+  const displayName = user?.displayName || username;
+  const badge = user?.customBadge || (username === "SENPAI_09" ? "[SYS_OPERATOR::ELITE]" : "[SYS_OPERATOR::RECRUIT]");
+  const avatarUrl = user?.avatarUrl || "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=80";
+  const bio = user?.bio || "Archiving media ephemera across multiple timelines. Obsidian-inspired central tracking environment.";
+  const nodeTag = `NODE_${username.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}`;
+
   return (
     <section className="w-full select-none mb-8 md:mb-12">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -86,24 +97,26 @@ export default function ProfileHeader({
             <div className="relative w-28 h-28 aspect-square overflow-hidden border-2 border-white shadow-[2px_2px_0px_0px_#ffffff] mb-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=80"
-                alt="User Avatar"
+                src={avatarUrl}
+                alt={`${displayName} Avatar`}
                 className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-300"
               />
               <div className="absolute inset-0 bg-cyber-purple/10 pointer-events-none" />
             </div>
 
             <div className="bg-cyber-purple border border-white text-white text-[10px] font-bold px-2 py-0.5 mb-2 uppercase tracking-widest">
-              [SYS_OPERATOR::ELITE]
+              {badge}
             </div>
 
             <h2 className="font-sans font-black text-xl text-white tracking-wide uppercase mb-1">
-              SENPAI_09
+              {displayName}
             </h2>
-            <span className="text-[10px] text-gray-500 mb-3 block">IP: 127.0.0.1 // DEV_NODE</span>
+            <span className="text-[10px] text-gray-500 mb-3 block">
+              IP: 127.0.0.1 // {nodeTag}
+            </span>
 
             <p className="font-sans text-xs text-gray-300 font-normal normal-case leading-relaxed border-t border-dashed border-gray-700/70 pt-3">
-              Archiving media ephemera across multiple timelines. Obsidian-inspired central tracking environment.
+              {bio}
             </p>
           </div>
 

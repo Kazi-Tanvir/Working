@@ -180,8 +180,10 @@ export async function fetchSeriesMetadata(title: string): Promise<ExternalMetada
  * Sync an individual media entry from external APIs and update the database.
  */
 export async function syncEntryMetadata(id: string) {
-  const entry = await prisma.mediaEntry.findUnique({
-    where: { id },
+  const entry = await prisma.media.findFirst({
+    where: {
+      OR: [{ id }, { userEntries: { some: { id } } }],
+    },
   });
 
   if (!entry) {
@@ -211,15 +213,15 @@ export async function syncEntryMetadata(id: string) {
   let changed = false;
 
   if ((entry.type === "anime" || entry.type === "series") && externalData.totalEpisodes) {
-    if (entry.progressTotal !== externalData.totalEpisodes) {
-      updates.progressTotal = externalData.totalEpisodes;
+    if (entry.totalEpisodes !== externalData.totalEpisodes) {
+      updates.totalEpisodes = externalData.totalEpisodes;
       changed = true;
     }
   }
 
   if (entry.type === "manga" && externalData.totalChapters) {
-    if (entry.progressTotal !== externalData.totalChapters) {
-      updates.progressTotal = externalData.totalChapters;
+    if (entry.totalEpisodes !== externalData.totalChapters) {
+      updates.totalEpisodes = externalData.totalChapters;
       changed = true;
     }
   }
@@ -232,16 +234,16 @@ export async function syncEntryMetadata(id: string) {
   }
 
   if (changed) {
-    const updated = await prisma.mediaEntry.update({
-      where: { id },
+    const updated = await prisma.media.update({
+      where: { id: entry.id },
       data: updates,
     });
 
     return {
       updated: true,
-      message: `Updated total count to ${updates.progressTotal ?? entry.progressTotal} ${entry.progressUnit.toUpperCase()} from ${externalData.source.toUpperCase()}.`,
+      message: `Updated total count to ${updates.totalEpisodes ?? entry.totalEpisodes} ${entry.progressUnit.toUpperCase()} from ${externalData.source.toUpperCase()}.`,
       entry: updated,
-      newTotal: updates.progressTotal ?? entry.progressTotal,
+      newTotal: updates.totalEpisodes ?? entry.totalEpisodes,
     };
   }
 

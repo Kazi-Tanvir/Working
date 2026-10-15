@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchMedia } from "@/utils/apiHelpers";
+import { getUserFromRequest } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  const sessionUser = await getUserFromRequest(request);
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q") || "";
   const type = searchParams.get("type") || "all";
@@ -11,7 +13,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const results = await searchMedia(query, type);
+    const results = await searchMedia(query, type, sessionUser?.id);
     return NextResponse.json({ success: true, results });
   } catch (error: any) {
     console.error("Search API Route error:", error);

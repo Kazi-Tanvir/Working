@@ -99,6 +99,7 @@ export default function SearchBar({ className }: { className?: string }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          mediaId: item.mediaId || (item.id.includes("-") ? undefined : item.id),
           title: item.title,
           type: item.type,
           releaseYear: item.releaseYear,
@@ -114,9 +115,14 @@ export default function SearchBar({ className }: { className?: string }) {
         setAddedIds(prev => ({ ...prev, [item.id]: true }));
         router.refresh();
       } else if (res.status === 409) {
-        // Already exists — mark as added anyway
+        // Already exists in user's library — mark as added
         setAddedIds(prev => ({ ...prev, [item.id]: true }));
         router.refresh();
+      } else if (res.status === 401) {
+        setErrorIds(prev => ({ ...prev, [item.id]: "LOGIN REQ" }));
+        setTimeout(() => {
+          setErrorIds(prev => ({ ...prev, [item.id]: "" }));
+        }, 4000);
       } else {
         setErrorIds(prev => ({ ...prev, [item.id]: data.error || "Failed to add" }));
         // Clear error after 4s
@@ -241,9 +247,9 @@ export default function SearchBar({ className }: { className?: string }) {
                               ★ {item.rating}
                             </span>
                           )}
-                          {item.isLocal && (
+                          {item.isLocal && item.localStatus && (
                             <span className="text-[9px] font-mono font-extrabold uppercase bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/30 px-1.5 py-0.5 rounded-sm">
-                              [LOCAL: {item.localStatus}]
+                              [IN LIST: {item.localStatus}]
                             </span>
                           )}
                         </div>
@@ -258,7 +264,7 @@ export default function SearchBar({ className }: { className?: string }) {
                       >
                         <span className="flex items-center gap-1">
                           <Check className="w-3.5 h-3.5 text-cyber-green" />
-                          [SYNCED]
+                          [TRACKED]
                         </span>
                       </button>
                     ) : errorIds[item.id] ? (

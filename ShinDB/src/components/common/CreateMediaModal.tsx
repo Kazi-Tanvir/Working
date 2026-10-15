@@ -442,6 +442,7 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          mediaId: item.mediaId || (item.id.includes("-") ? undefined : item.id),
           title: item.title,
           type: item.type,
           releaseYear: item.releaseYear,
@@ -462,6 +463,8 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
       } else if (res.status === 409) {
         setAddedIds(prev => ({ ...prev, [item.id]: true }));
         showToast(`"${item.title}" is already in your database`, "info");
+      } else if (res.status === 401) {
+        showToast("Please authenticate to add items to your library", "error");
       } else {
         showToast(data.error || "Failed to add item.", "error");
       }
@@ -556,7 +559,7 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
               ADD {defaultType.toUpperCase()}
             </span>
             <span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest hidden sm:inline">
-              ONLINE_CATALOG_SYNC
+              GLOBAL_DATABASE_SYNC
             </span>
           </div>
 
@@ -792,7 +795,7 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                                   {item.rating}
                                 </span>
                               )}
-                              {item.isLocal && (
+                              {item.isLocal && item.localStatus && (
                                 <span className="text-cyber-green font-bold">
                                   [IN ARCHIVE • {item.localStatus}]
                                 </span>

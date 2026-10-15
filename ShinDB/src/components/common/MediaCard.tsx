@@ -17,6 +17,7 @@ import { SeasonData, formatStructuredProgress, calculateTotalWatched, calculateT
 
 export interface MediaItem {
   id: string;
+  mediaId?: string;
   title: string;
   rating: string;
   externalRating?: string | null;
@@ -33,6 +34,7 @@ export interface MediaItem {
   type: "anime" | "manga" | "game" | "movie" | "series";
   notes?: string;
   isFavorite?: boolean;
+  isUserTracked?: boolean;
 }
 
 interface MediaCardProps {
@@ -453,6 +455,36 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
     }
   };
 
+  const handleTrackItem = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const defaultStatus =
+        item.type === "manga" ? "reading" : item.type === "game" ? "playing" : "watching";
+      const res = await fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mediaId: item.mediaId || item.id,
+          title: item.title,
+          type: item.type,
+          status: defaultStatus,
+          progressCurrent: 0,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const displayStatus =
+          item.type === "manga" ? "Reading" : item.type === "game" ? "Playing" : "Watching";
+        setCurrentStatus(displayStatus);
+        if (onItemUpdate && data.entry) {
+          onItemUpdate(data.entry);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to track item", err);
+    }
+  };
+
   // Determine Aspect Ratio based on category images
   const isGame = item.type === "game";
   const aspectClass = isGame ? "aspect-video" : "aspect-[2/3]";
@@ -515,41 +547,53 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
 
                 {/* Bottom Panel: Progress counter on left, Action buttons on right */}
                 <div className="border-t border-white/20 pt-1.5 flex items-center justify-between gap-2 w-full mt-auto">
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-mono text-[7px] text-gray-400 uppercase tracking-widest leading-none">
-                      LOGGED
-                    </span>
-                    <span className="font-mono font-black text-[11px] tracking-wide text-white truncate">
-                      {currentProgress}
-                    </span>
-                  </div>
-
-                  {/* Micro-interaction increment buttons */}
-                  <div className="flex items-center gap-1 shrink-0">
+                  {currentStatus === "Not Tracked" ? (
                     <button
-                      onClick={handleDecrement}
-                      className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
-                      title="Decrement Progress"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <button
-                      onClick={handleIncrement}
-                      className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
-                      title="Increment Progress"
+                      onClick={handleTrackItem}
+                      className="w-full bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[9px] py-1 px-2 border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <Plus className="w-3 h-3" />
+                      <span>TRACK GAME</span>
                     </button>
-                    {currentStatus !== "Completed" && (
-                      <button
-                        onClick={handleComplete}
-                        className="bg-white/10 hover:bg-cyber-green hover:text-black border border-white/20 text-white p-1 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
-                        title="Mark Completed"
-                      >
-                        <Check className="w-3 h-3" />
-                      </button>
-                    )}
-                  </div>
+                  ) : (
+                    <>
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-mono text-[7px] text-gray-400 uppercase tracking-widest leading-none">
+                          LOGGED
+                        </span>
+                        <span className="font-mono font-black text-[11px] tracking-wide text-white truncate">
+                          {currentProgress}
+                        </span>
+                      </div>
+
+                      {/* Micro-interaction increment buttons */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={handleDecrement}
+                          className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                          title="Decrement Progress"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={handleIncrement}
+                          className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                          title="Increment Progress"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                        {currentStatus !== "Completed" && (
+                          <button
+                            onClick={handleComplete}
+                            className="bg-white/10 hover:bg-cyber-green hover:text-black border border-white/20 text-white p-1 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                            title="Mark Completed"
+                          >
+                            <Check className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ) : (
@@ -600,43 +644,55 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
                   </div>
                 </div>
 
-                {/* Bottom Panel: Progress on left, Controls on right (Seasons stay inside the Modal) */}
+                {/* Bottom Panel: Progress on left, Controls on right */}
                 <div className="border-t border-white/20 pt-2 flex items-center justify-between gap-2 w-full mt-auto">
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-mono text-[8px] text-gray-400 uppercase tracking-widest leading-none">
-                      PROGRESS
-                    </span>
-                    <span className="font-mono font-bold text-xs tracking-wide text-white truncate" title={currentProgress}>
-                      {currentProgress}
-                    </span>
-                  </div>
-
-                  {/* Micro-interaction increment buttons */}
-                  <div className="flex items-center gap-1 shrink-0">
+                  {currentStatus === "Not Tracked" ? (
                     <button
-                      onClick={handleDecrement}
-                      className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
-                      title="Decrement Progress"
-                    >
-                      <Minus className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={handleIncrement}
-                      className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
-                      title="Increment Progress"
+                      onClick={handleTrackItem}
+                      className="w-full bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[10px] py-1.5 px-2 border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
+                      <span>ADD TO MY LOGS</span>
                     </button>
-                    {currentStatus !== "Completed" && (
-                      <button
-                        onClick={handleComplete}
-                        className="bg-white/10 hover:bg-cyber-green hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
-                        title="Mark Completed"
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
+                  ) : (
+                    <>
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-mono text-[8px] text-gray-400 uppercase tracking-widest leading-none">
+                          PROGRESS
+                        </span>
+                        <span className="font-mono font-bold text-xs tracking-wide text-white truncate" title={currentProgress}>
+                          {currentProgress}
+                        </span>
+                      </div>
+
+                      {/* Micro-interaction increment buttons */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={handleDecrement}
+                          className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                          title="Decrement Progress"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={handleIncrement}
+                          className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                          title="Increment Progress"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                        {currentStatus !== "Completed" && (
+                          <button
+                            onClick={handleComplete}
+                            className="bg-white/10 hover:bg-cyber-green hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                            title="Mark Completed"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}

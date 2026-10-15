@@ -172,7 +172,7 @@ export default function CategoryStats({
   ];
 
   return (
-    <section className="w-full flex flex-col gap-10 select-none font-mono">
+    <section className="w-full flex flex-col gap-12 md:gap-14 select-none font-mono">
       {rows.map((row) => {
         const Icon = row.icon;
         const active = countStatus(row.list, ["watching", "reading", "playing"]);
@@ -183,13 +183,13 @@ export default function CategoryStats({
         const recent = row.list.slice(0, 3);
 
         return (
-          <div key={row.key} className="flex flex-col gap-3">
+          <div key={row.key} className="flex flex-col gap-3.5">
             <div className="flex items-center justify-between">
               <div
                 className={`flex items-center gap-2 border bg-black/60 px-3.5 py-1.5 rounded-md text-xs font-bold text-white ${row.borderShadowClass}`}
               >
                 <Icon className={`w-4 h-4 ${row.accentText}`} />
-                <span className="tracking-widest uppercase">{row.title}</span>
+                <span className="font-sans tracking-wider uppercase font-bold">{row.title}</span>
               </div>
               <Link
                 href={row.href}
@@ -291,7 +291,7 @@ export default function CategoryStats({
                         />
                       </div>
                       <div className="flex-grow flex flex-col gap-0.5 min-w-0">
-                        <span className="text-xs font-bold text-gray-300 group-hover:text-white transition-colors truncate">
+                        <span className="font-sans text-xs font-bold text-gray-200 group-hover:text-white transition-colors truncate">
                           {item.title}
                         </span>
                         <span className="text-[9px] text-gray-500 truncate">

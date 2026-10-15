@@ -10,6 +10,10 @@ interface CurrentlyConsumingProps {
 }
 
 export default function CurrentlyConsuming({ activeItems }: CurrentlyConsumingProps) {
+  if (!activeItems || activeItems.length === 0) {
+    return null;
+  }
+
   return (
     <section className="w-full font-mono mb-8 md:mb-12 animate-section-in" style={{ animationDelay: '0.1s' }}>
       {/* Section Tactile Header Bar */}

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { MediaType, MediaStatus, ProgressUnit } from "@prisma/client";
 import { toMediaItem } from "@/lib/media";
+import { getCanonicalExternalRating } from "@/utils/seasonHelpers";
 
 const CreateTrackSchema = z.object({
   title: z.string().min(1).max(250),
@@ -32,8 +33,8 @@ function normalizeStatusInput(status: string | undefined, type: MediaType): Medi
   if (s === "dropped") return "dropped";
   if (s === "on hold" || s === "on-hold" || s === "on_hold") return "on_hold";
   if (s.startsWith("plan")) return "plan_to_consume";
-  if (s === "reading" || type === "manga") return "reading";
-  if (s === "playing" || type === "game") return "playing";
+  if (type === "manga") return "reading";
+  if (type === "game") return "playing";
   return "watching";
 }
 
@@ -112,6 +113,7 @@ export async function POST(request: NextRequest) {
 
     const { title, type, releaseYear, coverImage, rating, status, progress, genres } = parsed.data;
     const prog = parseProgressInput(progress, type);
+    const canonicalRating = getCanonicalExternalRating(title.trim());
 
     const created = await prisma.mediaEntry.create({
       data: {
@@ -119,6 +121,7 @@ export async function POST(request: NextRequest) {
         type,
         status: normalizeStatusInput(status, type),
         rating: parseRatingInput(rating),
+        externalRating: canonicalRating,
         progressCurrent: prog.progressCurrent,
         progressTotal: prog.progressTotal,
         progressUnit: prog.progressUnit,
@@ -251,16 +254,33 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, message: `Deleted entry ${id}` });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === "P2025") {
+      return NextResponse.json({ success: false, error: "Entry not found" }, { status: 404 });
+    }
     console.error("[TRACK_API_DELETE]", error);
     return NextResponse.json({ success: false, error: "Failed to delete entry" }, { status: 500 });
   }
 }
 
+const VALID_MEDIA_TYPES: MediaType[] = ["anime", "manga", "game", "movie", "series"];
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get("type") as MediaType | null;
+    const typeParam = searchParams.get("type");
+
+    if (typeParam && !VALID_MEDIA_TYPES.includes(typeParam as MediaType)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Invalid type parameter: "${typeParam}". Must be one of: ${VALID_MEDIA_TYPES.join(", ")}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const type = typeParam as MediaType | null;
 
     const entries = await prisma.mediaEntry.findMany({
       where: {

@@ -3,7 +3,6 @@ import { Terminal, Shield } from "lucide-react";
 import ProfileHeader from "@/components/sections/ProfileHeader";
 import CurrentlyConsuming from "@/components/sections/CurrentlyConsuming";
 import RecentlyCompleted from "@/components/sections/RecentlyCompleted";
-import SearchBar from "@/components/common/SearchBar";
 import Badge from "@/components/common/Badge";
 import CategoryStats from "@/components/sections/CategoryStats";
 import { getAllMediaGrouped } from "@/lib/media";
@@ -23,7 +22,7 @@ export default async function DashboardPage() {
   const completedItems = allMedia.filter((item) => item.status === "Completed");
 
   return (
-    <div className="w-full flex flex-col gap-8 md:gap-10">
+    <div className="w-full flex flex-col gap-10 md:gap-14">
       
       {/* Retro Welcome Terminal Header */}
       <header className="border-2 border-white bg-black p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] select-none font-mono">
@@ -53,11 +52,6 @@ export default async function DashboardPage() {
           </Badge>
         </div>
       </header>
-
-      {/* Prominent Search Bar Section */}
-      <section className="flex justify-center w-full">
-        <SearchBar />
-      </section>
 
       {/* Profile aggregates summary header */}
       <ProfileHeader

@@ -45,7 +45,7 @@ export const getStatusOptionsForType = (type: string): string[] => {
     case "game":
       return ["Plan to Play", "Playing", "Completed", "On Hold", "Dropped"];
     case "movie":
-      return ["Plan to Watch", "Watching", "Completed", "Dropped"];
+      return ["Plan to Watch", "Completed", "Dropped"];
     case "anime":
     case "series":
     default:
@@ -339,10 +339,15 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
   const handleAddSeason = async () => {
     const existing = seasonsState || [];
     const nextNum = existing.length > 0 ? Math.max(...existing.map((s) => s.seasonNumber)) + 1 : 1;
+    const promptInput = typeof window !== "undefined" ? window.prompt(`Enter episode count for Season ${nextNum}:`, "12") : "12";
+    if (promptInput === null) return; // User cancelled
+    const parsedCount = parseInt(promptInput, 10);
+    const episodeCount = isNaN(parsedCount) || parsedCount <= 0 ? 12 : parsedCount;
+
     const newSeason: SeasonData = {
       seasonNumber: nextNum,
       title: `Season ${nextNum}`,
-      episodeCount: 8,
+      episodeCount,
       episodesWatched: 0,
       isCompleted: false,
     };

@@ -87,6 +87,13 @@ export const CANONICAL_EXTERNAL_RATINGS: Record<string, number> = {
   "kaguya-sama: love is war": 8.7
 };
 
+function matchesCanonicalTitle(cleanTitle: string, canonicalKey: string): boolean {
+  if (cleanTitle === canonicalKey) return true;
+  const escaped = canonicalKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i");
+  return regex.test(cleanTitle);
+}
+
 /**
  * Generate default structured seasons for a title
  */
@@ -97,9 +104,11 @@ export function generateDefaultSeasons(
 ): SeasonData[] {
   const cleanTitle = title.toLowerCase().trim();
   
-  // 1. Check known canonical patterns
-  for (const [key, pattern] of Object.entries(CANONICAL_SEASONS_MAP)) {
-    if (cleanTitle.includes(key) || key.includes(cleanTitle)) {
+  // 1. Check known canonical patterns (sorted by length descending for best specificity)
+  const sortedSeasonKeys = Object.keys(CANONICAL_SEASONS_MAP).sort((a, b) => b.length - a.length);
+  for (const key of sortedSeasonKeys) {
+    if (matchesCanonicalTitle(cleanTitle, key)) {
+      const pattern = CANONICAL_SEASONS_MAP[key];
       let remaining = currentWatched;
       return pattern.map((eps, idx) => {
         const sNum = idx + 1;
@@ -259,9 +268,10 @@ export function formatStructuredProgress(
  */
 export function getCanonicalExternalRating(title: string): number | null {
   const cleanTitle = title.toLowerCase().trim();
-  for (const [key, rating] of Object.entries(CANONICAL_EXTERNAL_RATINGS)) {
-    if (cleanTitle.includes(key) || key.includes(cleanTitle)) {
-      return rating;
+  const sortedRatingKeys = Object.keys(CANONICAL_EXTERNAL_RATINGS).sort((a, b) => b.length - a.length);
+  for (const key of sortedRatingKeys) {
+    if (matchesCanonicalTitle(cleanTitle, key)) {
+      return CANONICAL_EXTERNAL_RATINGS[key];
     }
   }
   return null;

@@ -186,7 +186,7 @@ async function searchLocalDatabase(query: string, type: string): Promise<SearchR
           contains: normQuery,
         },
       },
-      take: 8,
+      take: typeFilter ? 8 : 4,
       orderBy: { updatedAt: "desc" },
     });
 
@@ -407,17 +407,18 @@ export async function searchMedia(query: string, type: string): Promise<SearchRe
     }
   }
 
-  // 3. Merge and de-duplicate by title (case-insensitive) to prevent repeats
+  // 3. Merge and de-duplicate by type + title (case-insensitive) to allow multi-format matches
   const merged = [...localResults];
-  const titlesSeen = new Set(localResults.map(r => r.title.toLowerCase()));
+  const keysSeen = new Set(localResults.map(r => `${r.type}:${r.title.toLowerCase().trim()}`));
 
   for (const item of externalResults) {
-    if (!titlesSeen.has(item.title.toLowerCase())) {
+    const key = `${item.type}:${item.title.toLowerCase().trim()}`;
+    if (!keysSeen.has(key)) {
       merged.push(item);
-      titlesSeen.add(item.title.toLowerCase());
+      keysSeen.add(key);
     }
   }
 
-  // Return top 12 combined matches
-  return merged.slice(0, 12);
+  // Return top 16 combined matches so external discoveries aren't crowded out
+  return merged.slice(0, 16);
 }

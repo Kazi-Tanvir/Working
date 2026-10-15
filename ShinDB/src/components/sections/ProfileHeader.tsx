@@ -1,16 +1,43 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { 
   Tv, 
   BookOpen, 
   Gamepad2, 
   Film, 
-  User, 
   Terminal, 
   CheckSquare, 
   PlayCircle, 
   Clock 
 } from "lucide-react";
 import { MediaItem } from "@/components/common/MediaCard";
+
+function useAnimatedCount(target: number, durationMs = 800) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    let animId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / durationMs, 1);
+      const ease = 1 - Math.pow(1 - progress, 4);
+      setCount(Math.floor(ease * target));
+      if (progress < 1) {
+        animId = requestAnimationFrame(step);
+      } else {
+        setCount(target);
+      }
+    };
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [target, durationMs]);
+
+  return count;
+}
 
 interface ProfileHeaderProps {
   animeList: MediaItem[];
@@ -39,12 +66,21 @@ export default function ProfileHeader({
     m.status === "Plan to Watch" || m.status === "Plan to Read" || m.status === "Plan to Play"
   ).length;
 
+  const animAnime = useAnimatedCount(animeList.length);
+  const animManga = useAnimatedCount(mangaList.length);
+  const animGames = useAnimatedCount(gamesList.length);
+  const animMoviesSeries = useAnimatedCount(moviesList.length + seriesList.length);
+  const animTotal = useAnimatedCount(totalCount);
+  const animActive = useAnimatedCount(activeCount);
+  const animCompleted = useAnimatedCount(completedCount);
+  const animPlan = useAnimatedCount(planToWatchCount);
+
   return (
-    <section className="w-full select-none font-mono mb-8 md:mb-12">
+    <section className="w-full select-none mb-8 md:mb-12">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* User Card Frame */}
-        <div className="lg:col-span-4 bg-cyber-card border-2 border-white p-6 shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-[6px_6px_0px_0px_var(--cyber-purple)] transition-all flex flex-col items-center text-center justify-between">
+        <div className="lg:col-span-4 bg-cyber-card border-2 border-white p-6 shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-[6px_6px_0px_0px_var(--cyber-purple)] transition-all flex flex-col items-center text-center justify-between font-mono">
           <div className="w-full flex flex-col items-center">
             {/* User Avatar Setup */}
             <div className="relative w-28 h-28 aspect-square overflow-hidden border-2 border-white shadow-[2px_2px_0px_0px_#ffffff] mb-4">
@@ -66,8 +102,8 @@ export default function ProfileHeader({
             </h2>
             <span className="text-[10px] text-gray-500 mb-3 block">IP: 127.0.0.1 // DEV_NODE</span>
 
-            <p className="text-xs text-gray-400 leading-relaxed border-t border-dashed border-gray-700 pt-3">
-              ARCHIVING MEDIA EPHEMERA ACROSS MULTIPLE TIMELINES. DESIGN INSPIRED BY ADVANCED OBSIDIAN SYSTEMS.
+            <p className="font-sans text-xs text-gray-300 font-normal normal-case leading-relaxed border-t border-dashed border-gray-700/70 pt-3">
+              Archiving media ephemera across multiple timelines. Obsidian-inspired central tracking environment.
             </p>
           </div>
 
@@ -80,7 +116,7 @@ export default function ProfileHeader({
         </div>
 
         {/* Dynamic Aggregated Statistics Grid */}
-        <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
           
           {/* ANIME COUNTER */}
           <div className="bg-cyber-card border-2 border-cyber-purple p-4 shadow-[4px_4px_0px_0px_var(--cyber-purple)] hover:-translate-y-0.5 transition-all flex flex-col justify-between">
@@ -89,8 +125,8 @@ export default function ProfileHeader({
               <Tv className="w-5 h-5 text-cyber-purple" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-white block leading-none mb-1">
-                {animeList.length}
+              <span className="text-3xl font-extrabold text-white block leading-none mb-1 tabular-nums">
+                {animAnime}
               </span>
               <span className="text-[9px] text-gray-500 uppercase tracking-widest">[RECORDS_LOGGED]</span>
             </div>
@@ -103,8 +139,8 @@ export default function ProfileHeader({
               <BookOpen className="w-5 h-5 text-cyber-orange" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-white block leading-none mb-1">
-                {mangaList.length}
+              <span className="text-3xl font-extrabold text-white block leading-none mb-1 tabular-nums">
+                {animManga}
               </span>
               <span className="text-[9px] text-gray-500 uppercase tracking-widest">[RECORDS_LOGGED]</span>
             </div>
@@ -117,8 +153,8 @@ export default function ProfileHeader({
               <Gamepad2 className="w-5 h-5 text-cyber-green" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-white block leading-none mb-1">
-                {gamesList.length}
+              <span className="text-3xl font-extrabold text-white block leading-none mb-1 tabular-nums">
+                {animGames}
               </span>
               <span className="text-[9px] text-gray-500 uppercase tracking-widest">[RECORDS_LOGGED]</span>
             </div>
@@ -131,8 +167,8 @@ export default function ProfileHeader({
               <Film className="w-5 h-5 text-cyber-cyan" />
             </div>
             <div>
-              <span className="text-3xl font-extrabold text-white block leading-none mb-1">
-                {moviesList.length + seriesList.length}
+              <span className="text-3xl font-extrabold text-white block leading-none mb-1 tabular-nums">
+                {animMoviesSeries}
               </span>
               <span className="text-[9px] text-gray-500 uppercase tracking-widest">[RECORDS_LOGGED]</span>
             </div>
@@ -146,7 +182,7 @@ export default function ProfileHeader({
               </div>
               <div className="flex flex-col">
                 <span className="text-gray-500 text-[10px] font-bold tracking-wider">TOTAL TRACKED</span>
-                <span className="text-2xl font-black text-white leading-none mt-1">{totalCount} ITEMS</span>
+                <span className="text-2xl font-black text-white leading-none mt-1 tabular-nums">{animTotal} ITEMS</span>
               </div>
             </div>
             <div className="text-[9px] text-right text-gray-500 leading-normal">
@@ -159,17 +195,17 @@ export default function ProfileHeader({
           <div className="col-span-2 bg-cyber-card border-2 border-white p-4 grid grid-cols-3 gap-2 text-center shadow-[4px_4px_0px_0px_#ffffff]">
             <div className="flex flex-col items-center justify-center">
               <PlayCircle className="w-4 h-4 text-cyber-cyan mb-1" />
-              <span className="text-lg font-black text-white leading-none">{activeCount}</span>
+              <span className="text-lg font-black text-white leading-none tabular-nums">{animActive}</span>
               <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider mt-1">ACTIVE</span>
             </div>
             <div className="flex flex-col items-center justify-center border-x border-gray-800">
               <CheckSquare className="w-4 h-4 text-cyber-green mb-1" />
-              <span className="text-lg font-black text-white leading-none">{completedCount}</span>
+              <span className="text-lg font-black text-white leading-none tabular-nums">{animCompleted}</span>
               <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider mt-1">DONE</span>
             </div>
             <div className="flex flex-col items-center justify-center">
               <Clock className="w-4 h-4 text-cyber-yellow mb-1" />
-              <span className="text-lg font-black text-white leading-none">{planToWatchCount}</span>
+              <span className="text-lg font-black text-white leading-none tabular-nums">{animPlan}</span>
               <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider mt-1">BACKLOG</span>
             </div>
           </div>

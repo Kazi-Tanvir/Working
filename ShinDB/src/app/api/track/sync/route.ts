@@ -11,11 +11,18 @@ export async function POST(request: NextRequest) {
 
     // 1. Sync specific item if ID provided
     if (id) {
-      const result = await syncEntryMetadata(id);
-      return NextResponse.json({
-        success: true,
-        ...result,
-      });
+      try {
+        const result = await syncEntryMetadata(id);
+        return NextResponse.json({
+          success: true,
+          ...result,
+        });
+      } catch (err: any) {
+        if (err.message === "Media entry not found") {
+          return NextResponse.json({ success: false, error: "Media entry not found" }, { status: 404 });
+        }
+        throw err;
+      }
     }
 
     // 2. Batch sync entries where total is unknown (progressTotal === null)

@@ -17,7 +17,7 @@ const RegisterSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain alphanumeric characters and underscores")
     .transform((val) => val.toLowerCase()),
   email: z.string().email("Invalid email address").transform((val) => val.toLowerCase()),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   displayName: z.string().max(50).optional(),
 });
 

@@ -4,12 +4,13 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { 
-  Activity, 
-  Tv, 
-  BookOpen, 
-  Gamepad2, 
-  Film, 
+import { UserButton, useUser } from "@clerk/nextjs";
+import {
+  Activity,
+  Tv,
+  BookOpen,
+  Gamepad2,
+  Film,
   Terminal,
   Menu,
   X,
@@ -20,6 +21,7 @@ import {
 export default function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { isSignedIn, user: clerkUser } = useUser();
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -42,9 +44,8 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={`w-full border-b-2 border-white sticky top-0 z-40 select-none font-mono transition-all duration-300 ${
-      scrolled ? "navbar-scrolled" : "bg-black"
-    }`}>
+    <nav className={`w-full border-b-2 border-white sticky top-0 z-40 select-none font-mono transition-all duration-300 ${scrolled ? "navbar-scrolled" : "bg-black"
+      }`}>
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-3.5">
         {/* Mobile Header containing Branding, Status, and Hamburger */}
         <div className="flex items-center justify-between w-full md:w-auto">
@@ -77,11 +78,10 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className={`relative flex items-center justify-center md:justify-start gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1.5 border transition-all duration-200 ${
-                  isActive
+                className={`relative flex items-center justify-center md:justify-start gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1.5 border transition-all duration-200 ${isActive
                     ? "bg-white text-black border-white shadow-[2px_2px_0px_0px_rgba(255,255,255,0.4)]"
                     : "bg-transparent text-gray-400 border-transparent hover:border-white hover:text-white hover:bg-white/5"
-                }`}
+                  }`}
               >
                 {link.icon}
                 <span>{link.label}</span>
@@ -95,20 +95,43 @@ export default function Navbar() {
 
         {/* User Session Bar */}
         <div className={`${isOpen ? "flex" : "hidden"} md:flex items-center gap-2.5 border-t md:border-t-0 border-white/10 pt-3 md:pt-0`}>
-          {user ? (
-            <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
+          {isSignedIn ? (
+            <div className="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-start">
               {/* Operator Badge */}
               <div className="flex items-center gap-2 border border-white/20 bg-white/5 px-2.5 py-1 text-xs text-gray-300">
-                <span className="w-2 h-2 rounded-full bg-cyber-lime animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-cyber-green animate-pulse" />
+                <span className="font-bold uppercase tracking-wider text-white">
+                  @{clerkUser?.username || clerkUser?.firstName || user?.username || "OPERATOR"}
+                </span>
+              </div>
+
+              {/* Clerk User Button */}
+              <div className="flex items-center justify-center">
+                <UserButton
+                  appearance={{
+                    elements: {
+                      rootBox: "flex items-center justify-center h-7 w-7",
+                      userButtonTrigger:
+                        "flex items-center justify-center h-7 w-7 rounded-none p-0 border border-white shadow-[2px_2px_0px_0px_#ffffff] hover:shadow-[3px_3px_0px_0px_var(--cyber-cyan)] transition-all bg-black focus:outline-none",
+                      userButtonAvatarBox: "h-full w-full rounded-none flex items-center justify-center",
+                      userButtonAvatarImage: "rounded-none h-full w-full object-cover",
+                      avatarBox: "rounded-none h-full w-full",
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          ) : user ? (
+            <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
+              <div className="flex items-center gap-2 border border-white/20 bg-white/5 px-2.5 py-1 text-xs text-gray-300">
+                <span className="w-2 h-2 rounded-full bg-cyber-green animate-pulse" />
                 <span className="font-bold uppercase tracking-wider text-white">
                   @{user.username}
                 </span>
               </div>
-
-              {/* Logout Button */}
               <button
                 onClick={() => logout()}
-                className="flex items-center gap-1.5 border border-white/30 hover:border-cyber-rose hover:bg-cyber-rose/10 hover:text-cyber-rose text-gray-400 text-xs px-2.5 py-1 uppercase tracking-wider transition-all cursor-pointer"
+                className="flex items-center gap-1.5 border border-white/30 hover:border-red-500 hover:bg-red-500/10 hover:text-red-400 text-gray-400 text-xs px-2.5 py-1 uppercase tracking-wider transition-all cursor-pointer"
                 title="Disconnect from session"
               >
                 <LogOut className="w-3.5 h-3.5" />

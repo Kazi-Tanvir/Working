@@ -12,6 +12,8 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.9.15",
+    "@clerk/themes": "^2.4.57",
     "@prisma/client": "^6.4.1",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.12",

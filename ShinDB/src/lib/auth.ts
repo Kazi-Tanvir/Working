@@ -132,10 +132,160 @@ export async function verifyToken(token: string): Promise<TokenPayload | null> {
   }
 }
 
+import { currentUser, auth } from "@clerk/nextjs/server";
+import { cache } from "react";
+
+// Fast in-memory cache for user sessions to prevent repeated external network calls
+const userCache = new Map<string, { user: SafeUser; expiresAt: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache
+
+export function invalidateUserCache(userId?: string) {
+  if (userId) {
+    userCache.delete(userId);
+  } else {
+    userCache.clear();
+  }
+}
+
+// ----------------------------------------------------
+// Clerk & Prisma User Synchronization
+// ----------------------------------------------------
+export async function syncClerkUserWithPrisma(clerkUser: any): Promise<SafeUser | null> {
+  if (!clerkUser) return null;
+
+  const clerkId = clerkUser.id;
+  const primaryEmail = clerkUser.emailAddresses?.[0]?.emailAddress;
+  const username =
+    clerkUser.username ||
+    (primaryEmail ? primaryEmail.split("@")[0] : `user_${clerkId.slice(-6)}`);
+  const displayName =
+    [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || username;
+  const avatarUrl = clerkUser.imageUrl || null;
+
+  try {
+    // 1. Search for existing user with clerkId or email
+    let user = await (prisma.user as any).findFirst({
+      where: {
+        OR: [
+          { clerkId },
+          ...(primaryEmail ? [{ email: primaryEmail }] : []),
+        ],
+      },
+    });
+
+    if (!user) {
+      // Create user in database
+      let finalUsername = username;
+      const existingUsername = await (prisma.user as any).findUnique({
+        where: { username: finalUsername },
+      });
+      if (existingUsername) {
+        finalUsername = `${username}_${Math.floor(Math.random() * 8999 + 1000)}`;
+      }
+
+      user = await (prisma.user as any).create({
+        data: {
+          username: finalUsername,
+          email: primaryEmail || `${clerkId}@clerk.shindb.internal`,
+          clerkId: clerkId,
+          displayName: displayName,
+          avatarUrl: avatarUrl,
+          authProvider: "clerk",
+          customBadge: "[SYS_OPERATOR::RECRUIT]",
+        },
+      });
+    } else if (!user.clerkId || user.clerkId !== clerkId) {
+      // Link clerkId if not yet linked
+      user = await (prisma.user as any).update({
+        where: { id: user.id },
+        data: {
+          clerkId: clerkId,
+          authProvider: user.authProvider === "email" ? "clerk" : user.authProvider,
+        },
+      });
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      customBadge: user.customBadge,
+      authProvider: user.authProvider,
+      createdAt: user.createdAt,
+    };
+  } catch (err) {
+    console.error("[AUTH] Error syncing Clerk user with Prisma:", err);
+    return null;
+  }
+}
+
+export async function resolveClerkUser(userId: string): Promise<SafeUser | null> {
+  const cached = userCache.get(userId);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.user;
+  }
+
+  // 1. Fast local Prisma DB check (~1ms query, NO Clerk API round-trip)
+  try {
+    const user = await (prisma.user as any).findFirst({
+      where: { clerkId: userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        displayName: true,
+        avatarUrl: true,
+        bio: true,
+        customBadge: true,
+        authProvider: true,
+        createdAt: true,
+      },
+    });
+
+    if (user) {
+      userCache.set(userId, { user, expiresAt: Date.now() + CACHE_TTL_MS });
+      return user;
+    }
+  } catch (err) {
+    console.error("[AUTH] Error checking local Prisma user by clerkId:", err);
+  }
+
+  // 2. Only if not yet in local DB, fetch from Clerk API for initial profile sync
+  try {
+    const clerkUser = await currentUser();
+    if (clerkUser) {
+      const syncedUser = await syncClerkUserWithPrisma(clerkUser);
+      if (syncedUser) {
+        userCache.set(userId, { user: syncedUser, expiresAt: Date.now() + CACHE_TTL_MS });
+        return syncedUser;
+      }
+    }
+  } catch (err) {
+    console.error("[AUTH] Error during first-time Clerk user sync:", err);
+  }
+
+  return null;
+}
+
 // ----------------------------------------------------
 // Cookie & Session Resolvers
 // ----------------------------------------------------
-export async function getSessionUser(): Promise<SafeUser | null> {
+export const getSessionUser = cache(async function getSessionUser(): Promise<SafeUser | null> {
+  // 1. Fast local check via auth() (JWT verification only, 0ms network time)
+  try {
+    const { userId } = await auth();
+    if (userId) {
+      const user = await resolveClerkUser(userId);
+      if (user) return user;
+    }
+  } catch {
+    // Fall back to legacy token check if Clerk is not active
+  }
+
+  // 2. Legacy JWT cookie session fallback
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(ACCESS_COOKIE_NAME)?.value;
@@ -165,11 +315,22 @@ export async function getSessionUser(): Promise<SafeUser | null> {
     console.error("[AUTH] Failed to get session user:", err);
     return null;
   }
-}
+});
 
 export async function getUserFromRequest(request: Request): Promise<SafeUser | null> {
+  // 1. Fast local check via auth() (JWT verification only, 0ms network time)
   try {
-    // 1. Check Authorization header (Bearer token)
+    const { userId } = await auth();
+    if (userId) {
+      const user = await resolveClerkUser(userId);
+      if (user) return user;
+    }
+  } catch {
+    // Fall back to legacy header/cookie check
+  }
+
+  // 2. Fallback to Bearer token or legacy Cookie
+  try {
     const authHeader = request.headers.get("authorization");
     let token: string | undefined;
 
@@ -177,7 +338,6 @@ export async function getUserFromRequest(request: Request): Promise<SafeUser | n
       token = authHeader.substring(7);
     }
 
-    // 2. Fallback to Cookie header
     if (!token) {
       const cookieHeader = request.headers.get("cookie");
       if (cookieHeader) {

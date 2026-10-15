@@ -4,7 +4,6 @@ import CurrentlyConsuming from "@/components/sections/CurrentlyConsuming";
 import RecentlyCompleted from "@/components/sections/RecentlyCompleted";
 import CategoryStats from "@/components/sections/CategoryStats";
 import SearchBar from "@/components/common/SearchBar";
-import LandingHero from "@/components/sections/LandingHero";
 import { getAllMediaGrouped } from "@/lib/media";
 import { getSessionUser } from "@/lib/auth";
 
@@ -13,33 +12,9 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const sessionUser = await getSessionUser();
 
-  // If unauthenticated visitor, display Cyber-Neobrutalist Landing Page
-  if (!sessionUser) {
-    const { prisma } = await import("@/lib/prisma");
-    const [animeCount, mangaCount, gameCount, movieCount, seriesCount] = await Promise.all([
-      prisma.media.count({ where: { type: "anime" } }),
-      prisma.media.count({ where: { type: "manga" } }),
-      prisma.media.count({ where: { type: "game" } }),
-      prisma.media.count({ where: { type: "movie" } }),
-      prisma.media.count({ where: { type: "series" } }),
-    ]);
-    const totalCount = animeCount + mangaCount + gameCount + movieCount + seriesCount;
-
-    return (
-      <LandingHero
-        totalCount={totalCount}
-        animeCount={animeCount}
-        mangaCount={mangaCount}
-        gameCount={gameCount}
-        movieCount={movieCount}
-        seriesCount={seriesCount}
-      />
-    );
-  }
-
-  // Load authenticated user's strictly scoped personal library
+  // Load user's personal library if logged in, otherwise empty library
   const { animeList, mangaList, gamesList, moviesList, seriesList } = await getAllMediaGrouped(
-    sessionUser.id
+    sessionUser?.id
   );
 
   const allMedia = [...animeList, ...mangaList, ...gamesList, ...moviesList, ...seriesList];

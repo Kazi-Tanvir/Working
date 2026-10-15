@@ -47,6 +47,7 @@ model User {
   customBadge     String?          @default("[SYS_OPERATOR::RECRUIT]") @map("custom_badge") @db.VarChar(50)
   authProvider    String           @default("email") @map("auth_provider")
   providerId      String?          @map("provider_id") @db.VarChar(100)
+  clerkId         String?          @unique @map("clerk_id") @db.VarChar(100)
   refreshToken    String?          @map("refresh_token") @db.Text
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")

@@ -33,6 +33,12 @@ enum ProgressUnit {
   mins
 }
 
+enum FriendshipStatus {
+  pending
+  accepted
+  blocked
+}
+
 // ----------------------------------------------------
 // 1. Users Table
 // ----------------------------------------------------
@@ -52,7 +58,9 @@ model User {
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
 
-  library         UserMediaEntry[]
+  library             UserMediaEntry[]
+  sentFriendships     Friendship[]     @relation("SentFriendships")
+  receivedFriendships Friendship[]     @relation("ReceivedFriendships")
 
   @@map("users")
 }
@@ -112,4 +120,24 @@ model UserMediaEntry {
   @@index([mediaId])
   @@index([userId, status])
   @@map("user_media_entries")
+}
+
+// ----------------------------------------------------
+// 4. Friendships (Social Graph per User)
+// ----------------------------------------------------
+model Friendship {
+  id          String           @id @default(cuid())
+  requesterId String           @map("requester_id")
+  addresseeId String           @map("addressee_id")
+  status      FriendshipStatus @default(pending)
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  requester   User             @relation("SentFriendships", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee   User             @relation("ReceivedFriendships", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId, status])
+  @@map("friendships")
 }

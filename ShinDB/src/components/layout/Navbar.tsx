@@ -15,7 +15,9 @@ import {
   Menu,
   X,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  Users,
+  Settings as SettingsIcon,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -24,6 +26,34 @@ export default function Navbar() {
   const { isSignedIn, user: clerkUser } = useUser();
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [pendingRequestsCount, setPendingRequestsCount] = useState<number>(0);
+
+  // Poll or check pending friend requests if user is logged in
+  useEffect(() => {
+    if (!user && !isSignedIn) return;
+
+    let isMounted = true;
+    const fetchPendingCount = async () => {
+      try {
+        const res = await fetch("/api/users/friends/requests");
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) {
+            setPendingRequestsCount(data.pendingCount || 0);
+          }
+        }
+      } catch {
+        // silent fail
+      }
+    };
+
+    fetchPendingCount();
+    const interval = setInterval(fetchPendingCount, 30000); // 30s poll
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [user, isSignedIn]);
 
   // Track scroll position for backdrop blur
   useEffect(() => {
@@ -41,6 +71,12 @@ export default function Navbar() {
     { href: "/games", label: "Games", icon: <Gamepad2 className="w-4 h-4" /> },
     { href: "/movies", label: "Movies", icon: <Film className="w-4 h-4" /> },
     { href: "/series", label: "Series", icon: <Tv className="w-4 h-4" /> },
+    {
+      href: "/friends",
+      label: "Friends",
+      icon: <Users className="w-4 h-4" />,
+      badge: pendingRequestsCount > 0 ? pendingRequestsCount : null,
+    },
   ];
 
   return (
@@ -72,7 +108,7 @@ export default function Navbar() {
         {/* Navigation Categories Router */}
         <div className={`${isOpen ? "flex" : "hidden"} md:flex flex-col md:flex-row flex-wrap items-stretch md:items-center gap-2 md:gap-2.5 w-full md:w-auto`}>
           {links.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
             return (
               <Link
                 key={link.href}
@@ -85,6 +121,11 @@ export default function Navbar() {
               >
                 {link.icon}
                 <span>{link.label}</span>
+                {link.badge ? (
+                  <span className="ml-1 px-1.5 py-0.2 text-[10px] bg-cyber-red text-white font-extrabold border border-white animate-pulse">
+                    {link.badge}
+                  </span>
+                ) : null}
                 {isActive && (
                   <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-cyber-purple rounded-full hidden md:block" />
                 )}
@@ -96,14 +137,35 @@ export default function Navbar() {
         {/* User Session Bar */}
         <div className={`${isOpen ? "flex" : "hidden"} md:flex items-center gap-2.5 border-t md:border-t-0 border-white/10 pt-3 md:pt-0`}>
           {isSignedIn ? (
-            <div className="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-start">
-              {/* Operator Badge */}
-              <div className="flex items-center gap-2 border border-white/20 bg-white/5 px-2.5 py-1 text-xs text-gray-300">
+            <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
+              {/* Operator Profile Link */}
+              <Link
+                href="/profile"
+                className={`flex items-center gap-2 border px-2.5 py-1 text-xs transition-all ${
+                  pathname === "/profile"
+                    ? "border-cyber-cyan bg-cyber-cyan/10 text-cyber-cyan"
+                    : "border-white/20 bg-white/5 hover:border-white text-gray-300"
+                }`}
+                title="View Operator Profile"
+              >
                 <span className="w-2 h-2 rounded-full bg-cyber-green animate-pulse" />
                 <span className="font-bold uppercase tracking-wider text-white">
                   @{clerkUser?.username || clerkUser?.firstName || user?.username || "OPERATOR"}
                 </span>
-              </div>
+              </Link>
+
+              {/* Settings Link */}
+              <Link
+                href="/settings"
+                className={`p-1.5 border transition-all ${
+                  pathname === "/settings"
+                    ? "border-cyber-purple bg-cyber-purple/20 text-white"
+                    : "border-white/20 hover:border-white text-gray-400 hover:text-white bg-white/5"
+                }`}
+                title="System Settings"
+              >
+                <SettingsIcon className="w-3.5 h-3.5" />
+              </Link>
 
               {/* Clerk User Button */}
               <div className="flex items-center justify-center">
@@ -123,12 +185,35 @@ export default function Navbar() {
             </div>
           ) : user ? (
             <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
-              <div className="flex items-center gap-2 border border-white/20 bg-white/5 px-2.5 py-1 text-xs text-gray-300">
+              {/* Operator Profile Link */}
+              <Link
+                href="/profile"
+                className={`flex items-center gap-2 border px-2.5 py-1 text-xs transition-all ${
+                  pathname === "/profile"
+                    ? "border-cyber-cyan bg-cyber-cyan/10 text-cyber-cyan"
+                    : "border-white/20 bg-white/5 hover:border-white text-gray-300"
+                }`}
+                title="View Operator Profile"
+              >
                 <span className="w-2 h-2 rounded-full bg-cyber-green animate-pulse" />
                 <span className="font-bold uppercase tracking-wider text-white">
                   @{user.username}
                 </span>
-              </div>
+              </Link>
+
+              {/* Settings Link */}
+              <Link
+                href="/settings"
+                className={`p-1.5 border transition-all ${
+                  pathname === "/settings"
+                    ? "border-cyber-purple bg-cyber-purple/20 text-white"
+                    : "border-white/20 hover:border-white text-gray-400 hover:text-white bg-white/5"
+                }`}
+                title="System Settings"
+              >
+                <SettingsIcon className="w-3.5 h-3.5" />
+              </Link>
+
               <button
                 onClick={() => logout()}
                 className="flex items-center gap-1.5 border border-white/30 hover:border-red-500 hover:bg-red-500/10 hover:text-red-400 text-gray-400 text-xs px-2.5 py-1 uppercase tracking-wider transition-all cursor-pointer"

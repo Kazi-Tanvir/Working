@@ -28,7 +28,7 @@ interface AuthContextType {
   oauthLogin: (
     provider: "google" | "discord",
     payload?: { email?: string; name?: string; avatarUrl?: string; providerId?: string }
-  ) => Promise<{ success: boolean; error?: string }>;
+  ) => Promise<{ success: boolean; error?: string; needsUsername?: boolean; redirect?: string }>;
   refreshUser: () => Promise<void>;
 }
 
@@ -136,6 +136,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (!res.ok) {
         return { success: false, error: data.error || `${provider} authentication failed` };
+      }
+
+      if (data.needsUsername) {
+        if (data.redirect) {
+          router.push(data.redirect);
+        }
+        return { success: true, needsUsername: true, redirect: data.redirect };
       }
 
       setUser(data.user);

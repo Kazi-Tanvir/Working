@@ -4,18 +4,42 @@ import { prisma } from "@/lib/prisma";
 import {
   signAccessToken,
   signRefreshToken,
+  signGoogleOnboardingToken,
   ACCESS_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
+  GOOGLE_ONBOARDING_COOKIE,
 } from "@/lib/auth";
 
 const GoogleAuthSchema = z.object({
-  code: z.string().optional(),
-  email: z.string().email().optional(),
-  name: z.string().optional(),
-  avatarUrl: z.string().url().optional(),
+  email: z.string().email(),
+  name: z.string().min(1).default("Google User"),
+  avatarUrl: z.string().optional().nullable(),
   providerId: z.string().optional(),
 });
 
+// GET: Initiates Google OAuth redirect to Google's consent screen
+export async function GET(request: NextRequest) {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
+  const redirectUri = `${baseUrl}/api/auth/callback/google`;
+
+  if (!clientId) {
+    // If client ID is not configured yet in .env, redirect to login with query param
+    return NextResponse.redirect(new URL("/login?google_missing_client=true", request.url));
+  }
+
+  const googleUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+  googleUrl.searchParams.set("client_id", clientId);
+  googleUrl.searchParams.set("redirect_uri", redirectUri);
+  googleUrl.searchParams.set("response_type", "code");
+  googleUrl.searchParams.set("scope", "openid email profile");
+  googleUrl.searchParams.set("access_type", "offline");
+  googleUrl.searchParams.set("prompt", "select_account");
+
+  return NextResponse.redirect(googleUrl.toString());
+}
+
+// POST: Direct / Dev verification of Google profile
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
@@ -23,50 +47,56 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-        { error: "Invalid OAuth payload", details: result.error.flatten().fieldErrors },
+        { error: "Invalid Google OAuth payload", details: result.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
-    // In a live environment with GOOGLE_CLIENT_ID & SECRET, exchange 'code' for tokens.
-    // For local dev/demo or token payload verification:
-    const email = result.data.email || "google.pilot@shindb.io";
-    const name = result.data.name || "Google Pilot";
-    const avatarUrl =
-      result.data.avatarUrl ||
-      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80";
-    const providerId = result.data.providerId || "google_usr_9988";
+    const { email, name, avatarUrl, providerId } = result.data;
+    const cleanEmail = email.toLowerCase().trim();
+    const resolvedProviderId = providerId || `google_${cleanEmail.replace(/[^a-z0-9]/g, "_")}`;
 
-    // 1. Find or create user
+    // Check if user already exists
     let user = await prisma.user.findFirst({
       where: {
-        OR: [{ email }, { providerId }],
+        OR: [{ email: cleanEmail }, { providerId: resolvedProviderId }],
       },
     });
 
+    // CASE 1: First time Google Login -> User needs to choose their username!
     if (!user) {
-      // Auto-generate clean unique username
-      const baseName = name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 15) || "user";
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const username = `${baseName}_${randomSuffix}`;
-
-      user = await prisma.user.create({
-        data: {
-          username,
-          email,
-          displayName: name,
-          avatarUrl,
-          authProvider: "google",
-          providerId,
-        },
+      const onboardingToken = await signGoogleOnboardingToken({
+        email: cleanEmail,
+        name: name.trim(),
+        avatarUrl: avatarUrl || null,
+        providerId: resolvedProviderId,
       });
-    } else if (user.authProvider !== "google") {
-      // Link Google account to existing user
+
+      const response = NextResponse.json({
+        success: true,
+        needsUsername: true,
+        redirect: "/auth/choose-username",
+      });
+
+      // Set temporary 20-minute onboarding cookie
+      response.cookies.set(GOOGLE_ONBOARDING_COOKIE, onboardingToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 20, // 20 minutes
+        path: "/",
+      });
+
+      return response;
+    }
+
+    // CASE 2: User already exists -> Log them in!
+    if (user.authProvider !== "google") {
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
           authProvider: "google",
-          providerId,
+          providerId: resolvedProviderId,
           avatarUrl: user.avatarUrl || avatarUrl,
         },
       });
@@ -94,8 +124,9 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json(
       {
         message: "Google authentication successful",
+        needsUsername: false,
         user: safeUser,
-        token: accessToken,
+        redirect: "/",
       },
       { status: 200 }
     );

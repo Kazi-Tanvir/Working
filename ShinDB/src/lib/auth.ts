@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export const ACCESS_COOKIE_NAME = "shindb_access_token";
 export const REFRESH_COOKIE_NAME = "shindb_refresh_token";
+export const GOOGLE_ONBOARDING_COOKIE = "shindb_google_onboarding";
 
 const JWT_SECRET = process.env.JWT_SECRET || "shindb_cyber_neobrutalist_secret_key_2026_dev_seed";
 const encodedKey = new TextEncoder().encode(JWT_SECRET);
@@ -15,6 +16,14 @@ export interface TokenPayload {
   email: string;
   displayName: string;
   type: "access" | "refresh";
+}
+
+export interface GoogleOnboardingPayload {
+  email: string;
+  name: string;
+  avatarUrl: string | null;
+  providerId: string;
+  type: "google_onboarding";
 }
 
 export interface SafeUser {
@@ -80,6 +89,36 @@ export async function signRefreshToken(user: {
     .setIssuedAt()
     .setExpirationTime("30d")
     .sign(encodedKey);
+}
+
+export async function signGoogleOnboardingToken(data: {
+  email: string;
+  name: string;
+  avatarUrl: string | null;
+  providerId: string;
+}): Promise<string> {
+  return new SignJWT({
+    ...data,
+    type: "google_onboarding",
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("20m")
+    .sign(encodedKey);
+}
+
+export async function verifyGoogleOnboardingToken(
+  token: string
+): Promise<GoogleOnboardingPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, encodedKey, {
+      algorithms: ["HS256"],
+    });
+    if (payload.type !== "google_onboarding") return null;
+    return payload as unknown as GoogleOnboardingPayload;
+  } catch {
+    return null;
+  }
 }
 
 export async function verifyToken(token: string): Promise<TokenPayload | null> {

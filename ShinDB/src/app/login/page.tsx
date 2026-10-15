@@ -4,14 +4,15 @@ import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { Terminal, Lock, User, AlertCircle, ArrowRight, ShieldCheck } from "lucide-react";
+import { Terminal, Lock, User, AlertCircle, ArrowRight } from "lucide-react";
+import { OAuthButtons } from "@/components/auth/OAuthButtons";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
 
-  const { login, oauthLogin } = useAuth();
+  const { login } = useAuth();
   const [loginInput, setLoginInput] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -37,18 +38,6 @@ function LoginForm() {
     }
   };
 
-  const handleOAuth = async (provider: "google" | "discord") => {
-    setError(null);
-    setIsSubmitting(true);
-    const result = await oauthLogin(provider);
-    setIsSubmitting(false);
-
-    if (!result.success) {
-      setError(result.error || `${provider} authentication failed`);
-    } else {
-      router.push(redirect);
-    }
-  };
 
   return (
     <div className="w-full max-w-md mx-auto my-auto flex flex-col gap-6 font-mono">
@@ -149,31 +138,8 @@ function LoginForm() {
           </button>
         </form>
 
-        {/* OAuth Section Divider */}
-        <div className="relative flex items-center justify-center my-1">
-          <div className="border-t border-white/20 w-full" />
-          <span className="bg-[#0a0a0f] px-3 text-[10px] text-gray-500 uppercase tracking-widest shrink-0">
-            FEDERATED CLEARANCE [PLACEHOLDER]
-          </span>
-        </div>
-
-        {/* OAuth Placeholders */}
-        <div className="grid grid-cols-2 gap-3 opacity-60">
-          <div
-            title="OAuth integration is in standby mode. Use standard credentials."
-            className="h-10 border border-white/20 bg-white/5 text-[11px] text-gray-400 font-bold uppercase tracking-wider flex items-center justify-center gap-2 select-none cursor-not-allowed"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-cyber-cyan" />
-            <span>Google [Soon]</span>
-          </div>
-          <div
-            title="OAuth integration is in standby mode. Use standard credentials."
-            className="h-10 border border-white/20 bg-white/5 text-[11px] text-gray-400 font-bold uppercase tracking-wider flex items-center justify-center gap-2 select-none cursor-not-allowed"
-          >
-            <Terminal className="w-3.5 h-3.5 text-cyber-purple" />
-            <span>Discord [Soon]</span>
-          </div>
-        </div>
+        {/* OAuth Federated Section */}
+        <OAuthButtons label="FEDERATED CLEARANCE" />
 
         {/* Base Account Credentials Info */}
         <div className="border border-white/10 bg-white/5 p-3 text-[11px] text-gray-400 flex flex-col gap-1">

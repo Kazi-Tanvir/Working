@@ -14,6 +14,7 @@ import {
 import Badge from "./Badge";
 import MediaModal from "./MediaModal";
 import { SeasonData, formatStructuredProgress, calculateTotalWatched, calculateTotalEpisodes } from "@/utils/seasonHelpers";
+import { showToast } from "@/components/common/Toast";
 
 export interface MediaItem {
   id: string;
@@ -42,15 +43,30 @@ interface MediaCardProps {
   onStatusChange?: (id: string, newStatus: string) => void;
   onProgressChange?: (id: string, newProgress: string) => void;
   onItemUpdate?: (updatedItem: MediaItem) => void;
+  isFriendView?: boolean;
+  isAlreadyTracked?: boolean;
+  onAddPlan?: (item: MediaItem) => void | Promise<void>;
+  readOnly?: boolean;
 }
 
-export default function MediaCard({ item, onStatusChange, onProgressChange, onItemUpdate }: MediaCardProps) {
+export default function MediaCard({
+  item,
+  onStatusChange,
+  onProgressChange,
+  onItemUpdate,
+  isFriendView = false,
+  isAlreadyTracked = false,
+  onAddPlan,
+  readOnly = false,
+}: MediaCardProps) {
   // Setup simulated interactive state for progressive tracking (plus/minus)
   const [currentProgress, setCurrentProgress] = useState(item.progress);
   const [currentStatus, setCurrentStatus] = useState(item.status);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeSeasonNum, setActiveSeasonNum] = useState(item.currentSeason || 1);
   const [seasonsState, setSeasonsState] = useState<SeasonData[] | undefined>(item.seasons);
+  const [isLocallyTracked, setIsLocallyTracked] = useState(isAlreadyTracked);
+  const [isAddingPlan, setIsAddingPlan] = useState(false);
 
   // Synchronize state when item prop updates from collection
   React.useEffect(() => {
@@ -58,7 +74,74 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
     setCurrentStatus(item.status);
     setActiveSeasonNum(item.currentSeason || 1);
     setSeasonsState(item.seasons);
-  }, [item]);
+    setIsLocallyTracked(isAlreadyTracked);
+  }, [item, isAlreadyTracked]);
+
+  const getPlanVerb = () => {
+    if (item.type === "manga") return "READ";
+    if (item.type === "game") return "PLAY";
+    return "WATCH";
+  };
+
+  const getPlanLabel = () => {
+    if (item.type === "manga") return "Plan to Read";
+    if (item.type === "game") return "Plan to Play";
+    return "Plan to Watch";
+  };
+
+  const planVerb = getPlanVerb();
+  const planLabel = getPlanLabel();
+
+  const handlePlanClick = async (e?: React.MouseEvent | MediaItem) => {
+    if (e && "stopPropagation" in e) {
+      e.stopPropagation();
+    }
+    if (isLocallyTracked || isAddingPlan) return;
+    setIsAddingPlan(true);
+
+    if (onAddPlan) {
+      try {
+        await onAddPlan(item);
+        setIsLocallyTracked(true);
+      } catch (err) {
+        console.error("Error in onAddPlan:", err);
+      } finally {
+        setIsAddingPlan(false);
+      }
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mediaId: item.mediaId || item.id,
+          title: item.title,
+          type: item.type,
+          status: "plan_to_consume",
+          progressCurrent: 0,
+          coverImage: item.coverImage,
+          releaseYear: item.releaseYear,
+          genres: item.genres,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsLocallyTracked(true);
+        showToast(`✓ Added "${item.title}" to ${planLabel}`, "success");
+      } else if (res.status === 409) {
+        setIsLocallyTracked(true);
+        showToast(`"${item.title}" is already in your library`, "info");
+      } else {
+        showToast(`ERROR: ${data.error || "Failed to add to your list"}`, "error");
+      }
+    } catch {
+      showToast("ERROR: Failed to add to your list", "error");
+    } finally {
+      setIsAddingPlan(false);
+    }
+  };
 
   // Determine media icon & colors dynamically
   const getMediaMeta = () => {
@@ -522,13 +605,35 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
                     {currentStatus}
                   </Badge>
 
-                  <div className="flex items-center gap-1 font-mono text-[10px] text-cyber-yellow font-bold bg-black/80 px-1.5 py-0.5 border border-white/10 shrink-0">
-                    <Star className="w-3 h-3 fill-cyber-yellow" />
-                    <span>{item.rating.split("/")[0]}</span>
-                    {item.externalRating && (
-                      <span className="text-[8px] text-cyber-cyan border-l border-white/20 pl-1" title="External Rating">
-                        {item.externalRating.split("/")[0]}
-                      </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1 font-mono text-[10px] text-cyber-yellow font-bold bg-black/80 px-1.5 py-0.5 border border-white/10 shrink-0">
+                      <Star className="w-3 h-3 fill-cyber-yellow" />
+                      <span>{item.rating.split("/")[0]}</span>
+                      {item.externalRating && (
+                        <span className="text-[8px] text-cyber-cyan border-l border-white/20 pl-1" title="External Rating">
+                          {item.externalRating.split("/")[0]}
+                        </span>
+                      )}
+                    </div>
+
+                    {isFriendView && (
+                      isLocallyTracked ? (
+                        <div
+                          className="p-1 bg-cyber-green/20 text-cyber-green border border-cyber-green/60 rounded-sm"
+                          title="Already in your library"
+                        >
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </div>
+                      ) : (
+                        <button
+                          onClick={handlePlanClick}
+                          disabled={isAddingPlan}
+                          className="p-1 bg-cyber-purple hover:bg-white text-white hover:text-black border border-white shadow-[2px_2px_0px_0px_#ffffff] transition-all cursor-pointer active:scale-90 rounded-sm"
+                          title="Add to my list as Plan to Play"
+                        >
+                          <Plus className="w-3 h-3 stroke-[3]" />
+                        </button>
+                      )
                     )}
                   </div>
                 </div>
@@ -549,7 +654,24 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
 
                 {/* Bottom Panel: Progress counter on left, Action buttons on right */}
                 <div className="border-t border-white/20 pt-1.5 flex items-center justify-between gap-2 w-full mt-auto">
-                  {currentStatus === "Not Tracked" ? (
+                  {isFriendView ? (
+                    isLocallyTracked ? (
+                      <div className="w-full bg-cyber-green/20 border border-cyber-green/60 text-cyber-green font-mono font-bold text-[9px] py-1 px-2 flex items-center justify-center gap-1.5 rounded-sm">
+                        <Check className="w-3 h-3" />
+                        <span>IN YOUR LIBRARY</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handlePlanClick}
+                        disabled={isAddingPlan}
+                        className="w-full bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[9px] py-1 px-2 border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center justify-center gap-1 cursor-pointer active:scale-95"
+                        title="Add to my list as Plan to Play"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>{isAddingPlan ? "ADDING..." : "+ PLAN TO PLAY"}</span>
+                      </button>
+                    )
+                  ) : currentStatus === "Not Tracked" ? (
                     <button
                       onClick={handleTrackItem}
                       className="w-full bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[9px] py-1 px-2 border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center justify-center gap-1 cursor-pointer"
@@ -607,13 +729,35 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
                     {currentStatus}
                   </Badge>
 
-                  <div className="flex items-center gap-1 font-mono text-[10px] text-cyber-yellow font-bold bg-black/80 px-1.5 py-0.5 border border-white/10 shrink-0">
-                    <Star className="w-3 h-3 fill-cyber-yellow" />
-                    <span>{item.rating.split("/")[0]}</span>
-                    {item.externalRating && (
-                      <span className="text-[8px] text-cyber-cyan border-l border-white/20 pl-1" title="Official External Rating">
-                        {item.externalRating.split("/")[0]}
-                      </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1 font-mono text-[10px] text-cyber-yellow font-bold bg-black/80 px-1.5 py-0.5 border border-white/10 shrink-0">
+                      <Star className="w-3 h-3 fill-cyber-yellow" />
+                      <span>{item.rating.split("/")[0]}</span>
+                      {item.externalRating && (
+                        <span className="text-[8px] text-cyber-cyan border-l border-white/20 pl-1" title="Official External Rating">
+                          {item.externalRating.split("/")[0]}
+                        </span>
+                      )}
+                    </div>
+
+                    {isFriendView && (
+                      isLocallyTracked ? (
+                        <div
+                          className="p-1 bg-cyber-green/20 text-cyber-green border border-cyber-green/60 rounded-sm"
+                          title="Already in your library"
+                        >
+                          <Check className="w-3.5 h-3.5 stroke-[3]" />
+                        </div>
+                      ) : (
+                        <button
+                          onClick={handlePlanClick}
+                          disabled={isAddingPlan}
+                          className="p-1 bg-cyber-purple hover:bg-white text-white hover:text-black border border-white shadow-[2px_2px_0px_0px_#ffffff] transition-all cursor-pointer active:scale-90 rounded-sm"
+                          title={`Add to my list as ${planLabel}`}
+                        >
+                          <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                        </button>
+                      )
                     )}
                   </div>
                 </div>
@@ -648,7 +792,24 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
 
                 {/* Bottom Panel: Progress on left, Controls on right */}
                 <div className="border-t border-white/20 pt-2 flex items-center justify-between gap-2 w-full mt-auto">
-                  {currentStatus === "Not Tracked" ? (
+                  {isFriendView ? (
+                    isLocallyTracked ? (
+                      <div className="w-full bg-cyber-green/20 border border-cyber-green/60 text-cyber-green font-mono font-bold text-[10px] py-1.5 px-2 flex items-center justify-center gap-1.5 rounded-sm">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>IN YOUR LIBRARY</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handlePlanClick}
+                        disabled={isAddingPlan}
+                        className="w-full bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[10px] py-1.5 px-2 border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                        title={`Add to my list as ${planLabel}`}
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>{isAddingPlan ? "ADDING..." : `+ ${planLabel.toUpperCase()}`}</span>
+                      </button>
+                    )
+                  ) : currentStatus === "Not Tracked" ? (
                     <button
                       onClick={handleTrackItem}
                       className="w-full bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[10px] py-1.5 px-2 border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center justify-center gap-1.5 cursor-pointer"
@@ -743,6 +904,10 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
         }}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        readOnly={readOnly || isFriendView}
+        isFriendView={isFriendView}
+        isAlreadyTracked={isLocallyTracked}
+        onAddPlan={() => handlePlanClick()}
         onUpdateItem={(updatedItem) => {
           setCurrentStatus(updatedItem.status);
           setCurrentProgress(updatedItem.progress);

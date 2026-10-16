@@ -40,6 +40,10 @@ interface MediaModalProps {
   onClose: () => void;
   onUpdateItem?: (updatedItem: MediaItem) => void;
   onUpdateState?: (status: string, progress: string) => void;
+  readOnly?: boolean;
+  isFriendView?: boolean;
+  isAlreadyTracked?: boolean;
+  onAddPlan?: (item: MediaItem) => void | Promise<void>;
 }
 
 export const getStatusOptionsForType = (type: string): string[] => {
@@ -65,7 +69,17 @@ const DEFAULT_COVER_IMAGES = {
   series: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80"
 };
 
-export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpdateState }: MediaModalProps) {
+export default function MediaModal({
+  item,
+  isOpen,
+  onClose,
+  onUpdateItem,
+  onUpdateState,
+  readOnly = false,
+  isFriendView = false,
+  isAlreadyTracked = false,
+  onAddPlan,
+}: MediaModalProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -768,7 +782,24 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
           </div>
 
           <div className="flex items-center gap-3">
-            {!isEditing && !showConfirmDelete && (
+            {isFriendView && (
+              isAlreadyTracked ? (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-cyber-green/20 text-cyber-green border border-cyber-green/60 text-[10px] font-mono font-bold rounded-sm">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>IN YOUR LIST</span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onAddPlan && onAddPlan(item)}
+                  className="px-3 py-1 bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[10px] border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>+ {item.type === "manga" ? "PLAN TO READ" : item.type === "game" ? "PLAN TO PLAY" : "PLAN TO WATCH"}</span>
+                </button>
+              )
+            )}
+            {!readOnly && !isEditing && !showConfirmDelete && (
               <>
                 {(item.type === "anime" || item.type === "manga" || item.type === "series") && (
                   <button
@@ -1248,23 +1279,25 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                             </span>
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleToggleSeasonCompleted(activeSeason.seasonNumber)}
-                            className={`px-2.5 py-1 text-[10px] border font-bold flex items-center gap-1 transition-all cursor-pointer ${
-                              activeSeason.isCompleted
-                                ? "bg-cyber-green/20 text-cyber-green border-cyber-green hover:bg-cyber-red/20 hover:text-cyber-red hover:border-cyber-red"
-                                : "bg-cyber-green/15 text-cyber-green border-cyber-green/40 hover:bg-cyber-green hover:text-black"
-                            }`}
-                            title={
-                              activeSeason.isCompleted
-                                ? `Season ${activeSeason.seasonNumber} completed. Click to mark incomplete/reset.`
-                                : `Mark all ${activeSeason.episodeCount} episodes of Season ${activeSeason.seasonNumber} as completed.`
-                            }
-                          >
-                            <Check className="w-3 h-3" />
-                            {activeSeason.isCompleted ? "✓ Completed (Click to Reset)" : `Mark S${activeSeason.seasonNumber} Completed`}
-                          </button>
+                          {!readOnly && (
+                            <button
+                              type="button"
+                              onClick={() => handleToggleSeasonCompleted(activeSeason.seasonNumber)}
+                              className={`px-2.5 py-1 text-[10px] border font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                                activeSeason.isCompleted
+                                  ? "bg-cyber-green/20 text-cyber-green border-cyber-green hover:bg-cyber-red/20 hover:text-cyber-red hover:border-cyber-red"
+                                  : "bg-cyber-green/15 text-cyber-green border-cyber-green/40 hover:bg-cyber-green hover:text-black"
+                              }`}
+                              title={
+                                activeSeason.isCompleted
+                                  ? `Season ${activeSeason.seasonNumber} completed. Click to mark incomplete/reset.`
+                                  : `Mark all ${activeSeason.episodeCount} episodes of Season ${activeSeason.seasonNumber} as completed.`
+                              }
+                            >
+                              <Check className="w-3 h-3" />
+                              {activeSeason.isCompleted ? "✓ Completed (Click to Reset)" : `Mark S${activeSeason.seasonNumber} Completed`}
+                            </button>
+                          )}
                         </div>
 
                         {/* Episode Grid with Small Square Buttons */}
@@ -1275,13 +1308,14 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                               <button
                                 key={epNum}
                                 type="button"
-                                onClick={() => handleSetEpisodeWatched(activeSeason.seasonNumber, epNum)}
-                                className={`w-8 h-8 border font-mono text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
+                                disabled={readOnly}
+                                onClick={() => !readOnly && handleSetEpisodeWatched(activeSeason.seasonNumber, epNum)}
+                                className={`w-8 h-8 border font-mono text-xs font-bold flex items-center justify-center transition-all ${readOnly ? "cursor-default" : "cursor-pointer"} ${
                                   isWatched
                                     ? "bg-cyber-cyan text-black border-cyber-cyan font-black shadow-[1px_1px_0px_0px_rgba(255,255,255,0.4)]"
                                     : "bg-[#111] text-gray-400 border-white/20 hover:border-white hover:text-white"
                                 }`}
-                                title={`Episode ${epNum}${isWatched ? " (Watched - click to toggle off)" : " (Click to mark watched)"}`}
+                                title={`Episode ${epNum}${isWatched ? " (Watched)" : ""}`}
                               >
                                 {epNum}
                               </button>
@@ -1299,41 +1333,43 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                         Vol <span className="font-bold text-cyber-orange">{mangaVolume}</span> · Ch <span className="font-bold text-cyber-orange">{mangaChapter}</span>/{item.progressTotal ?? "?"} CH
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 self-end sm:self-center">
-                      <button
-                        type="button"
-                        onClick={() => handleQuickMangaChapterChange(-1)}
-                        className="w-16 h-8 border border-white/20 text-xs hover:border-cyber-orange hover:text-cyber-orange transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
-                        title="Decrement 1 Chapter"
-                      >
-                        -1 Ch
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickMangaChapterChange(1)}
-                        className="w-16 h-8 border border-cyber-orange/40 bg-cyber-orange/15 text-cyber-orange hover:bg-cyber-orange hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
-                        title="Increment 1 Chapter"
-                      >
-                        +1 Ch
-                      </button>
-                      <span className="text-gray-700 mx-0.5">|</span>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickMangaVolumeChange(-1)}
-                        className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
-                        title={`Decrement 1 Volume (~${chaptersPerVol} chapters)`}
-                      >
-                        -1 Vol
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickMangaVolumeChange(1)}
-                        className="w-16 h-8 border border-white/30 bg-white/10 text-white hover:bg-white hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
-                        title={`Increment 1 Volume (~${chaptersPerVol} chapters)`}
-                      >
-                        +1 Vol
-                      </button>
-                    </div>
+                    {!readOnly && (
+                      <div className="flex items-center gap-1.5 self-end sm:self-center">
+                        <button
+                          type="button"
+                          onClick={() => handleQuickMangaChapterChange(-1)}
+                          className="w-16 h-8 border border-white/20 text-xs hover:border-cyber-orange hover:text-cyber-orange transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title="Decrement 1 Chapter"
+                        >
+                          -1 Ch
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickMangaChapterChange(1)}
+                          className="w-16 h-8 border border-cyber-orange/40 bg-cyber-orange/15 text-cyber-orange hover:bg-cyber-orange hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title="Increment 1 Chapter"
+                        >
+                          +1 Ch
+                        </button>
+                        <span className="text-gray-700 mx-0.5">|</span>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickMangaVolumeChange(-1)}
+                          className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title={`Decrement 1 Volume (~${chaptersPerVol} chapters)`}
+                        >
+                          -1 Vol
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickMangaVolumeChange(1)}
+                          className="w-16 h-8 border border-white/30 bg-white/10 text-white hover:bg-white hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title={`Increment 1 Volume (~${chaptersPerVol} chapters)`}
+                        >
+                          +1 Vol
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (item.type === "anime" && (item.progressUnit === "mins" || (item.progress && item.progress.toLowerCase().includes("min")))) || item.type === "movie" ? (
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-3 bg-[#0a0a0c] border border-white/10 font-mono gap-3">
@@ -1345,38 +1381,40 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                         </span> / {item.progressTotal ?? "?"} MINS
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 self-end sm:self-center">
-                      <button
-                        type="button"
-                        onClick={() => handleQuickEpisodeChange(-10)}
-                        className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
-                        title="Rewind 10 Minutes"
-                      >
-                        -10m
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickEpisodeChange(10)}
-                        className={`w-16 h-8 border text-xs transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm ${
-                          item.type === "movie"
-                            ? "border-cyber-yellow/40 bg-cyber-yellow/15 text-cyber-yellow hover:bg-cyber-yellow hover:text-black"
-                            : "border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white"
-                        }`}
-                        title="Forward 10 Minutes"
-                      >
-                        +10m
-                      </button>
-                      {item.progressTotal && item.progressTotal > 0 && directProgressCurrent < item.progressTotal && (
+                    {!readOnly && (
+                      <div className="flex items-center gap-1.5 self-end sm:self-center">
                         <button
                           type="button"
-                          onClick={() => handleCompleteDirect()}
-                          className="h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
-                          title="Mark Movie Completed"
+                          onClick={() => handleQuickEpisodeChange(-10)}
+                          className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title="Rewind 10 Minutes"
                         >
-                          ✓ Complete
+                          -10m
                         </button>
-                      )}
-                    </div>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickEpisodeChange(10)}
+                          className={`w-16 h-8 border text-xs transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm ${
+                            item.type === "movie"
+                              ? "border-cyber-yellow/40 bg-cyber-yellow/15 text-cyber-yellow hover:bg-cyber-yellow hover:text-black"
+                              : "border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white"
+                          }`}
+                          title="Forward 10 Minutes"
+                        >
+                          +10m
+                        </button>
+                        {item.progressTotal && item.progressTotal > 0 && directProgressCurrent < item.progressTotal && (
+                          <button
+                            type="button"
+                            onClick={() => handleCompleteDirect()}
+                            className="h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
+                            title="Mark Movie Completed"
+                          >
+                            ✓ Complete
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : item.type === "anime" ? (
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-3 bg-[#0a0a0c] border border-white/10 font-mono gap-3">
@@ -1386,34 +1424,36 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                         <span className="font-bold text-cyber-purple">{directProgressCurrent}</span> / {item.progressTotal ?? "?"} EP
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 self-end sm:self-center">
-                      <button
-                        type="button"
-                        onClick={() => handleQuickEpisodeChange(-1)}
-                        className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-cyber-purple hover:text-cyber-purple transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
-                        title="Previous Episode"
-                      >
-                        -1 EP
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickEpisodeChange(1)}
-                        className="w-16 h-8 border border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
-                        title="Next Episode"
-                      >
-                        +1 EP
-                      </button>
-                      {item.progressTotal && item.progressTotal > 0 && directProgressCurrent < item.progressTotal && (
+                    {!readOnly && (
+                      <div className="flex items-center gap-1.5 self-end sm:self-center">
                         <button
                           type="button"
-                          onClick={() => handleCompleteDirect()}
-                          className="h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
-                          title="Mark All Episodes Completed"
+                          onClick={() => handleQuickEpisodeChange(-1)}
+                          className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-cyber-purple hover:text-cyber-purple transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title="Previous Episode"
                         >
-                          ✓ Complete All
+                          -1 EP
                         </button>
-                      )}
-                    </div>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickEpisodeChange(1)}
+                          className="w-16 h-8 border border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title="Next Episode"
+                        >
+                          +1 EP
+                        </button>
+                        {item.progressTotal && item.progressTotal > 0 && directProgressCurrent < item.progressTotal && (
+                          <button
+                            type="button"
+                            onClick={() => handleCompleteDirect()}
+                            className="h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
+                            title="Mark All Episodes Completed"
+                          >
+                            ✓ Complete All
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : null}
 
@@ -1458,13 +1498,25 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                 >
                   Close
                 </button>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="h-10 px-6 bg-white text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                  <span>Edit Record</span>
-                </button>
+                {isFriendView && !isAlreadyTracked && (
+                  <button
+                    type="button"
+                    onClick={() => onAddPlan && onAddPlan(item)}
+                    className="h-10 px-6 bg-cyber-purple hover:bg-white text-white hover:text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  >
+                    <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>+ {item.type === "manga" ? "Plan to Read" : item.type === "game" ? "Plan to Play" : "Plan to Watch"}</span>
+                  </button>
+                )}
+                {!readOnly && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="h-10 px-6 bg-white text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Edit Record</span>
+                  </button>
+                )}
               </div>
 
             </div>

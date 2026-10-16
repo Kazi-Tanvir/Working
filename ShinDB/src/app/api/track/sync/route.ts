@@ -7,7 +7,7 @@ import { MediaType } from "@prisma/client";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { id, type } = body;
+    const { id, type, mode = "airing" } = body;
 
     // 1. Sync specific item if ID provided
     if (id) {
@@ -25,17 +25,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 2. Batch sync entries where total is unknown (progressTotal === null)
+    // 2. Batch sync entries (airing/unknown or all entries in category)
     const filterType =
-      type && ["anime", "manga", "series"].includes(type) ? (type as MediaType) : undefined;
+      type && ["anime", "manga", "series", "movie", "game"].includes(type) ? (type as MediaType) : undefined;
+
+    const isAllMode = mode === "all";
 
     const entriesToSync = await prisma.media.findMany({
       where: {
         ...(filterType && { type: filterType }),
-        totalEpisodes: null,
+        ...(!isAllMode && { totalEpisodes: null }),
       },
       select: { id: true, title: true, type: true },
-      take: 20, // process batch of airing/unknown entries
+      take: isAllMode ? 50 : 25,
     });
 
     const results = [];
@@ -52,13 +54,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      mode: isAllMode ? "all" : "airing",
       checkedCount: entriesToSync.length,
       updatedCount: results.length,
       updatedItems: results,
       message:
         results.length > 0
-          ? `Successfully updated ${results.length} item(s) with new episode/chapter counts.`
-          : "Checked entries: All currently announced counts are already up to date.",
+          ? `Successfully synchronized ${results.length} item(s) from external databases.`
+          : isAllMode
+          ? `Checked all ${entriesToSync.length} entries: metadata is up to date.`
+          : "Checked airing entries: all announced counts are up to date.",
     });
   } catch (error: any) {
     console.error("Sync API Error:", error);

@@ -21,9 +21,8 @@ import {
   Film,
   Sparkles,
   Loader2,
-  Terminal,
 } from "lucide-react";
-import { MediaItem } from "@/types/media";
+import MediaCard, { MediaItem } from "@/components/common/MediaCard";
 
 interface FriendProfileResponse {
   success: boolean;
@@ -92,9 +91,75 @@ export default function FriendProfilePage({
     }
   };
 
+  const [myTrackedIds, setMyTrackedIds] = useState<Set<string>>(new Set());
+  const [myTrackedTitles, setMyTrackedTitles] = useState<Set<string>>(new Set());
+
+  const fetchMyLibrary = async () => {
+    try {
+      const res = await fetch("/api/track");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.items)) {
+          const ids = new Set<string>();
+          const titles = new Set<string>();
+          json.items.forEach((item: MediaItem) => {
+            if (item.mediaId) ids.add(item.mediaId);
+            if (item.id) ids.add(item.id);
+            if (item.title) titles.add(item.title.toLowerCase().trim());
+          });
+          setMyTrackedIds(ids);
+          setMyTrackedTitles(titles);
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to fetch my library:", err);
+    }
+  };
+
   useEffect(() => {
     fetchProfile();
+    fetchMyLibrary();
   }, [username]);
+
+  const handleAddPlan = async (targetItem: MediaItem) => {
+    const verb =
+      targetItem.type === "manga"
+        ? "Plan to Read"
+        : targetItem.type === "game"
+        ? "Plan to Play"
+        : "Plan to Watch";
+
+    try {
+      const res = await fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mediaId: targetItem.mediaId || targetItem.id,
+          title: targetItem.title,
+          type: targetItem.type,
+          status: "plan_to_consume",
+          progressCurrent: 0,
+          coverImage: targetItem.coverImage,
+          releaseYear: targetItem.releaseYear,
+          genres: targetItem.genres,
+        }),
+      });
+      const resJson = await res.json();
+      if (res.ok && resJson.success) {
+        setMyTrackedIds((prev) => new Set([...prev, targetItem.mediaId || targetItem.id, targetItem.id]));
+        setMyTrackedTitles((prev) => new Set([...prev, targetItem.title.toLowerCase().trim()]));
+        showToast(`✓ Added "${targetItem.title}" to ${verb}`);
+      } else if (res.status === 409) {
+        setMyTrackedIds((prev) => new Set([...prev, targetItem.mediaId || targetItem.id, targetItem.id]));
+        setMyTrackedTitles((prev) => new Set([...prev, targetItem.title.toLowerCase().trim()]));
+        showToast(`"${targetItem.title}" is already in your library`);
+      } else {
+        showToast(`ERROR: ${resJson.error || "Failed to add to library"}`);
+      }
+    } catch {
+      showToast("ERROR: Failed to add to library");
+    }
+  };
 
   // Send request action
   const handleSendFriendRequest = async () => {
@@ -367,57 +432,29 @@ export default function FriendProfilePage({
         </div>
 
         {filteredLibrary.length === 0 ? (
-          <div className="p-8 text-center text-xs text-gray-500">
+          <div className="p-8 text-center text-xs text-gray-500 font-mono">
             NO ENTRIES FOUND MATCHING CATEGORY FILTER "{activeTypeFilter.toUpperCase()}".
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {filteredLibrary.map((item) => (
-              <div
-                key={item.id}
-                className="cyber-card border-2 border-white shadow-[3px_3px_0px_0px_#ffffff] bg-black overflow-hidden flex flex-col justify-between"
-              >
-                <div className="relative aspect-[3/4] bg-white/5 overflow-hidden">
-                  {item.coverImage ? (
-                    <img
-                      src={item.coverImage}
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
-                      NO POSTER
-                    </div>
-                  )}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-6">
+            {filteredLibrary.map((item) => {
+              const isAlreadyTracked =
+                Boolean(data.isSelf) ||
+                Boolean(item.mediaId && myTrackedIds.has(item.mediaId)) ||
+                myTrackedIds.has(item.id) ||
+                myTrackedTitles.has(item.title.toLowerCase().trim());
 
-                  {/* Badges */}
-                  <span className="absolute top-2 left-2 text-[9px] uppercase px-1.5 py-0.5 bg-black border border-white text-white font-bold">
-                    {item.type}
-                  </span>
-
-                  {item.rating && (
-                    <span className="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 bg-cyber-purple text-white border border-white">
-                      ★ {item.rating}
-                    </span>
-                  )}
-                </div>
-
-                <div className="p-2.5">
-                  <div className="text-xs font-bold text-white truncate" title={item.title}>
-                    {item.title}
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5 flex items-center justify-between">
-                    <span className="uppercase text-cyber-cyan font-bold">{item.status}</span>
-                    <span>{item.progress}</span>
-                  </div>
-                  {item.notes && (
-                    <div className="text-[9px] text-gray-400 italic line-clamp-1 mt-1 border-t border-white/10 pt-1">
-                      "{item.notes}"
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+              return (
+                <MediaCard
+                  key={item.id}
+                  item={item}
+                  isFriendView={!data.isSelf}
+                  isAlreadyTracked={isAlreadyTracked}
+                  readOnly={!data.isSelf}
+                  onAddPlan={handleAddPlan}
+                />
+              );
+            })}
           </div>
         )}
       </div>

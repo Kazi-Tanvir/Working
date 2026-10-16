@@ -1,0 +1,48 @@
+here are some minor bugs and quality of life changes
+
+overall - 
+--- regarding season --- 
+- main problem is with seasons in anime and series - so the problem you should not be able to update or add seasons by yourself [update means there is a + button and editing option for editing the number number of episodes remove that ][structure of season is season is restricted to the source [api]]
+- you should only mark how many episode completed from the modal if you get the data from the api [ series usually has seasons with them but anime doesnt have that]
+- seccondly i think the anilist api doesnt provide season wise info on ep - so if there is no info from the source no need to add the season info [ you may just entirely skip season info for anime as anilist doesnt give that]
+- finally regarding the seasons - overall marking as completed means you should mark all the episodes in the season as completed too and vice versa 
+--- regarding what should be placed where ---
+- movies has both anime movies and normal movies but /movies should have only the normal movies and tehy anime moveis should be at /anime
+- and in dashboard total movies and series are in single box thats okay but same theory should go there to [anime movies should be counted with anime and normal movies should be countes with series in toatl movies and series card ] [misght need to add a total different card for movies that will have normal movies count as total movies but not recommending now that might hamper the symmetry of the cards  ]
+-- minor bugs --
+- from modal page completing a series or anime doesnt add the number to max ep count 
+- and there a problem thats particularly happens due to one piece [we will need to change some things for that like you should be able to update the number of ep watched directly from the modal edit section  [you are unable to do that now without adding a proper season structure as we are removeing the season structure for anime you should be able to update number of ep watched directly]]
+
+dashboard - 
+- the search bar stays on the right side not left [ common all website and ap has it on right]
+- i hope the search gateways are not hard coded 
+- the line height between the completed , watching , dropped looks unnatural they should have same line difference as the total entries and watched episodes [ do it for all media stats ] and the rest of the card is okay 
+- and rest of the dashboard looks okay for now 
+- and check if anything is hardcoded [ i think the compailation rate is hard coded to be 100% ] - make sure all of them has proper data and does proper caching to make it smoother 
+- mobile version looks okay 
+
+manga - 
+- manga should be able to updated by both chapter and volumes 
+- and the volumes and chapter should be syched properly 
+- but i thnk there might be problem when you updat the chapters and it might be in the middle of the volume in that scenario you might use floor funtion to show the volume number  [ and i hope there will be no bugs if you update the volume as it alreast rounds up all the time ]
+- and the final problem is with the fact that you might not know how many chapter are there in the each volume inn that case you might just do simple algebra [ total chap / total vol and round up the number and remove few chapter form last volume if needed ]
+
+
+- finally check if anything broke or wrong after each changes
+quality of life changes [you dont need to do this now - but if you dont do or do it tell me in the report ]
+- authentication token - use sessionid type somthing to instantly verify user - currenty every time i change pages it checks if the user is authenticated that makes experience slower so use local cookies or somthing that will instantly proof your authentication so there is no actual delay and that should stay in cached memory of the browser 
+- do pre fetching : if a user is on a same page and isnt loading anything heavy or changing the pages constanlty then pre -fetch other pages one by one so it feels its super fast 
+- use optimistic ui : when user changes  somthing it should instantly change and update the database in its own pace and if any error it will throw that later after it actually occurs 
+
+so here are few bugs 
+in the anime movies the number of mins in the movies is direclty turned into ep [like 98 minutes movie turned into 98 ep ] 
+- make sure anime movies are progressed in mins or you can just give 1 ep for movei but in that case you will need to get proper duration for movie for statistics in the anime statistics 
+- and +1 ep / chaptes / volumes and -1 buttons are assymetric make them in same size so they look symmetric
+
+now we will be editing the section in screenshot 
+- there should be to option for sych both airing in overall data synch for all entries but that all entry should give proper warning that it might take some time [further sycnching all may be hidden like after hover on synch button in the section it should show the 2 synching options]
+- sorting is okay but default sorting should be based on type [ watching -> completes -> dropped -> on hold -> plan to watch] and other sorting are last updated [current default sort] , alphabetical and time 
+- filter option should just hide unhide filters - it should be called advanced filter where you can add advaced filter based on their property 
+- remove properties button thats useless
+- search and new works perfectly 
+

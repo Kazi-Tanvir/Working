@@ -26,9 +26,13 @@ import {
   SeasonData, 
   formatStructuredProgress, 
   calculateTotalWatched, 
-  calculateTotalEpisodes,
-  generateDefaultSeasons
+  calculateTotalEpisodes
 } from "@/utils/seasonHelpers";
+import {
+  getChaptersPerVolume,
+  chapterToVolume,
+  volumeToChapter
+} from "@/utils/mangaHelpers";
 
 interface MediaModalProps {
   item: MediaItem;
@@ -76,9 +80,21 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
   const [notes, setNotes] = useState(item.notes || "");
   const [coverImage, setCoverImage] = useState(item.coverImage);
 
-  // Structured Seasons State
-  const [seasonsState, setSeasonsState] = useState<SeasonData[] | undefined>(item.seasons);
+  // Structured Seasons State (Strictly for TV Series)
+  const [seasonsState, setSeasonsState] = useState<SeasonData[] | undefined>(
+    item.type === "series" ? item.seasons : undefined
+  );
   const [selectedSeasonNum, setSelectedSeasonNum] = useState<number>(item.currentSeason || 1);
+
+  // Direct progress for anime and non-season media
+  const [directProgressCurrent, setDirectProgressCurrent] = useState<number>(item.progressCurrent || 0);
+
+  // Manga volume & chapter sync
+  const chaptersPerVol = getChaptersPerVolume(item.progressTotal, null);
+  const [mangaChapter, setMangaChapter] = useState<number>(item.type === "manga" ? item.progressCurrent || 0 : 0);
+  const [mangaVolume, setMangaVolume] = useState<number>(
+    item.type === "manga" ? chapterToVolume(item.progressCurrent || 0, chaptersPerVol) : 0
+  );
 
   // Sync edits if item changes
   useEffect(() => {
@@ -87,12 +103,18 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
     setProgress(item.progress);
     setNotes(item.notes || "");
     setCoverImage(item.coverImage);
-    setSeasonsState(item.seasons);
+    setSeasonsState(item.type === "series" ? item.seasons : undefined);
     setSelectedSeasonNum(item.currentSeason || 1);
+    setDirectProgressCurrent(item.progressCurrent || 0);
+    if (item.type === "manga") {
+      const ch = item.progressCurrent || 0;
+      setMangaChapter(ch);
+      setMangaVolume(chapterToVolume(ch, chaptersPerVol));
+    }
     setIsEditing(false);
     setShowConfirmDelete(false);
     setErrorMsg("");
-  }, [item, isOpen]);
+  }, [item, isOpen, chaptersPerVol]);
 
   // Lock scroll on body and handle Escape key down to close modal
   useEffect(() => {
@@ -124,7 +146,8 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
   // Accents & Metas based on Media Type
   const getTypeMeta = () => {
     switch (item.type) {
-      case "anime":
+      case "anime": {
+        const isMovie = item.progressUnit === "mins" || (item.progress && item.progress.toLowerCase().includes("min"));
         return {
           color: "var(--cyber-purple)",
           shadowClass: "neo-shadow-purple",
@@ -132,9 +155,10 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
           accentText: "text-cyber-purple",
           accentBg: "bg-cyber-purple/10",
           accentBtn: "hover:bg-cyber-purple/20 hover:text-cyber-purple",
-          unitLabel: "EP",
-          progressPlaceholder: "e.g. 12/24 EP"
+          unitLabel: isMovie ? "MINS" : "EP",
+          progressPlaceholder: isMovie ? "e.g. 106 mins" : "e.g. 12/24 EP",
         };
+      }
       case "manga":
         return {
           color: "var(--cyber-orange)",
@@ -287,11 +311,13 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
     setProgress(newProg);
 
     let newStatus = status;
-    if (totalWatched >= totalEpisodes && totalEpisodes > 0 && status !== "Completed") {
+    // Check if all seasons completed
+    const allSeasonsCompleted = updated.every((s) => s.isCompleted);
+    if (allSeasonsCompleted && totalEpisodes > 0 && status !== "Completed") {
       newStatus = "Completed";
       setStatus("Completed");
-    } else if (status === "Completed" && totalWatched < totalEpisodes) {
-      newStatus = item.type === "game" ? "Playing" : item.type === "manga" ? "Reading" : "Watching";
+    } else if (status === "Completed" && !allSeasonsCompleted) {
+      newStatus = "Watching";
       setStatus(newStatus);
     }
 
@@ -335,131 +361,105 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
     }
   };
 
-  // Add a new season to this series
-  const handleAddSeason = async () => {
-    const existing = seasonsState || [];
-    const nextNum = existing.length > 0 ? Math.max(...existing.map((s) => s.seasonNumber)) + 1 : 1;
-    const promptInput = typeof window !== "undefined" ? window.prompt(`Enter episode count for Season ${nextNum}:`, "12") : "12";
-    if (promptInput === null) return; // User cancelled
-    const parsedCount = parseInt(promptInput, 10);
-    const episodeCount = isNaN(parsedCount) || parsedCount <= 0 ? 12 : parsedCount;
-
-    const newSeason: SeasonData = {
-      seasonNumber: nextNum,
-      title: `Season ${nextNum}`,
-      episodeCount,
-      episodesWatched: 0,
-      isCompleted: false,
-    };
-    const updated = [...existing, newSeason];
-    setSeasonsState(updated);
-    setSelectedSeasonNum(nextNum);
-
-    const totalWatched = calculateTotalWatched(updated);
-    const totalEpisodes = calculateTotalEpisodes(updated);
-    const newProg = formatStructuredProgress(updated, nextNum, totalWatched, totalEpisodes, meta.unitLabel);
-    setProgress(newProg);
-
-    const updatedItem: MediaItem = {
-      ...item,
-      progress: newProg,
-      progressCurrent: totalWatched,
-      progressTotal: totalEpisodes,
-      seasons: updated,
-      currentSeason: nextNum,
-    };
-    if (onUpdateItem) onUpdateItem(updatedItem);
-
-    try {
-      await fetch("/api/track", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: item.id,
-          type: item.type,
-          seasons: updated,
-          currentSeason: nextNum,
-          progressCurrent: totalWatched,
-        }),
-      });
-      router.refresh();
-      showToast(`Added Season ${nextNum}`, "success");
-    } catch {
-      showToast("Failed to add season", "error");
-    }
-  };
-
-  // Update a season's total episode count
-  const handleUpdateSeasonEpisodeCount = async (seasonNum: number, newCount: number) => {
-    if (!seasonsState) return;
-    const count = Math.max(1, newCount);
-    const updated = seasonsState.map((s) => {
-      if (s.seasonNumber === seasonNum) {
-        const watched = Math.min(s.episodesWatched, count);
-        return {
+  // Status selection change with automatic completion propagation
+  const handleStatusChange = (newStatus: string) => {
+    setStatus(newStatus);
+    if (newStatus === "Completed") {
+      if (item.type === "series" && seasonsState && seasonsState.length > 0) {
+        const completedSeasons = seasonsState.map((s) => ({
           ...s,
-          episodeCount: count,
-          episodesWatched: watched,
-          isCompleted: watched >= count && count > 0,
-        };
+          episodesWatched: s.episodeCount,
+          isCompleted: true,
+        }));
+        setSeasonsState(completedSeasons);
+        const totalWatched = calculateTotalWatched(completedSeasons);
+        const totalEpisodes = calculateTotalEpisodes(completedSeasons);
+        setDirectProgressCurrent(totalWatched);
+        setProgress(formatStructuredProgress(completedSeasons, selectedSeasonNum, totalWatched, totalEpisodes, meta.unitLabel));
+      } else if (item.progressTotal && item.progressTotal > 0) {
+        setDirectProgressCurrent(item.progressTotal);
+        if (item.type === "manga") {
+          setMangaChapter(item.progressTotal);
+          setMangaVolume(chapterToVolume(item.progressTotal, chaptersPerVol));
+        }
+        setProgress(`${item.progressTotal}/${item.progressTotal} ${meta.unitLabel.toUpperCase()}`);
       }
-      return { ...s };
-    });
-
-    setSeasonsState(updated);
-    const totalWatched = calculateTotalWatched(updated);
-    const totalEpisodes = calculateTotalEpisodes(updated);
-    const newProg = formatStructuredProgress(updated, seasonNum, totalWatched, totalEpisodes, meta.unitLabel);
-    setProgress(newProg);
-
-    const updatedItem: MediaItem = {
-      ...item,
-      progress: newProg,
-      progressCurrent: totalWatched,
-      progressTotal: totalEpisodes,
-      seasons: updated,
-      currentSeason: seasonNum,
-    };
-    if (onUpdateItem) onUpdateItem(updatedItem);
-
-    try {
-      await fetch("/api/track", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: item.id,
-          type: item.type,
-          seasons: updated,
-          currentSeason: seasonNum,
-          progressCurrent: totalWatched,
-        }),
-      });
-      router.refresh();
-    } catch {
-      showToast("Failed to update episode count", "error");
     }
   };
 
-  // Initialize seasons for a series or anime without seasons breakdown
-  const handleInitializeSeasons = async () => {
-    const defaultSeasons = generateDefaultSeasons(item.title, item.progressTotal, item.progressCurrent || 0);
-    setSeasonsState(defaultSeasons);
-    setSelectedSeasonNum(1);
-
-    const totalWatched = calculateTotalWatched(defaultSeasons);
-    const totalEpisodes = calculateTotalEpisodes(defaultSeasons);
-    const newProg = formatStructuredProgress(defaultSeasons, 1, totalWatched, totalEpisodes, meta.unitLabel);
+  // Direct progress change for anime and items without seasons
+  const handleDirectProgressChange = (newWatched: number) => {
+    const val = Math.max(0, newWatched);
+    setDirectProgressCurrent(val);
+    const total = item.progressTotal;
+    const newProg = `${val}/${total ?? "?"} ${meta.unitLabel.toUpperCase()}`;
     setProgress(newProg);
+    if (total && total > 0 && val >= total) {
+      setStatus("Completed");
+    } else if (status === "Completed" && total && total > 0 && val < total) {
+      setStatus(item.type === "game" ? "Playing" : item.type === "manga" ? "Reading" : "Watching");
+    }
+  };
+
+  // Manga chapter change (auto-syncs volume)
+  const handleMangaChapterChange = (newChapter: number) => {
+    const ch = Math.max(0, newChapter);
+    setMangaChapter(ch);
+    const vol = chapterToVolume(ch, chaptersPerVol);
+    setMangaVolume(vol);
+    setDirectProgressCurrent(ch);
+    const total = item.progressTotal;
+    const newProg = `${ch}/${total ?? "?"} CH`;
+    setProgress(newProg);
+    if (total && total > 0 && ch >= total) {
+      setStatus("Completed");
+    } else if (status === "Completed" && total && total > 0 && ch < total) {
+      setStatus("Reading");
+    }
+  };
+
+  // Manga volume change (auto-syncs chapter)
+  const handleMangaVolumeChange = (newVolume: number) => {
+    const vol = Math.max(0, newVolume);
+    setMangaVolume(vol);
+    const ch = volumeToChapter(vol, chaptersPerVol, item.progressTotal);
+    setMangaChapter(ch);
+    setDirectProgressCurrent(ch);
+    const total = item.progressTotal;
+    const newProg = `${ch}/${total ?? "?"} CH`;
+    setProgress(newProg);
+    if (total && total > 0 && ch >= total) {
+      setStatus("Completed");
+    } else if (status === "Completed" && total && total > 0 && ch < total) {
+      setStatus("Reading");
+    }
+  };
+
+  // Quick interactive episode / runtime increment/decrement
+  const handleQuickEpisodeChange = async (delta: number) => {
+    const total = item.progressTotal;
+    const nextVal = Math.max(0, Math.min(total || 99999, directProgressCurrent + delta));
+    setDirectProgressCurrent(nextVal);
+    const newProg = `${nextVal}/${total ?? "?"} ${meta.unitLabel.toUpperCase()}`;
+    setProgress(newProg);
+
+    let nextStatus = status;
+    if (total && total > 0 && nextVal >= total) {
+      nextStatus = "Completed";
+      setStatus("Completed");
+    } else if (status === "Completed" && total && total > 0 && nextVal < total) {
+      nextStatus = "Watching";
+      setStatus("Watching");
+    }
 
     const updatedItem: MediaItem = {
       ...item,
+      status: nextStatus,
       progress: newProg,
-      progressCurrent: totalWatched,
-      progressTotal: totalEpisodes,
-      seasons: defaultSeasons,
-      currentSeason: 1,
+      progressCurrent: nextVal,
     };
     if (onUpdateItem) onUpdateItem(updatedItem);
+    if (onUpdateState) onUpdateState(nextStatus, newProg);
 
     try {
       await fetch("/api/track", {
@@ -468,15 +468,145 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
         body: JSON.stringify({
           id: item.id,
           type: item.type,
-          seasons: defaultSeasons,
-          currentSeason: 1,
-          progressCurrent: totalWatched,
+          progressCurrent: nextVal,
+          status: nextStatus,
         }),
       });
       router.refresh();
-      showToast("Seasons breakdown initialized!", "success");
+      showToast(meta.unitLabel.toUpperCase() === "MINS" ? `Logged ${nextVal} mins` : `Logged Ep ${nextVal}`, "success");
     } catch {
-      showToast("Failed to initialize seasons", "error");
+      showToast("Failed to update progress", "error");
+    }
+  };
+
+  // Quick complete anime
+  const handleCompleteDirect = async () => {
+    if (!item.progressTotal || item.progressTotal <= 0) return;
+    const total = item.progressTotal;
+    setDirectProgressCurrent(total);
+    const newProg = `${total}/${total} ${meta.unitLabel.toUpperCase()}`;
+    setProgress(newProg);
+    setStatus("Completed");
+
+    const updatedItem: MediaItem = {
+      ...item,
+      status: "Completed",
+      progress: newProg,
+      progressCurrent: total,
+    };
+    if (onUpdateItem) onUpdateItem(updatedItem);
+    if (onUpdateState) onUpdateState("Completed", newProg);
+
+    try {
+      await fetch("/api/track", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: item.id,
+          type: item.type,
+          progressCurrent: total,
+          status: "Completed",
+        }),
+      });
+      router.refresh();
+      showToast(`Marked "${item.title}" as Completed!`, "success");
+    } catch {
+      showToast("Failed to mark as completed", "error");
+    }
+  };
+
+  // Quick manga chapter increment/decrement
+  const handleQuickMangaChapterChange = async (delta: number) => {
+    const nextCh = Math.max(0, mangaChapter + delta);
+    const total = item.progressTotal;
+    if (total && total > 0 && nextCh > total) return;
+    const nextVol = chapterToVolume(nextCh, chaptersPerVol);
+    setMangaChapter(nextCh);
+    setMangaVolume(nextVol);
+    setDirectProgressCurrent(nextCh);
+    const newProg = `${nextCh}/${total ?? "?"} CH`;
+    setProgress(newProg);
+
+    let nextStatus = status;
+    if (total && total > 0 && nextCh >= total) {
+      nextStatus = "Completed";
+      setStatus("Completed");
+    } else if (status === "Completed" && total && total > 0 && nextCh < total) {
+      nextStatus = "Reading";
+      setStatus("Reading");
+    }
+
+    const updatedItem: MediaItem = {
+      ...item,
+      status: nextStatus,
+      progress: newProg,
+      progressCurrent: nextCh,
+    };
+    if (onUpdateItem) onUpdateItem(updatedItem);
+    if (onUpdateState) onUpdateState(nextStatus, newProg);
+
+    try {
+      await fetch("/api/track", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: item.id,
+          type: item.type,
+          progressCurrent: nextCh,
+          status: nextStatus,
+        }),
+      });
+      router.refresh();
+      showToast(`Logged Ch ${nextCh} (Vol ${nextVol})`, "success");
+    } catch {
+      showToast("Failed to update manga chapter", "error");
+    }
+  };
+
+  // Quick manga volume increment/decrement
+  const handleQuickMangaVolumeChange = async (delta: number) => {
+    const nextVol = Math.max(0, mangaVolume + delta);
+    const nextCh = volumeToChapter(nextVol, chaptersPerVol, item.progressTotal);
+    const total = item.progressTotal;
+    setMangaVolume(nextVol);
+    setMangaChapter(nextCh);
+    setDirectProgressCurrent(nextCh);
+    const newProg = `${nextCh}/${total ?? "?"} CH`;
+    setProgress(newProg);
+
+    let nextStatus = status;
+    if (total && total > 0 && nextCh >= total) {
+      nextStatus = "Completed";
+      setStatus("Completed");
+    } else if (status === "Completed" && total && total > 0 && nextCh < total) {
+      nextStatus = "Reading";
+      setStatus("Reading");
+    }
+
+    const updatedItem: MediaItem = {
+      ...item,
+      status: nextStatus,
+      progress: newProg,
+      progressCurrent: nextCh,
+    };
+    if (onUpdateItem) onUpdateItem(updatedItem);
+    if (onUpdateState) onUpdateState(nextStatus, newProg);
+
+    try {
+      await fetch("/api/track", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: item.id,
+          type: item.type,
+          progressCurrent: nextCh,
+          status: nextStatus,
+        }),
+      });
+      router.refresh();
+      showToast(`Logged Vol ${nextVol} (Ch ${nextCh})`, "success");
+    } catch {
+      showToast("Failed to update manga volume", "error");
     }
   };
 
@@ -493,6 +623,26 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
       cleanRating = Math.min(10, Math.max(0, rateVal));
     }
 
+    let progressVal = directProgressCurrent;
+    let seasonsToSave = seasonsState;
+
+    if (status === "Completed") {
+      if (item.type === "series" && seasonsToSave && seasonsToSave.length > 0) {
+        seasonsToSave = seasonsToSave.map((s) => ({
+          ...s,
+          episodesWatched: s.episodeCount,
+          isCompleted: true,
+        }));
+        progressVal = calculateTotalWatched(seasonsToSave);
+      } else if (item.progressTotal && item.progressTotal > 0) {
+        progressVal = item.progressTotal;
+      }
+    } else if (item.type === "manga") {
+      progressVal = mangaChapter;
+    } else if (item.type === "series" && seasonsToSave && seasonsToSave.length > 0) {
+      progressVal = calculateTotalWatched(seasonsToSave);
+    }
+
     try {
       const res = await fetch("/api/track", {
         method: "PUT",
@@ -502,12 +652,12 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
           type: item.type,
           rating: cleanRating,
           status,
+          progressCurrent: progressVal,
           coverImage: coverImage.trim(),
           notes: notes.trim(),
-          ...(seasonsState && {
-            seasons: seasonsState,
+          ...(item.type === "series" && seasonsToSave && {
+            seasons: seasonsToSave,
             currentSeason: selectedSeasonNum,
-            progressCurrent: calculateTotalWatched(seasonsState),
           }),
         }),
       });
@@ -773,7 +923,7 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                   <label className="text-gray-400 font-mono">TRACKING STATUS</label>
                   <select
                     value={status}
-                    onChange={e => setStatus(e.target.value)}
+                    onChange={e => handleStatusChange(e.target.value)}
                     className="w-full bg-[#111] text-white border border-white/20 p-2 font-mono focus:border-white outline-none uppercase"
                   >
                     {getStatusOptionsForType(item.type).map((opt) => (
@@ -802,20 +952,13 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                   />
                 </div>
 
-                {/* SEASONS & PROGRESSION MANAGEMENT IN EDIT MODE */}
-                {seasonsState && seasonsState.length > 0 ? (
+                {/* PROGRESSION MANAGEMENT IN EDIT MODE */}
+                {item.type === "series" && seasonsState && seasonsState.length > 0 ? (
                   <div className="col-span-1 sm:col-span-2 flex flex-col gap-3 p-3 bg-[#0a0a0c] border border-white/10 font-mono">
                     <div className="flex items-center justify-between border-b border-white/10 pb-2">
                       <span className="text-[10px] text-gray-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
-                        <Layers className="w-3.5 h-3.5 text-cyber-cyan" /> SEASONS PROGRESSION & LIMITS
+                        <Layers className="w-3.5 h-3.5 text-cyber-cyan" /> SEASONS PROGRESSION
                       </span>
-                      <button
-                        type="button"
-                        onClick={handleAddSeason}
-                        className="text-[10px] text-cyber-cyan hover:underline flex items-center gap-1 cursor-pointer font-bold"
-                      >
-                        <Plus className="w-3 h-3" /> Add Season
-                      </button>
                     </div>
 
                     {/* Season Selector Tabs */}
@@ -841,28 +984,20 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                       ))}
                     </div>
 
-                    {/* Active Season Edit Controls */}
+                    {/* Active Season Edit Controls (Read-only total episode count per source API) */}
                     {activeSeason && (
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-white/5 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/5 text-xs">
                         <div className="flex flex-col gap-1">
-                          <label className="text-[10px] text-gray-400">EPISODES WATCHED</label>
+                          <label className="text-[10px] text-gray-400 flex items-center justify-between">
+                            <span>EPISODES WATCHED IN S{activeSeason.seasonNumber}</span>
+                            <span className="text-gray-500 font-bold">Total: {activeSeason.episodeCount} eps</span>
+                          </label>
                           <input
                             type="number"
                             min="0"
                             max={activeSeason.episodeCount}
                             value={activeSeason.episodesWatched}
                             onChange={(e) => handleSetEpisodeWatched(activeSeason.seasonNumber, parseInt(e.target.value) || 0)}
-                            className="bg-[#111] text-white border border-white/20 p-2 font-mono text-xs focus:border-cyber-cyan outline-none"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[10px] text-gray-400">TOTAL EPISODES IN S{activeSeason.seasonNumber}</label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="999"
-                            value={activeSeason.episodeCount}
-                            onChange={(e) => handleUpdateSeasonEpisodeCount(activeSeason.seasonNumber, parseInt(e.target.value) || 1)}
                             className="bg-[#111] text-white border border-white/20 p-2 font-mono text-xs focus:border-cyber-cyan outline-none"
                           />
                         </div>
@@ -883,26 +1018,58 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                       </div>
                     )}
                   </div>
-                ) : (item.type === "series" || item.type === "anime") ? (
-                  <div className="col-span-1 sm:col-span-2 p-3 bg-[#0a0a0c] border border-dashed border-white/20 font-mono flex items-center justify-between">
-                    <span className="text-xs text-gray-400">No structured seasons initialized.</span>
-                    <button
-                      type="button"
-                      onClick={handleInitializeSeasons}
-                      className="px-2.5 py-1 text-xs bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40 hover:bg-cyber-cyan hover:text-black font-bold flex items-center gap-1 cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3" /> Initialize Seasons Breakdown
-                    </button>
+                ) : item.type === "manga" ? (
+                  <div className="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-[#0a0a0c] border border-white/10 font-mono">
+                    <div className="flex flex-col gap-1.5 text-xs">
+                      <label className="text-gray-400 flex items-center justify-between">
+                        <span>CHAPTERS READ (CH)</span>
+                        <span className="text-cyber-orange font-bold">Total: {item.progressTotal ?? "?"} CH</span>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max={item.progressTotal || 99999}
+                        value={mangaChapter}
+                        onChange={(e) => handleMangaChapterChange(parseInt(e.target.value) || 0)}
+                        className="w-full bg-[#111] text-white border border-white/20 p-2 font-mono text-xs focus:border-cyber-orange outline-none"
+                        placeholder="e.g. 108"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5 text-xs">
+                      <label className="text-gray-400 flex items-center justify-between">
+                        <span>VOLUMES READ (VOL)</span>
+                        <span className="text-cyber-orange font-bold">[SYNCED]</span>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max={9999}
+                        value={mangaVolume}
+                        onChange={(e) => handleMangaVolumeChange(parseInt(e.target.value) || 0)}
+                        className="w-full bg-[#111] text-white border border-white/20 p-2 font-mono text-xs focus:border-cyber-orange outline-none"
+                        placeholder="e.g. 12"
+                      />
+                    </div>
+                    <span className="col-span-1 sm:col-span-2 text-[10px] text-gray-500">
+                      [SYNC_INFO: ~{chaptersPerVol} chapters per volume • Vol = floor(Ch / {chaptersPerVol})]
+                    </span>
                   </div>
                 ) : (
                   <div className="col-span-1 sm:col-span-2 flex flex-col gap-1.5 text-xs font-mono">
-                    <label className="text-gray-400">CURRENT PROGRESS ({meta.unitLabel.toUpperCase()})</label>
+                    <label className="text-gray-400 flex items-center justify-between">
+                      <span>{meta.unitLabel.toUpperCase() === "MINS" || item.type === "movie" ? "MOVIE RUNTIME WATCHED (MINS)" : `EPISODES WATCHED (${meta.unitLabel.toUpperCase()})`}</span>
+                      <span className={`${item.type === "movie" ? "text-cyber-yellow" : "text-cyber-purple"} font-bold`}>
+                        Total: {item.progressTotal ?? "?"} {meta.unitLabel.toUpperCase()}
+                      </span>
+                    </label>
                     <input
-                      type="text"
-                      value={progress}
-                      onChange={e => setProgress(e.target.value)}
-                      placeholder={meta.progressPlaceholder}
-                      className="w-full bg-[#111] text-white border border-white/20 p-2 focus:border-white outline-none"
+                      type="number"
+                      min="0"
+                      max={item.progressTotal || 99999}
+                      value={directProgressCurrent}
+                      onChange={(e) => handleDirectProgressChange(parseInt(e.target.value) || 0)}
+                      className="w-full bg-[#111] text-white border border-white/20 p-2 font-mono text-xs focus:border-white outline-none"
+                      placeholder={`e.g. ${item.progressTotal ? Math.min(12, item.progressTotal) : 12}`}
                     />
                   </div>
                 )}
@@ -1031,7 +1198,10 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                 {/* =========================================================
                     SEASON & EPISODE COMMAND CENTER (SMALL SQUARE BUTTONS)
                     ========================================================= */}
-                {seasonsState && seasonsState.length > 0 ? (
+                {/* =========================================================
+                    PROGRESSION & EPISODE COMMAND CENTER
+                    ========================================================= */}
+                {item.type === "series" && seasonsState && seasonsState.length > 0 ? (
                   <div className="flex flex-col gap-3 p-3.5 bg-[#0a0a0c] border border-white/10 font-mono">
                     <div className="flex items-center justify-between border-b border-white/10 pb-2">
                       <span className="text-[10px] text-gray-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
@@ -1063,17 +1233,6 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                           )}
                         </button>
                       ))}
-
-                      {/* Add Next Season Button */}
-                      <button
-                        type="button"
-                        onClick={handleAddSeason}
-                        className="w-11 h-11 border border-dashed border-white/30 hover:border-cyber-cyan hover:text-cyber-cyan text-gray-400 bg-black/40 font-mono text-xs font-bold transition-all flex flex-col items-center justify-center cursor-pointer shrink-0"
-                        title="Add Next Season"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span className="text-[9px]">+S</span>
-                      </button>
                     </div>
 
                     {/* Active Season Information & Complete Season Action */}
@@ -1084,19 +1243,9 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                             <span className="text-xs font-bold text-white uppercase tracking-wider">
                               {activeSeason.title || `Season ${activeSeason.seasonNumber}`}
                             </span>
-                            <div className="flex items-center gap-1 text-[10px] text-gray-400">
-                              <span>({activeSeason.episodesWatched} /</span>
-                              <input
-                                type="number"
-                                min="1"
-                                max="999"
-                                value={activeSeason.episodeCount}
-                                onChange={(e) => handleUpdateSeasonEpisodeCount(activeSeason.seasonNumber, parseInt(e.target.value) || 1)}
-                                className="w-10 bg-[#111] text-cyber-cyan font-bold border border-white/20 px-1 py-0.5 text-center font-mono text-[10px] focus:border-cyber-cyan outline-none"
-                                title="Edit total episode limit for this season"
-                              />
-                              <span>eps)</span>
-                            </div>
+                            <span className="text-[10px] text-gray-400 font-bold">
+                              ({activeSeason.episodesWatched} / {activeSeason.episodeCount} eps)
+                            </span>
                           </div>
 
                           <button
@@ -1142,16 +1291,129 @@ export default function MediaModal({ item, isOpen, onClose, onUpdateItem, onUpda
                       </div>
                     )}
                   </div>
-                ) : (item.type === "series" || item.type === "anime") ? (
-                  <div className="flex items-center justify-between p-3.5 bg-[#0a0a0c] border border-dashed border-white/20 font-mono">
-                    <span className="text-xs text-gray-400">No structured seasons initialized.</span>
-                    <button
-                      type="button"
-                      onClick={handleInitializeSeasons}
-                      className="px-2.5 py-1 text-xs bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40 hover:bg-cyber-cyan hover:text-black font-bold flex items-center gap-1 cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3" /> Initialize Seasons Breakdown
-                    </button>
+                ) : item.type === "manga" ? (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-3 bg-[#0a0a0c] border border-white/10 font-mono gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">MANGA SYNCHRONIZATION</span>
+                      <span className="text-xs text-white">
+                        Vol <span className="font-bold text-cyber-orange">{mangaVolume}</span> · Ch <span className="font-bold text-cyber-orange">{mangaChapter}</span>/{item.progressTotal ?? "?"} CH
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 self-end sm:self-center">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickMangaChapterChange(-1)}
+                        className="w-16 h-8 border border-white/20 text-xs hover:border-cyber-orange hover:text-cyber-orange transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                        title="Decrement 1 Chapter"
+                      >
+                        -1 Ch
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickMangaChapterChange(1)}
+                        className="w-16 h-8 border border-cyber-orange/40 bg-cyber-orange/15 text-cyber-orange hover:bg-cyber-orange hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                        title="Increment 1 Chapter"
+                      >
+                        +1 Ch
+                      </button>
+                      <span className="text-gray-700 mx-0.5">|</span>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickMangaVolumeChange(-1)}
+                        className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                        title={`Decrement 1 Volume (~${chaptersPerVol} chapters)`}
+                      >
+                        -1 Vol
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickMangaVolumeChange(1)}
+                        className="w-16 h-8 border border-white/30 bg-white/10 text-white hover:bg-white hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                        title={`Increment 1 Volume (~${chaptersPerVol} chapters)`}
+                      >
+                        +1 Vol
+                      </button>
+                    </div>
+                  </div>
+                ) : (item.type === "anime" && (item.progressUnit === "mins" || (item.progress && item.progress.toLowerCase().includes("min")))) || item.type === "movie" ? (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-3 bg-[#0a0a0c] border border-white/10 font-mono gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">MOVIE RUNTIME / PROGRESS</span>
+                      <span className="text-xs text-white">
+                        <span className={`font-bold ${item.type === "movie" ? "text-cyber-yellow" : "text-cyber-purple"}`}>
+                          {directProgressCurrent}
+                        </span> / {item.progressTotal ?? "?"} MINS
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 self-end sm:self-center">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickEpisodeChange(-10)}
+                        className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                        title="Rewind 10 Minutes"
+                      >
+                        -10m
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickEpisodeChange(10)}
+                        className={`w-16 h-8 border text-xs transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm ${
+                          item.type === "movie"
+                            ? "border-cyber-yellow/40 bg-cyber-yellow/15 text-cyber-yellow hover:bg-cyber-yellow hover:text-black"
+                            : "border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white"
+                        }`}
+                        title="Forward 10 Minutes"
+                      >
+                        +10m
+                      </button>
+                      {item.progressTotal && item.progressTotal > 0 && directProgressCurrent < item.progressTotal && (
+                        <button
+                          type="button"
+                          onClick={() => handleCompleteDirect()}
+                          className="h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title="Mark Movie Completed"
+                        >
+                          ✓ Complete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ) : item.type === "anime" ? (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-3 bg-[#0a0a0c] border border-white/10 font-mono gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">EPISODE PROGRESS</span>
+                      <span className="text-xs text-white">
+                        <span className="font-bold text-cyber-purple">{directProgressCurrent}</span> / {item.progressTotal ?? "?"} EP
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 self-end sm:self-center">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickEpisodeChange(-1)}
+                        className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-cyber-purple hover:text-cyber-purple transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                        title="Previous Episode"
+                      >
+                        -1 EP
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickEpisodeChange(1)}
+                        className="w-16 h-8 border border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                        title="Next Episode"
+                      >
+                        +1 EP
+                      </button>
+                      {item.progressTotal && item.progressTotal > 0 && directProgressCurrent < item.progressTotal && (
+                        <button
+                          type="button"
+                          onClick={() => handleCompleteDirect()}
+                          className="h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          title="Mark All Episodes Completed"
+                        >
+                          ✓ Complete All
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ) : null}
 

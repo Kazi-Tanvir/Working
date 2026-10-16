@@ -167,8 +167,8 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
   const handleIncrement = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    // 1. Season-aware increment
-    if (seasonsState && seasonsState.length > 0) {
+    // 1. Season-aware increment (strictly for series)
+    if (item.type === "series" && seasonsState && seasonsState.length > 0) {
       const updatedSeasons = seasonsState.map((s) => ({ ...s }));
       const activeS =
         updatedSeasons.find((s) => s.seasonNumber === activeSeasonNum) || updatedSeasons[0];
@@ -223,7 +223,8 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
       const unit = totalPart.replace(String(totalVal), "").trim();
 
       if (isNaN(totalVal) || currentVal < totalVal) {
-        const newVal = currentVal + 1;
+        const step = unit.toLowerCase().includes("min") ? 10 : 1;
+        const newVal = isNaN(totalVal) ? currentVal + step : Math.min(totalVal, currentVal + step);
         const newProg = `${newVal}/${isNaN(totalVal) ? "?" : totalVal} ${unit}`;
         setCurrentProgress(newProg);
 
@@ -278,8 +279,8 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
   const handleDecrement = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    // 1. Season-aware decrement
-    if (seasonsState && seasonsState.length > 0) {
+    // 1. Season-aware decrement (strictly for series)
+    if (item.type === "series" && seasonsState && seasonsState.length > 0) {
       const updatedSeasons = seasonsState.map((s) => ({ ...s }));
       const activeS =
         updatedSeasons.find((s) => s.seasonNumber === activeSeasonNum) || updatedSeasons[0];
@@ -332,7 +333,8 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
       const unit = totalPart.replace(String(totalVal), "").trim();
 
       if (currentVal > 0) {
-        const newVal = currentVal - 1;
+        const step = unit.toLowerCase().includes("min") ? 10 : 1;
+        const newVal = Math.max(0, currentVal - step);
         const newProg = `${newVal}/${isNaN(totalVal) ? "?" : totalVal} ${unit}`;
         setCurrentProgress(newProg);
 
@@ -669,14 +671,14 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={handleDecrement}
-                          className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                          className="w-7 h-7 bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
                           title="Decrement Progress"
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={handleIncrement}
-                          className="bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                          className="w-7 h-7 bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
                           title="Increment Progress"
                         >
                           <Plus className="w-3.5 h-3.5" />
@@ -684,7 +686,7 @@ export default function MediaCard({ item, onStatusChange, onProgressChange, onIt
                         {currentStatus !== "Completed" && (
                           <button
                             onClick={handleComplete}
-                            className="bg-white/10 hover:bg-cyber-green hover:text-black border border-white/20 text-white p-1.5 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
+                            className="w-7 h-7 bg-white/10 hover:bg-cyber-green hover:text-black border border-white/20 text-white transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
                             title="Mark Completed"
                           >
                             <Check className="w-3.5 h-3.5" />

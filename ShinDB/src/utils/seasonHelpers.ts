@@ -28,27 +28,7 @@ export const CANONICAL_SEASONS_MAP: Record<string, number[]> = {
   "chernobyl": [5],
   "shogun": [10],
   "hannibal": [13, 13, 13],
-  "gen v": [8, 8],
-
-  // Anime
-  "dan da dan": [12, 12, 12],
-  "jujutsu kaisen": [24, 23],
-  "demon slayer: kimetsu no yaiba": [26, 7, 11, 11, 8],
-  "attack on titan": [25, 12, 22, 28],
-  "haikyu!!": [25, 25, 10, 25],
-  "kaguya-sama: love is war": [12, 12, 13],
-  "bocchi the rock!": [12, 12],
-  "delicious in dungeon": [24, 12],
-  "mob psycho 100": [12, 13, 12],
-  "vinland saga": [24, 24],
-  "classroom of the elite": [12, 13, 13],
-  "dr. stone": [24, 11, 22],
-  "one-punch man": [12, 12],
-  "chainsaw man": [12, 12],
-  "bleach: thousand-year blood war": [13, 13, 10],
-  "re:zero": [25, 25, 16],
-  "hell's paradise": [13, 12],
-  "the apothecary diaries": [24, 12]
+  "gen v": [8, 8]
 };
 
 // Canonical external ratings map (IMDb / MAL out of 10)

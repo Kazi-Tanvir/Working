@@ -33,14 +33,16 @@ export function toMediaItem(
 ): MediaItem {
   const { media } = entry;
 
-  // Seasons breakdown resolution
+  // Seasons breakdown resolution strictly for TV series
   let parsedSeasons: SeasonData[] | undefined = undefined;
-  if (Array.isArray(entry.seasons) && entry.seasons.length > 0) {
-    parsedSeasons = entry.seasons as unknown as SeasonData[];
-  } else if (Array.isArray(media.defaultSeasons) && media.defaultSeasons.length > 0) {
-    parsedSeasons = media.defaultSeasons as unknown as SeasonData[];
-  } else if (media.type === "series") {
-    parsedSeasons = generateDefaultSeasons(media.title, media.totalEpisodes, entry.progressCurrent);
+  if (media.type === "series") {
+    if (Array.isArray(entry.seasons) && entry.seasons.length > 0) {
+      parsedSeasons = entry.seasons as unknown as SeasonData[];
+    } else if (Array.isArray(media.defaultSeasons) && media.defaultSeasons.length > 0) {
+      parsedSeasons = media.defaultSeasons as unknown as SeasonData[];
+    } else {
+      parsedSeasons = generateDefaultSeasons(media.title, media.totalEpisodes, entry.progressCurrent);
+    }
   }
 
   // Format progress string
@@ -56,7 +58,7 @@ export function toMediaItem(
       media.totalEpisodes,
       media.progressUnit
     );
-  } else if (media.type === "anime" || media.type === "manga" || media.type === "series") {
+  } else if (media.type === "anime" || media.type === "manga" || media.type === "series" || media.type === "movie") {
     const total = media.totalEpisodes ?? "?";
     progressStr = `${entry.progressCurrent}/${total} ${media.progressUnit.toUpperCase()}`;
   }
@@ -114,7 +116,7 @@ export function catalogToMediaItem(
 
   let progressStr = `0/${media.totalEpisodes ?? "?"} ${media.progressUnit.toUpperCase()}`;
   if (media.progressUnit === "hrs") progressStr = `0 hrs`;
-  if (media.progressUnit === "mins") progressStr = `${media.totalEpisodes ?? 0} mins`;
+  if (media.progressUnit === "mins") progressStr = `0/${media.totalEpisodes ?? "?"} MINS`;
 
   const parsedGenres = Array.isArray(media.genres)
     ? (media.genres as any[]).map((g) => String(g))

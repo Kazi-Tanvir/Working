@@ -70,11 +70,38 @@ export default function CategoryStats({
     return 25;
   };
 
-  const animeEps = animeList.reduce((acc, i) => acc + parseProgressNum(i.progress), 0);
+  // Differentiate anime series episodes and anime movie runtimes
+  let animeSeriesEps = 0;
+  let animeMovieMins = 0;
+  let completedAnimeMovies = 0;
+
+  for (const item of animeList) {
+    const isMovie = item.progressUnit === "mins" || item.progress.toLowerCase().includes("min");
+    const num = parseProgressNum(item.progress);
+    if (isMovie) {
+      animeMovieMins += num;
+      if (item.status.toLowerCase() === "completed" || num > 0) {
+        completedAnimeMovies += 1;
+      }
+    } else {
+      animeSeriesEps += num;
+    }
+  }
+
+  const totalAnimeMinutes = (animeSeriesEps * 23) + animeMovieMins;
+  const animeDays = (totalAnimeMinutes / 1440).toFixed(1);
+  const totalAnimeWatched = animeSeriesEps + completedAnimeMovies;
+
   const mangaChs = mangaList.reduce((acc, i) => acc + parseProgressNum(i.progress), 0);
   const gameHrs = gamesList.reduce((acc, i) => acc + parseProgressNum(i.progress), 0);
   const seriesEps = seriesList.reduce((acc, i) => acc + parseProgressNum(i.progress), 0);
   const completedMovies = countStatus(moviesList, ["completed"]);
+  const moviesDurationMins = moviesList.reduce((acc, i) => {
+    if (i.status.toLowerCase() === "completed") {
+      return acc + (parseProgressNum(i.progress) || 120);
+    }
+    return acc;
+  }, 0);
 
   const rows: StatRowConfig[] = [
     {
@@ -92,8 +119,8 @@ export default function CategoryStats({
       borderShadowClass:
         "border-cyber-purple/40 shadow-[2px_2px_0px_0px_var(--cyber-purple)]",
       list: animeList,
-      daysValue: ((animeEps * 23) / 1440).toFixed(1),
-      extraMetrics: [{ label: "Episodes Watched", value: animeEps }],
+      daysValue: animeDays,
+      extraMetrics: [{ label: "Episodes Watched", value: totalAnimeWatched }],
     },
     {
       key: "manga",
@@ -113,7 +140,7 @@ export default function CategoryStats({
       daysValue: ((mangaChs * 5) / 1440).toFixed(1),
       extraMetrics: [
         { label: "Chapters Read", value: mangaChs },
-        { label: "Volumes Read", value: Math.floor(mangaChs / 9.15) },
+        { label: "Volumes Read", value: Math.floor(mangaChs / 9) },
       ],
     },
     {
@@ -166,8 +193,8 @@ export default function CategoryStats({
       borderShadowClass:
         "border-cyber-yellow/40 shadow-[2px_2px_0px_0px_var(--cyber-yellow)]",
       list: moviesList,
-      daysValue: ((completedMovies * 130) / 1440).toFixed(1),
-      extraMetrics: [],
+      daysValue: (moviesDurationMins / 1440).toFixed(1),
+      extraMetrics: [{ label: "Movies Watched", value: completedMovies }],
     },
   ];
 
@@ -220,8 +247,8 @@ export default function CategoryStats({
                 </div>
               </div>
 
-              <div className="lg:col-span-3 grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs border-y lg:border-y-0 lg:border-x border-white/5 py-4 lg:py-0 lg:px-6">
-                <div className="flex items-center justify-between text-gray-400">
+              <div className="lg:col-span-3 grid grid-cols-2 gap-x-6 gap-y-2.5 text-xs border-y lg:border-y-0 lg:border-x border-white/5 py-4 lg:py-0 lg:px-6 content-center">
+                <div className="flex items-center justify-between text-gray-400 leading-normal">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#2ecc71] inline-block" />
                     {row.activeLabel}
@@ -229,7 +256,7 @@ export default function CategoryStats({
                   <span className="font-bold text-white ml-2">{active}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-gray-400">
+                <div className="flex items-center justify-between text-gray-400 leading-normal">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#3498db] inline-block" />
                     Completed
@@ -237,7 +264,7 @@ export default function CategoryStats({
                   <span className="font-bold text-white ml-2">{completed}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-gray-400">
+                <div className="flex items-center justify-between text-gray-400 leading-normal">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#f1c40f] inline-block" />
                     On-Hold
@@ -245,7 +272,7 @@ export default function CategoryStats({
                   <span className="font-bold text-white ml-2">{onHold}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-gray-400">
+                <div className="flex items-center justify-between text-gray-400 leading-normal">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#e74c3c] inline-block" />
                     Dropped
@@ -253,7 +280,7 @@ export default function CategoryStats({
                   <span className="font-bold text-white ml-2">{dropped}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-gray-400 col-span-2">
+                <div className="flex items-center justify-between text-gray-400 col-span-2 leading-normal">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#7f8c8d] inline-block" />
                     {row.planLabel}
@@ -262,13 +289,13 @@ export default function CategoryStats({
                 </div>
               </div>
 
-              <div className="lg:col-span-2 flex flex-col justify-center gap-2 text-xs">
-                <div className="flex justify-between items-center text-gray-400">
+              <div className="lg:col-span-2 flex flex-col justify-center gap-2.5 text-xs">
+                <div className="flex justify-between items-center text-gray-400 leading-normal">
                   <span>Total Entries</span>
                   <span className="font-bold text-white">{row.list.length}</span>
                 </div>
                 {row.extraMetrics.map((m) => (
-                  <div key={m.label} className="flex justify-between items-center text-gray-400">
+                  <div key={m.label} className="flex justify-between items-center text-gray-400 leading-normal">
                     <span>{m.label}</span>
                     <span className="font-bold text-white">{m.value}</span>
                   </div>

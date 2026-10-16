@@ -200,7 +200,9 @@ export default function ProfileHeader({
             </div>
             <div className="text-[9px] text-right text-gray-500 leading-normal">
               COMPILATION RATE<br />
-              <span className="text-cyber-green font-bold">100% SUCCESS</span>
+              <span className="text-cyber-green font-bold">
+                {totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}% SUCCESS
+              </span>
             </div>
           </div>
 

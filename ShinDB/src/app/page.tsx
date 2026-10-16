@@ -7,6 +7,7 @@ import CategoryStats from "@/components/sections/CategoryStats";
 import SearchBar from "@/components/common/SearchBar";
 import { getAllMediaGrouped } from "@/lib/media";
 import { getSessionUser } from "@/lib/auth";
+import { ACTIVE_SEARCH_GATEWAYS } from "@/utils/apiHelpers";
 
 export const dynamic = "force-dynamic";
 
@@ -29,18 +30,18 @@ export default async function DashboardPage() {
 
   return (
     <div className="w-full flex flex-col gap-10 md:gap-14">
-      {/* Real-time Multi-Database Search Bar */}
+      {/* Real-time Multi-Database Search Bar (Right-aligned) */}
       <section className="w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <div className="flex-1 max-w-2xl">
-          <SearchBar />
-        </div>
-        <div className="flex items-center gap-2 font-mono text-xs text-gray-500 self-end md:self-center">
+        <div className="flex items-center gap-2 font-mono text-xs text-gray-500 self-start md:self-center order-2 md:order-1">
           <span className="hidden lg:inline text-[11px] uppercase tracking-wider text-gray-400">
             Search Gateway
           </span>
           <span className="border border-white/20 bg-white/5 px-2.5 py-1 text-[10px] text-gray-300">
-            [AniList • RAWG • TVmaze]
+            [{ACTIVE_SEARCH_GATEWAYS.join(" • ")}]
           </span>
+        </div>
+        <div className="flex-1 max-w-2xl md:ml-auto order-1 md:order-2">
+          <SearchBar />
         </div>
       </section>
 

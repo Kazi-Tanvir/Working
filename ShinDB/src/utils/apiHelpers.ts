@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { MediaType } from "@prisma/client";
 import { toMediaItem } from "@/lib/media";
 
-
+export const ACTIVE_SEARCH_GATEWAYS = ["AniList", "RAWG", "TMDB"] as const;
 export interface SearchResultItem {
   id: string;
   mediaId?: string;

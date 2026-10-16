@@ -308,11 +308,48 @@ export async function PUT(request: NextRequest) {
       calculatedWatched = prog.progressCurrent;
     }
 
+    let finalStatus: MediaStatus =
+      status !== undefined ? normalizeStatusInput(status, mediaType) : userEntry.status;
+
+    // If marked as completed: ensure progress reaches max episodes, and all seasons marked completed
+    if (finalStatus === "completed") {
+      if (Array.isArray(validatedSeasons) && validatedSeasons.length > 0) {
+        validatedSeasons = validatedSeasons.map((s: any) => ({
+          ...s,
+          episodesWatched: s.episodeCount,
+          isCompleted: true,
+        }));
+        calculatedWatched = (validatedSeasons as any[]).reduce((sum, s) => sum + s.episodesWatched, 0);
+      } else if (Array.isArray(userEntry.seasons) && (userEntry.seasons as any[]).length > 0 && mediaType === "series") {
+        validatedSeasons = (userEntry.seasons as any[]).map((s: any) => ({
+          ...s,
+          episodesWatched: s.episodeCount,
+          isCompleted: true,
+        }));
+        calculatedWatched = (validatedSeasons as any[]).reduce((sum, s) => sum + s.episodesWatched, 0);
+      } else if (userEntry.media.totalEpisodes && userEntry.media.totalEpisodes > 0) {
+        calculatedWatched = userEntry.media.totalEpisodes;
+      }
+    } else {
+      // Vice versa: if all episodes or all seasons are completed, auto-mark completed
+      if (Array.isArray(validatedSeasons) && validatedSeasons.length > 0) {
+        const allCompleted = validatedSeasons.every((s: any) => s.isCompleted);
+        if (allCompleted) {
+          finalStatus = "completed";
+        }
+      } else {
+        const total = userEntry.media.totalEpisodes;
+        if (total && total > 0 && calculatedWatched >= total) {
+          finalStatus = "completed";
+        }
+      }
+    }
+
     // Update UserMediaEntry
     const updated = await prisma.userMediaEntry.update({
       where: { id: userEntry.id },
       data: {
-        ...(status !== undefined && { status: normalizeStatusInput(status, mediaType) }),
+        status: finalStatus,
         ...(rating !== undefined && { rating: parseRatingInput(rating) }),
         progressCurrent: calculatedWatched,
         ...(validatedSeasons !== undefined && { seasons: validatedSeasons }),

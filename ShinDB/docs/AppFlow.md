@@ -1,9 +1,9 @@
 # ShinDB — Application Flow
 
-> **Version**: 1.1.0-phase1-complete  
-> **Last Updated**: 2026-10-15  
-> **Status**: Active (Phase 1 Verified & Operational)  
-> **Companion Docs**: [PRD.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/PRD.md) · [DESIGN.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/DESIGN.md) · [TechSpec.md](file:///d:/02_CODE/04_WORKING/ShinDB/src/notes/TechSpec.md)
+> **Version**: 1.0.0  
+> **Last Updated**: 2026-10-16  
+> **Status**: Complete (v1.0.0 User Flows Implemented & Tested)  
+> **Companion Docs**: [PRD.md](./PRD.md) · [DESIGN.md](./DESIGN.md) · [TechSpec.md](./TechSpec.md)
 
 ---
 

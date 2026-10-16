@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     if (!targetUser) {
       return NextResponse.json(
-        { success: false, error: `Operator '@${targetUsername}' not found in registry` },
+        { success: false, error: `User '@${targetUsername}' not found` },
         { status: 404 }
       );
     }
@@ -67,19 +67,19 @@ export async function POST(request: NextRequest) {
     if (existing) {
       if (existing.status === "accepted") {
         return NextResponse.json(
-          { success: false, error: "Operator is already an authorized friend" },
+          { success: false, error: "You are already friends with this user" },
           { status: 409 }
         );
       }
       if (existing.status === "pending") {
         if (existing.requesterId === user.id) {
           return NextResponse.json(
-            { success: false, error: "Connection request already pending dispatch" },
+            { success: false, error: "Friend request is already pending" },
             { status: 409 }
           );
         } else {
           return NextResponse.json(
-            { success: false, error: "Pending incoming request from this operator exists" },
+            { success: false, error: "An incoming friend request from this user already exists" },
             { status: 409 }
           );
         }

@@ -184,15 +184,15 @@ export default function FriendProfilePage({
     }
   };
 
-  // Sever link action
+  // Remove friend action
   const handleSeverLink = async () => {
     if (!data?.friendshipId) return;
-    if (!confirm(`Confirm disconnection from operator @${username}?`)) return;
+    if (!confirm(`Confirm removing friend @${username}?`)) return;
 
     try {
       const res = await fetch(`/api/users/friends/${data.friendshipId}`, { method: "DELETE" });
       if (res.ok) {
-        showToast("LINK TERMINATED // Operator removed from network");
+        showToast("Friend removed from your network");
         router.push("/friends");
       } else {
         showToast("ERROR: Failed to remove connection");
@@ -207,7 +207,7 @@ export default function FriendProfilePage({
       <div className="max-w-7xl mx-auto px-4 py-16 text-center font-mono select-none">
         <Loader2 className="w-10 h-10 text-cyber-cyan animate-spin mx-auto mb-4" />
         <p className="text-xs text-gray-400 uppercase tracking-widest">
-          INTERCEPTING OPERATOR DOSSIER @{username}...
+          LOADING PROFILE FOR @{username}...
         </p>
       </div>
     );
@@ -231,13 +231,13 @@ export default function FriendProfilePage({
           </div>
 
           <div className="text-[10px] tracking-widest text-cyber-red uppercase font-black mb-1">
-            SECURITY_LEVEL_5 // RESTRICTED ACCESS
+            PRIVATE PROFILE // RESTRICTED ACCESS
           </div>
           <h2 className="text-2xl font-black text-white uppercase tracking-wider mb-2">
-            OPERATOR DOSSIER CLASSIFIED
+            PRIVATE PROFILE
           </h2>
           <p className="text-xs text-gray-400 max-w-md mx-auto mb-6">
-            Detailed media libraries, progress history, and personal logs are classified. Mutual friendship authorization is mandatory to view this operator's collection.
+            Detailed media libraries, progress history, and personal logs are private. You must be friends to view this user's profile and collection.
           </p>
 
           {/* User Preview Snippet */}
@@ -265,7 +265,7 @@ export default function FriendProfilePage({
               className="w-full sm:w-auto px-5 py-2.5 border border-white/30 text-gray-300 hover:text-white text-xs uppercase flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>[← RETURN TO FRIENDS HUB]</span>
+              <span>[← BACK TO FRIENDS]</span>
             </Link>
 
             {data?.friendStatus === "pending" ? (
@@ -273,7 +273,7 @@ export default function FriendProfilePage({
                 disabled
                 className="w-full sm:w-auto px-6 py-2.5 bg-white/10 text-cyber-yellow text-xs font-bold uppercase border border-cyber-yellow/40 cursor-not-allowed"
               >
-                [CONNECTION REQUEST PENDING]
+                [FRIEND REQUEST PENDING]
               </button>
             ) : (
               <button
@@ -282,7 +282,7 @@ export default function FriendProfilePage({
                 className="w-full sm:w-auto px-6 py-2.5 bg-cyber-purple text-white text-xs font-black uppercase border border-white shadow-[3px_3px_0px_0px_#ffffff] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>[+ TRANSMIT FRIEND REQUEST]</span>
+                <span>[+ ADD FRIEND]</span>
               </button>
             )}
           </div>
@@ -317,7 +317,7 @@ export default function FriendProfilePage({
           className="text-xs text-gray-400 hover:text-cyber-cyan uppercase flex items-center gap-1.5 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>BACK TO FRIENDS NETWORK</span>
+          <span>BACK TO FRIENDS</span>
         </Link>
       </div>
 
@@ -340,7 +340,7 @@ export default function FriendProfilePage({
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-cyber-green animate-pulse" />
                 <span className="text-[10px] tracking-widest text-cyber-green uppercase font-bold">
-                  MUTUAL_LINK::AUTHORIZED // DOSSIER DECRYPTED
+                  FRIENDS // PROFILE UNLOCKED
                 </span>
                 <span className="text-[10px] px-2 py-0.5 bg-white/10 text-cyber-cyan border border-cyber-cyan/40 font-bold ml-2">
                   {targetUser.customBadge || "[SYS_OPERATOR::ELITE]"}
@@ -369,7 +369,7 @@ export default function FriendProfilePage({
               className="px-4 py-2 border border-red-500/40 hover:border-red-500 text-red-400 hover:bg-red-500/10 text-xs uppercase transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <UserX className="w-3.5 h-3.5" />
-              <span>[DISCONNECT LINK]</span>
+              <span>[REMOVE FRIEND]</span>
             </button>
           </div>
         </div>
@@ -378,7 +378,7 @@ export default function FriendProfilePage({
       {/* Stats Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
         <div className="cyber-card p-4 border-2 border-white shadow-[3px_3px_0px_0px_#ffffff] bg-black text-center">
-          <span className="block text-[10px] text-gray-400 uppercase tracking-widest">TOTAL LOGS</span>
+          <span className="block text-[10px] text-gray-400 uppercase tracking-widest">TOTAL ENTRIES</span>
           <span className="text-2xl font-black text-white">{stats?.totalEntries ?? 0}</span>
         </div>
 
@@ -410,7 +410,7 @@ export default function FriendProfilePage({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6">
           <h3 className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
             <Activity className="w-4 h-4 text-cyber-cyan" />
-            OPERATOR LIBRARY DOSSIER ({filteredLibrary.length})
+            USER MEDIA LIBRARY ({filteredLibrary.length})
           </h3>
 
           {/* Category Filter Pills */}

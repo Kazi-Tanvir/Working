@@ -4,13 +4,13 @@ import { Terminal, Shield } from "lucide-react";
 export default function RegisterPage() {
   return (
     <div className="w-full max-w-md mx-auto my-auto flex flex-col gap-6 font-mono py-6">
-      {/* Top Cyber System Header */}
+      {/* Top System Header */}
       <div className="flex items-center justify-between border-b border-white/20 pb-2 text-[11px] text-gray-400 uppercase tracking-widest">
         <span className="flex items-center gap-1.5 text-cyber-green">
           <span className="w-2 h-2 bg-cyber-green rounded-full animate-pulse" />
-          SYS_OPERATOR // ENLISTMENT
+          SHINDB // REGISTER
         </span>
-        <span className="text-gray-400">NODE: RECRUIT_GATE</span>
+        <span className="text-gray-400">NEW ACCOUNT</span>
       </div>
 
       {/* Terminal Title Bar */}
@@ -20,12 +20,12 @@ export default function RegisterPage() {
             <Terminal className="w-4 h-4 text-white" />
           </div>
           <span className="font-extrabold text-xs tracking-widest uppercase text-white">
-            [SYS_AUTH::REGISTRATION_TERMINAL]
+            [CREATE ACCOUNT]
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-cyber-green font-bold uppercase">
           <Shield className="w-3.5 h-3.5 text-cyber-green" />
-          <span>NEW_OPERATOR</span>
+          <span>NEW USER</span>
         </div>
       </div>
 

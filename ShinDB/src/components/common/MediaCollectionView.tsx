@@ -468,7 +468,7 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
               {showSyncMenu && (
                 <div className="absolute right-0 top-full mt-1 w-64 bg-black/95 border border-white/20 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] p-1.5 z-30 font-mono text-xs flex flex-col gap-1 backdrop-blur-md">
                   <div className="text-[10px] uppercase text-gray-500 font-bold px-2 py-1 border-b border-white/10 flex items-center justify-between">
-                    <span>Sync Gateway</span>
+                    <span>Sync APIs</span>
                     <span className="text-[9px] text-gray-400">External API</span>
                   </div>
                   <button

@@ -35,7 +35,7 @@ export async function GET(
 
     if (!targetUser) {
       return NextResponse.json(
-        { success: false, error: "Target user dossier not found" },
+        { success: false, error: "Target user profile not found" },
         { status: 404 }
       );
     }
@@ -120,7 +120,7 @@ export async function GET(
         {
           success: false,
           error: "FRIENDSHIP_REQUIRED",
-          message: "Classified dossier. Mutual friendship authorization required.",
+          message: "Private profile. Mutual friendship authorization required.",
           isFriend: false,
           isSelf: false,
           friendStatus,

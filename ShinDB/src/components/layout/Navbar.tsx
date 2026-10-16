@@ -91,7 +91,7 @@ export default function Navbar() {
               <Terminal className="w-4 h-4 text-white animate-pulse" />
             </div>
             <span className="font-extrabold text-sm tracking-widest text-white uppercase group-hover:text-cyber-cyan transition-colors">
-              [ShinDB::MVP]
+              ShinDB
             </span>
           </Link>
 
@@ -138,7 +138,7 @@ export default function Navbar() {
         <div className={`${isOpen ? "flex" : "hidden"} md:flex items-center gap-2.5 border-t md:border-t-0 border-white/10 pt-3 md:pt-0`}>
           {isSignedIn ? (
             <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
-              {/* Operator Profile Link */}
+              {/* Profile Link */}
               <Link
                 href="/profile"
                 className={`flex items-center gap-2 border px-2.5 py-1 text-xs transition-all ${
@@ -146,11 +146,11 @@ export default function Navbar() {
                     ? "border-cyber-cyan bg-cyber-cyan/10 text-cyber-cyan"
                     : "border-white/20 bg-white/5 hover:border-white text-gray-300"
                 }`}
-                title="View Operator Profile"
+                title="View Profile"
               >
                 <span className="w-2 h-2 rounded-full bg-cyber-green animate-pulse" />
                 <span className="font-bold uppercase tracking-wider text-white">
-                  @{clerkUser?.username || clerkUser?.firstName || user?.username || "OPERATOR"}
+                  @{clerkUser?.username || clerkUser?.firstName || user?.username || "PROFILE"}
                 </span>
               </Link>
 
@@ -162,7 +162,7 @@ export default function Navbar() {
                     ? "border-cyber-purple bg-cyber-purple/20 text-white"
                     : "border-white/20 hover:border-white text-gray-400 hover:text-white bg-white/5"
                 }`}
-                title="System Settings"
+                title="Settings"
               >
                 <SettingsIcon className="w-3.5 h-3.5" />
               </Link>
@@ -185,7 +185,7 @@ export default function Navbar() {
             </div>
           ) : user ? (
             <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
-              {/* Operator Profile Link */}
+              {/* Profile Link */}
               <Link
                 href="/profile"
                 className={`flex items-center gap-2 border px-2.5 py-1 text-xs transition-all ${
@@ -193,7 +193,7 @@ export default function Navbar() {
                     ? "border-cyber-cyan bg-cyber-cyan/10 text-cyber-cyan"
                     : "border-white/20 bg-white/5 hover:border-white text-gray-300"
                 }`}
-                title="View Operator Profile"
+                title="View Profile"
               >
                 <span className="w-2 h-2 rounded-full bg-cyber-green animate-pulse" />
                 <span className="font-bold uppercase tracking-wider text-white">

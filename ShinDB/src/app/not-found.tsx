@@ -41,7 +41,7 @@ export default function NotFound() {
             Lost in Cyberspace // Page Not Found
           </h1>
           <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-            The media record, profile dossier, or routing pathway you requested does not exist in ShinDB archives or has been purged.
+            The media record, profile, or page you requested does not exist in ShinDB archives or has been moved.
           </p>
         </div>
 

@@ -167,17 +167,17 @@ export default function SettingsPage() {
         <div className="cyber-card p-8 border-2 border-white shadow-[6px_6px_0px_0px_#ffffff] bg-black">
           <Terminal className="w-12 h-12 text-cyber-yellow mx-auto mb-4 animate-pulse" />
           <h2 className="text-2xl font-black uppercase text-white mb-2">
-            ACCESS_DENIED // SETTINGS LOCKED
+            SIGN IN REQUIRED // SETTINGS LOCKED
           </h2>
           <p className="text-gray-400 text-sm max-w-md mx-auto mb-6">
-            Authentication is required to adjust terminal operator configurations.
+            Authentication is required to adjust profile settings.
           </p>
           <div className="flex justify-center gap-4">
             <Link
               href="/login"
               className="px-6 py-2.5 bg-cyber-purple text-white font-extrabold uppercase text-xs border border-white shadow-[3px_3px_0px_0px_#ffffff]"
             >
-              [AUTHENTICATE SESSION]
+              [SIGN IN]
             </Link>
           </div>
         </div>
@@ -219,7 +219,7 @@ export default function SettingsPage() {
           System Settings
         </h1>
         <p className="text-xs text-gray-400 mt-1">
-          Customize operator identification, security ciphers, and full data archive exports.
+          Customize your profile, security settings, and full data archive exports.
         </p>
       </div>
 
@@ -270,14 +270,14 @@ export default function SettingsPage() {
             <div className="cyber-card p-6 border-2 border-white shadow-[4px_4px_0px_0px_#ffffff] bg-black">
               <h2 className="text-sm font-black uppercase text-white tracking-wider mb-6 flex items-center gap-2 border-b border-white/10 pb-3">
                 <UserIcon className="w-4 h-4 text-cyber-purple" />
-                OPERATOR DOSSIER SPECIFICATIONS
+                PROFILE SPECIFICATIONS
               </h2>
 
               <form onSubmit={handleSaveProfile} className="space-y-6">
                 {/* Avatar Preview & URL */}
                 <div>
                   <label className="block text-xs font-bold uppercase text-gray-300 mb-2">
-                    OPERATOR AVATAR ART
+                    AVATAR IMAGE
                   </label>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-3">
                     <div className="w-16 h-16 border-2 border-white bg-cyber-purple/20 flex items-center justify-center font-black text-2xl text-white overflow-hidden shadow-[3px_3px_0px_0px_#ffffff] shrink-0">
@@ -320,7 +320,7 @@ export default function SettingsPage() {
                 {/* Display Name */}
                 <div>
                   <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
-                    DISPLAY CALLSIGN / NAME
+                    DISPLAY NAME
                   </label>
                   <input
                     type="text"
@@ -335,7 +335,7 @@ export default function SettingsPage() {
                 {/* Custom Badge */}
                 <div>
                   <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
-                    OPERATOR BADGE CODENAME
+                    PROFILE BADGE
                   </label>
                   <input
                     type="text"
@@ -366,7 +366,7 @@ export default function SettingsPage() {
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="text-xs font-bold uppercase text-gray-300">
-                      OPERATOR BIOGRAPHY / MISSION DIRECTIVE
+                      BIOGRAPHY
                     </label>
                     <span className="text-[10px] text-gray-500">{bio.length} / 500</span>
                   </div>
@@ -388,7 +388,7 @@ export default function SettingsPage() {
                     className="px-6 py-2.5 bg-white text-black font-extrabold text-xs uppercase border border-white shadow-[3px_3px_0px_0px_#ffffff] hover:bg-cyber-cyan transition-all flex items-center gap-2 cursor-pointer"
                   >
                     {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                    <span>[SAVE PROFILE CONFIGURATION]</span>
+                    <span>[SAVE PROFILE]</span>
                   </button>
                 </div>
               </form>
@@ -436,18 +436,18 @@ export default function SettingsPage() {
               <div className="cyber-card p-6 border-2 border-white shadow-[4px_4px_0px_0px_#ffffff] bg-black">
                 <h2 className="text-sm font-black uppercase text-white tracking-wider mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
                   <Key className="w-4 h-4 text-cyber-yellow" />
-                  UPDATE SECURITY PASSCODE
+                  UPDATE PASSWORD
                 </h2>
 
                 {user?.authProvider === "google" || user?.authProvider === "discord" || isSignedIn ? (
                   <div className="p-4 border border-cyber-yellow/40 bg-cyber-yellow/5 text-xs text-cyber-yellow">
-                    Operator authenticated via federated OAuth / Clerk. Password mutation is managed through your identity provider.
+                    Signed in via federated OAuth / Clerk. Password management is handled through your identity provider.
                   </div>
                 ) : (
                   <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
                     <div>
                       <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
-                        CURRENT PASSCODE
+                        CURRENT PASSWORD
                       </label>
                       <input
                         type="password"
@@ -460,7 +460,7 @@ export default function SettingsPage() {
 
                     <div>
                       <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
-                        NEW PASSCODE (MIN 8 CHARS)
+                        NEW PASSWORD (MIN 8 CHARS)
                       </label>
                       <input
                         type="password"
@@ -474,7 +474,7 @@ export default function SettingsPage() {
 
                     <div>
                       <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
-                        CONFIRM NEW PASSCODE
+                        CONFIRM NEW PASSWORD
                       </label>
                       <input
                         type="password"
@@ -492,7 +492,7 @@ export default function SettingsPage() {
                       className="px-6 py-2.5 bg-cyber-yellow text-black font-extrabold text-xs uppercase border border-white shadow-[3px_3px_0px_0px_#ffffff] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer"
                     >
                       {isChangingPassword ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Lock className="w-3.5 h-3.5" />}
-                      <span>[MUTATE CIPHER]</span>
+                      <span>[UPDATE PASSWORD]</span>
                     </button>
                   </form>
                 )}
@@ -505,11 +505,11 @@ export default function SettingsPage() {
             <div className="cyber-card p-6 border-2 border-white shadow-[4px_4px_0px_0px_#ffffff] bg-black space-y-6">
               <h2 className="text-sm font-black uppercase text-white tracking-wider flex items-center gap-2 border-b border-white/10 pb-3">
                 <Download className="w-4 h-4 text-cyber-cyan" />
-                OFFLINE DATABASE DOSSIER EXPORT
+                OFFLINE DATABASE EXPORT
               </h2>
 
               <p className="text-xs text-gray-300">
-                Download a cryptographically verified JSON archive containing all personal media tracking entries, structured episode history, personal ratings, multi-season logs, and operator profile metadata.
+                Download a complete JSON export of all your personal media tracking entries, structured episode history, personal ratings, and profile metadata.
               </p>
 
               <div className="border border-white/20 bg-white/5 p-4 text-xs space-y-2">
@@ -526,7 +526,7 @@ export default function SettingsPage() {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-cyber-cyan text-black font-extrabold text-xs uppercase border border-white shadow-[4px_4px_0px_0px_#ffffff] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
                 >
                   <Download className="w-4 h-4" />
-                  <span>[DOWNLOAD COMPLETE ARCHIVE (JSON)]</span>
+                  <span>[EXPORT LIBRARY DATA (JSON)]</span>
                 </a>
               </div>
             </div>

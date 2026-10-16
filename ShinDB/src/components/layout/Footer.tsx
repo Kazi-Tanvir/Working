@@ -63,8 +63,6 @@ export default function Footer() {
         <div className="flex items-center gap-2.5">
           <span className="w-1.5 h-1.5 bg-cyber-green rounded-full" />
           <span className="text-gray-400 font-sans tracking-wide">ShinDB</span>
-          <span className="text-gray-600">//</span>
-          <span className="text-gray-500 hidden sm:inline">Obsidian Media Tracking Core</span>
         </div>
 
         <button
@@ -72,7 +70,7 @@ export default function Footer() {
           className="flex items-center gap-1 text-gray-500 hover:text-white uppercase transition-colors px-1.5 py-0.5 border border-white/10 hover:border-white/30 cursor-pointer text-[9px]"
           title="Toggle system telemetry drawer"
         >
-          <span>{isExpanded ? "[-] HIDE TELEMETRY" : "[+] SYS_TELEMETRY"}</span>
+          <span>{isExpanded ? "[-] HIDE TELEMETRY" : "[+] TELEMETRY"}</span>
         </button>
       </div>
     </footer>

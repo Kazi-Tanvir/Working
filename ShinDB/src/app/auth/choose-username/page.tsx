@@ -69,7 +69,7 @@ function ChooseUsernameContent() {
     const cleanUsername = username.trim().toLowerCase();
 
     if (!cleanUsername) {
-      setFormError("Operator username is required.");
+      setFormError("Username is required.");
       return;
     }
 
@@ -176,11 +176,11 @@ function ChooseUsernameContent() {
               <Sparkles className="w-4 h-4 text-black" />
             </div>
             <h1 className="text-lg font-black tracking-wider text-white uppercase">
-              CHOOSE OPERATOR USERNAME
+              CHOOSE YOUR USERNAME
             </h1>
           </div>
           <p className="text-xs text-gray-400 mt-1">
-            FIRST-TIME GOOGLE AUTHENTICATION DETECTED. CLAIM YOUR UNIQUE OPERATOR USERNAME.
+            FIRST-TIME SIGN IN DETECTED. CLAIM YOUR UNIQUE USERNAME.
           </p>
         </div>
 
@@ -223,7 +223,7 @@ function ChooseUsernameContent() {
           {/* Username Input */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] uppercase tracking-wider text-gray-400 flex items-center justify-between">
-              <span>[01] OPERATOR USERNAME</span>
+              <span>[01] USERNAME</span>
               <span className="text-[10px] text-cyber-cyan">UNIQUE HANDLE</span>
             </label>
             <div className="flex items-center border border-white/30 bg-black/60 focus-within:border-white focus-within:ring-1 focus-within:ring-white transition-all">
@@ -303,7 +303,7 @@ export default function ChooseUsernamePage() {
     <Suspense
       fallback={
         <div className="font-mono text-center text-xs text-gray-500 py-12">
-          LOADING ONBOARDING GATEWAY...
+          SETTING UP YOUR PROFILE...
         </div>
       }
     >

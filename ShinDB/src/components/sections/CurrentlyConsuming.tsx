@@ -28,7 +28,7 @@ export default function CurrentlyConsuming({ activeItems }: CurrentlyConsumingPr
           <Badge color="cyan" className="!border-white/40 text-[10px] badge-pulse">
             <span className="flex items-center gap-1">
               <Terminal className="w-3.5 h-3.5" />
-              {activeItems.length} ACTIVE PROCESSES
+              {activeItems.length} CONSUMING
             </span>
           </Badge>
         </div>
@@ -50,10 +50,10 @@ export default function CurrentlyConsuming({ activeItems }: CurrentlyConsumingPr
       ) : (
         <div className="bg-cyber-card border-2 border-dashed border-gray-700 p-12 text-center select-none flex flex-col items-center justify-center gap-2">
           <span className="text-gray-500 text-xs font-bold uppercase tracking-widest">
-            [SYS_WARNING: ZERO_ACTIVE_LOADS]
+            NOTHING CURRENTLY CONSUMING
           </span>
-          <span className="text-[10px] text-gray-600">
-            USE SEARCH OR TAB GRID CONTROLS TO LOG CURRENTLY WATCHING, READING, OR PLAYING ITEMS.
+          <span className="text-[10px] text-gray-500">
+            Use search to log items you are currently watching, reading, or playing.
           </span>
         </div>
       )}

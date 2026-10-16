@@ -4,13 +4,13 @@ import { Terminal, Shield } from "lucide-react";
 export default function LoginPage() {
   return (
     <div className="w-full max-w-md mx-auto my-auto flex flex-col gap-6 font-mono py-6">
-      {/* Top Cyber System Header */}
+      {/* Top System Header */}
       <div className="flex items-center justify-between border-b border-white/20 pb-2 text-[11px] text-gray-400 uppercase tracking-widest">
         <span className="flex items-center gap-1.5 text-cyber-cyan">
           <span className="w-2 h-2 bg-cyber-cyan rounded-full animate-pulse" />
-          SYS_SEC_V2 // GATEWAY
+          SHINDB // SIGN IN
         </span>
-        <span className="text-gray-400">NODE: ALPHA_01</span>
+        <span className="text-gray-400">SECURE LOGIN</span>
       </div>
 
       {/* Terminal Title Bar */}
@@ -20,7 +20,7 @@ export default function LoginPage() {
             <Terminal className="w-4 h-4 text-white" />
           </div>
           <span className="font-extrabold text-xs tracking-widest uppercase text-white">
-            [SYS_AUTH::LOGIN_TERMINAL]
+            [SIGN IN]
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-cyber-green font-bold uppercase">

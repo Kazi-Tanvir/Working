@@ -24,7 +24,7 @@ export default function RecentlyCompleted({ completedItems }: RecentlyCompletedP
           <Badge color="green" className="!border-white/40 text-[10px]">
             <span className="flex items-center gap-1">
               <Terminal className="w-3.5 h-3.5" />
-              {completedItems.length} ARCHIVES SEALED
+              {completedItems.length} TOTAL ENTRIES
             </span>
           </Badge>
         </div>
@@ -46,10 +46,10 @@ export default function RecentlyCompleted({ completedItems }: RecentlyCompletedP
       ) : (
         <div className="bg-cyber-card border-2 border-dashed border-gray-700 p-12 text-center select-none flex flex-col items-center justify-center gap-2">
           <span className="text-gray-500 text-xs font-bold uppercase tracking-widest">
-            [SYS_WARNING: ZERO_ARCHIVES_SEALED]
+            NO COMPLETED ENTRIES YET
           </span>
-          <span className="text-[10px] text-gray-600">
-            MARK ACTIVE TRACKS AS COMPLETED TO MOVE THEM INTO RECENTLY COMPLETED LOGS.
+          <span className="text-[10px] text-gray-500">
+            Mark items as completed to see them here.
           </span>
         </div>
       )}

@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("[USER_SEARCH_ERROR]:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to search operator directory" },
+      { success: false, error: "Failed to search user directory" },
       { status: 500 }
     );
   }

@@ -34,7 +34,7 @@ export default async function DashboardPage() {
       <section className="w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         <div className="flex items-center gap-2 font-mono text-xs text-gray-500 self-start md:self-center order-2 md:order-1">
           <span className="hidden lg:inline text-[11px] uppercase tracking-wider text-gray-400">
-            Search Gateway
+            APIs
           </span>
           <span className="border border-white/20 bg-white/5 px-2.5 py-1 text-[10px] text-gray-300">
             [{ACTIVE_SEARCH_GATEWAYS.join(" • ")}]
@@ -68,26 +68,26 @@ export default async function DashboardPage() {
       {allMedia.length === 0 && (
         <section className="w-full border-2 border-dashed border-cyber-purple/50 bg-[#09090b]/80 p-8 md:p-12 text-center flex flex-col items-center justify-center gap-4 shadow-[4px_4px_0px_0px_rgba(139,92,246,0.3)] animate-section-in font-mono">
           <div className="bg-cyber-purple/20 text-cyber-purple border border-cyber-purple px-3 py-1 text-xs font-bold uppercase tracking-widest">
-            [SYS_STATUS: ARCHIVE_EMPTY]
+            [EMPTY LIBRARY]
           </div>
           <h2 className="font-sans font-black text-xl md:text-2xl text-white uppercase tracking-wider">
-            Command Console Ready // No Media Tracked
+            Ready // No Media Tracked Yet
           </h2>
           <p className="text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed">
-            Your personal obsidian database is initialized. Use the search gateway above to log Anime from AniList, Games from RAWG, or Movies &amp; TV from TVmaze.
+            Your personal media database is ready. Use the search bar above to log Anime from AniList, Games from RAWG, or Movies &amp; TV from TVmaze.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 mt-2 text-xs">
             <Link
               href="/anime"
               className="neo-btn-primary px-4 py-2 border border-white text-white font-bold tracking-wider uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff]"
             >
-              Browse Anime Archive
+              Browse Anime
             </Link>
             <Link
               href="/games"
               className="neo-btn-green px-4 py-2 border border-black text-black font-bold tracking-wider uppercase transition-all shadow-[2px_2px_0px_0px_#000000]"
             >
-              Browse Games Archive
+              Browse Games
             </Link>
           </div>
         </section>

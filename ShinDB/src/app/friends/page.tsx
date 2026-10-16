@@ -218,11 +218,11 @@ export default function FriendsHubPage() {
   };
 
   const handleRemoveFriend = async (friendshipId: string, username: string) => {
-    if (!confirm(`Confirm disconnection from operator @${username}?`)) return;
+    if (!confirm(`Confirm removing friend @${username}?`)) return;
     try {
       const res = await fetch(`/api/users/friends/${friendshipId}`, { method: "DELETE" });
       if (res.ok) {
-        showToast(`LINK SEVERED // Operator @${username} removed`);
+        showToast(`Friend @${username} removed`);
         fetchFriends();
         if (previewFriend?.friendshipId === friendshipId) {
           setPreviewFriend(null);
@@ -242,20 +242,20 @@ export default function FriendsHubPage() {
             ACCESS_RESTRICTED // AUTHENTICATION REQUIRED
           </h2>
           <p className="text-gray-400 text-sm max-w-md mx-auto mb-6">
-            The Friends Network and Operator Dossiers are strictly gated for authenticated ShinDB personnel.
+            The Friends Network and User Profiles are strictly available for signed-in ShinDB users.
           </p>
           <div className="flex justify-center gap-4">
             <Link
               href="/login"
               className="px-6 py-2.5 bg-cyber-purple text-white font-extrabold uppercase text-xs border border-white shadow-[3px_3px_0px_0px_#ffffff] hover:translate-x-0.5 hover:translate-y-0.5"
             >
-              [AUTHENTICATE SESSION]
+              [SIGN IN]
             </Link>
             <Link
               href="/register"
               className="px-6 py-2.5 bg-white text-black font-extrabold uppercase text-xs border border-white shadow-[3px_3px_0px_0px_rgba(255,255,255,0.4)] hover:bg-gray-200"
             >
-              [INITIALIZE ACCOUNT]
+              [CREATE ACCOUNT]
             </Link>
           </div>
         </div>
@@ -281,7 +281,7 @@ export default function FriendsHubPage() {
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2.5 h-2.5 rounded-full bg-cyber-green animate-pulse" />
               <span className="text-[10px] tracking-widest text-cyber-green uppercase font-bold">
-                NETWORK_NODE::OPERATOR_HUB // LIVE
+                FRIENDS_NETWORK // ONLINE
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-black text-white tracking-wider uppercase flex items-center gap-3">
@@ -289,7 +289,7 @@ export default function FriendsHubPage() {
               Friends Network
             </h1>
             <p className="text-xs text-gray-400 mt-1">
-              Synchronize libraries, inspect operator tracking logs, and manage encrypted mutual connections.
+              Share libraries, view friend activity, and connect with other users.
             </p>
           </div>
 
@@ -348,7 +348,7 @@ export default function FriendsHubPage() {
             }`}
           >
             <Search className="w-3.5 h-3.5" />
-            <span>03 // Find Operators</span>
+            <span>03 // Find Friends</span>
           </button>
         </div>
       </div>
@@ -358,7 +358,7 @@ export default function FriendsHubPage() {
         <div className="cyber-card p-12 text-center border-2 border-white">
           <Loader2 className="w-8 h-8 text-cyber-cyan animate-spin mx-auto mb-3" />
           <p className="text-xs text-gray-400 uppercase tracking-widest">
-            SYNCHRONIZING OPERATOR GRAPH...
+            LOADING FRIENDS...
           </p>
         </div>
       ) : (
@@ -370,16 +370,16 @@ export default function FriendsHubPage() {
                 <div className="cyber-card p-12 text-center border-2 border-dashed border-white/30 bg-black">
                   <UserPlus className="w-10 h-10 text-gray-500 mx-auto mb-3" />
                   <h3 className="text-sm font-extrabold uppercase text-white mb-1">
-                    NO OPERATORS PRESENTLY LINKED
+                    NO FRIENDS CONNECTED YET
                   </h3>
                   <p className="text-xs text-gray-400 max-w-md mx-auto mb-5">
-                    Your personal network is currently isolated. Dispatch connection requests using the Find Operators tab.
+                    Your personal network is currently empty. Connect with friends using the Find Friends tab.
                   </p>
                   <button
                     onClick={() => setActiveTab("search")}
                     className="px-5 py-2 bg-cyber-purple text-white text-xs font-extrabold uppercase border border-white shadow-[3px_3px_0px_0px_#ffffff] hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer"
                   >
-                    [SEARCH OPERATORS NOW]
+                    [FIND FRIENDS NOW]
                   </button>
                 </div>
               ) : (
@@ -440,7 +440,7 @@ export default function FriendsHubPage() {
                           </div>
                           <div>
                             <span className="block text-gray-400 text-[9px] uppercase">COMPLETED</span>
-                            <span className="font-extrabold text-cyber-green">{friend.completedCount} archives</span>
+                            <span className="font-extrabold text-cyber-green">{friend.completedCount} completed</span>
                           </div>
                         </div>
 
@@ -489,19 +489,19 @@ export default function FriendsHubPage() {
                           href={`/friends/${friend.username}`}
                           className="flex-1 py-1.5 bg-white text-black font-extrabold text-[11px] uppercase text-center border border-white hover:bg-cyber-cyan transition-all shadow-[2px_2px_0px_0px_#ffffff]"
                         >
-                          [VIEW DOSSIER]
+                          [VIEW PROFILE]
                         </Link>
                         <button
                           onClick={() => setPreviewFriend(friend)}
                           className="px-2.5 py-1.5 border border-white/30 hover:border-white text-gray-300 text-[11px] uppercase hover:bg-white/10 transition-all cursor-pointer"
-                          title="Quick Telemetry Preview"
+                          title="Quick Preview"
                         >
                           <Activity className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleRemoveFriend(friend.friendshipId, friend.username)}
                           className="px-2.5 py-1.5 border border-red-500/40 hover:border-red-500 text-red-400 hover:bg-red-500/10 text-[11px] uppercase transition-all cursor-pointer"
-                          title="Sever Connection"
+                          title="Remove Friend"
                         >
                           <UserX className="w-3.5 h-3.5" />
                         </button>
@@ -521,13 +521,13 @@ export default function FriendsHubPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-2 h-2 rounded-full bg-cyber-yellow animate-pulse" />
                   <h3 className="text-sm font-extrabold uppercase text-white tracking-wider">
-                    INCOMING AUTHORIZATION REQUESTS ({incomingRequests.length})
+                    INCOMING FRIEND REQUESTS ({incomingRequests.length})
                   </h3>
                 </div>
 
                 {incomingRequests.length === 0 ? (
                   <div className="border border-white/20 p-6 text-center text-xs text-gray-500 bg-black">
-                    NO PENDING INCOMING CONNECTION REQUESTS.
+                    NO PENDING FRIEND REQUESTS.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -579,13 +579,13 @@ export default function FriendsHubPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <Clock className="w-4 h-4 text-gray-400" />
                   <h3 className="text-sm font-extrabold uppercase text-gray-400 tracking-wider">
-                    DISPATCHED OUTGOING REQUESTS ({outgoingRequests.length})
+                    OUTGOING FRIEND REQUESTS ({outgoingRequests.length})
                   </h3>
                 </div>
 
                 {outgoingRequests.length === 0 ? (
                   <div className="border border-white/20 p-6 text-center text-xs text-gray-500 bg-black">
-                    NO OUTGOING TRANSMISSIONS PENDING RESPONSE.
+                    NO OUTGOING FRIEND REQUESTS PENDING.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -640,7 +640,7 @@ export default function FriendsHubPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="ENTER OPERATOR CODENAME OR ALIAS (e.g. senpai, pilot)..."
+                    placeholder="SEARCH BY USERNAME OR DISPLAY NAME..."
                     className="w-full pl-9 pr-4 py-2.5 bg-black border-2 border-white text-white text-xs font-mono uppercase focus:outline-none focus:border-cyber-cyan placeholder-gray-500"
                     autoFocus
                   />
@@ -656,12 +656,12 @@ export default function FriendsHubPage() {
               {searchQuery.trim().length >= 2 ? (
                 <div>
                   <div className="text-xs text-gray-400 uppercase tracking-widest mb-3">
-                    REGISTRY DISCOVERY MATCHES ({searchResults.length})
+                    SEARCH RESULTS ({searchResults.length})
                   </div>
 
                   {searchResults.length === 0 && !isSearching ? (
                     <div className="border border-white/20 p-12 text-center text-xs text-gray-500 bg-black">
-                      NO MATCHING OPERATOR DOSSIERS FOUND IN REGISTRY.
+                      NO MATCHING USERS FOUND.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -690,7 +690,7 @@ export default function FriendsHubPage() {
                             </div>
 
                             <div className="text-[11px] text-gray-400 border-t border-white/10 pt-2 mb-3">
-                              Library Archives: <span className="font-extrabold text-white">{target.totalEntries}</span>
+                              Total Entries: <span className="font-extrabold text-white">{target.totalEntries}</span>
                             </div>
                           </div>
 
@@ -701,14 +701,14 @@ export default function FriendsHubPage() {
                                 href={`/friends/${target.username}`}
                                 className="block w-full py-1.5 bg-cyber-green text-black font-extrabold text-xs uppercase text-center border border-white shadow-[2px_2px_0px_0px_#ffffff]"
                               >
-                                [LINKED // VIEW DOSSIER]
+                                [FRIENDS // VIEW PROFILE]
                               </Link>
                             ) : target.relationship === "pending_sent" ? (
                               <button
                                 disabled
                                 className="w-full py-1.5 bg-white/10 text-cyber-yellow font-bold text-xs uppercase border border-cyber-yellow/40 cursor-not-allowed"
                               >
-                                [TRANSMISSION PENDING]
+                                [REQUEST PENDING]
                               </button>
                             ) : target.relationship === "pending_received" ? (
                               <button
@@ -723,7 +723,7 @@ export default function FriendsHubPage() {
                                 className="w-full py-1.5 bg-white text-black font-extrabold text-xs uppercase border border-white hover:bg-cyber-purple hover:text-white transition-all shadow-[2px_2px_0px_0px_#ffffff] cursor-pointer flex items-center justify-center gap-1.5"
                               >
                                 <UserPlus className="w-3.5 h-3.5" />
-                                <span>[+ SEND FRIEND REQUEST]</span>
+                                <span>[+ ADD FRIEND]</span>
                               </button>
                             )}
                           </div>
@@ -734,7 +734,7 @@ export default function FriendsHubPage() {
                 </div>
               ) : (
                 <div className="border border-white/20 p-8 text-center text-xs text-gray-500 bg-black">
-                  ENTER AT LEAST 2 CHARACTERS TO SCAN THE GLOBAL OPERATOR DIRECTORY.
+                  ENTER AT LEAST 2 CHARACTERS TO SEARCH FOR USERS.
                 </div>
               )}
             </div>
@@ -798,7 +798,7 @@ export default function FriendsHubPage() {
                 href={`/friends/${previewFriend.username}`}
                 className="px-5 py-2 bg-cyber-cyan text-black font-extrabold text-xs uppercase border border-white shadow-[2px_2px_0px_0px_#ffffff] hover:translate-x-0.5 hover:translate-y-0.5"
               >
-                [VIEW FULL DOSSIER →]
+                [VIEW FULL PROFILE →]
               </Link>
             </div>
           </div>

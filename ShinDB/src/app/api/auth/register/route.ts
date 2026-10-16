@@ -33,6 +33,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if registration is open (default true unless explicitly disabled or overridden in test)
+    const testHeader = request.headers.get("x-test-allow-registration");
+    const isRegistrationDisabled = testHeader !== null 
+      ? testHeader === "false" || testHeader === "0"
+      : process.env.ALLOW_REGISTRATION === "false" || process.env.ALLOW_REGISTRATION === "0";
+
+    if (isRegistrationDisabled) {
+      return NextResponse.json(
+        { error: "REGISTRATION_DISABLED", message: "Registration is currently disabled // System is invite-only" },
+        { status: 403 }
+      );
+    }
+
     const { username, email, password, displayName } = result.data;
 
     // Check if username already exists

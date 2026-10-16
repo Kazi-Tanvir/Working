@@ -91,13 +91,14 @@ export default function Toast() {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3.5 max-w-sm w-full pointer-events-none select-none font-mono">
       {toasts.map((toast) => {
         const styles = getToastStyles(toast.type);
+        const duration = toast.duration || 3000;
         return (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-start gap-3 border-2 p-4 animate-[slideIn_0.2s_ease-out] ${styles.bg} ${styles.border} ${styles.shadow}`}
+            className={`pointer-events-auto relative overflow-hidden flex items-start gap-3 border-2 p-4 animate-slide-in-right ${styles.bg} ${styles.border} ${styles.shadow}`}
           >
             <div className="shrink-0 mt-0.5">{styles.icon}</div>
-            <div className="flex-grow flex flex-col gap-1">
+            <div className="flex-grow flex flex-col gap-1 pr-2">
               <span className="text-[10px] text-gray-500 uppercase tracking-widest font-extrabold">
                 {toast.type === "system" ? "SYSTEM LOG" : `NOTIFICATION::${toast.type.toUpperCase()}`}
               </span>
@@ -105,10 +106,19 @@ export default function Toast() {
             </div>
             <button
               onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
-              className="shrink-0 text-gray-500 hover:text-white transition-colors cursor-pointer"
+              className="shrink-0 text-gray-500 hover:text-white transition-colors cursor-pointer p-0.5"
+              aria-label="Dismiss notification"
             >
               <X className="w-3.5 h-3.5" />
             </button>
+
+            {/* Countdown progress bar */}
+            <div
+              className={`absolute bottom-0 left-0 h-1 ${styles.bg.includes("green") ? "bg-cyber-green" : toast.type === "error" ? "bg-cyber-red" : toast.type === "warning" ? "bg-cyber-yellow" : toast.type === "system" ? "bg-cyber-purple" : "bg-cyber-cyan"}`}
+              style={{
+                animation: `toastProgress ${duration}ms linear forwards`,
+              }}
+            />
           </div>
         );
       })}

@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import ProfileHeader from "@/components/sections/ProfileHeader";
 import CurrentlyConsuming from "@/components/sections/CurrentlyConsuming";
 import RecentlyCompleted from "@/components/sections/RecentlyCompleted";
@@ -61,6 +62,35 @@ export default async function DashboardPage() {
         moviesList={moviesList}
         seriesList={seriesList}
       />
+
+      {/* Empty Library Onboarding Banner */}
+      {allMedia.length === 0 && (
+        <section className="w-full border-2 border-dashed border-cyber-purple/50 bg-[#09090b]/80 p-8 md:p-12 text-center flex flex-col items-center justify-center gap-4 shadow-[4px_4px_0px_0px_rgba(139,92,246,0.3)] animate-section-in font-mono">
+          <div className="bg-cyber-purple/20 text-cyber-purple border border-cyber-purple px-3 py-1 text-xs font-bold uppercase tracking-widest">
+            [SYS_STATUS: ARCHIVE_EMPTY]
+          </div>
+          <h2 className="font-sans font-black text-xl md:text-2xl text-white uppercase tracking-wider">
+            Command Console Ready // No Media Tracked
+          </h2>
+          <p className="text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed">
+            Your personal obsidian database is initialized. Use the search gateway above to log Anime from AniList, Games from RAWG, or Movies &amp; TV from TVmaze.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-2 text-xs">
+            <Link
+              href="/anime"
+              className="neo-btn-primary px-4 py-2 border border-white text-white font-bold tracking-wider uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff]"
+            >
+              Browse Anime Archive
+            </Link>
+            <Link
+              href="/games"
+              className="neo-btn-green px-4 py-2 border border-black text-black font-bold tracking-wider uppercase transition-all shadow-[2px_2px_0px_0px_#000000]"
+            >
+              Browse Games Archive
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Currently Consuming Grid (Active processes) */}
       <CurrentlyConsuming activeItems={activeItems} />

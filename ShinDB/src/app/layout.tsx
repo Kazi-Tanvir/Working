@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Toast from "@/components/common/Toast";
+import NetworkStatusBanner from "@/components/common/NetworkStatusBanner";
 import { AuthProvider } from "@/context/AuthContext";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
@@ -57,11 +58,14 @@ export default function RootLayout({
           }}
         >
           <AuthProvider>
+            {/* Top Network Status Banner for Offline Detection */}
+            <NetworkStatusBanner />
+
             {/* Navigation Shell */}
             <Navbar />
 
-            {/* Core Content Container */}
-            <main className="flex-grow flex flex-col max-w-7xl mx-auto w-full px-4 md:px-8 py-8 md:py-12">
+            {/* Core Content Container with Page Transition Animation */}
+            <main className="flex-grow flex flex-col max-w-7xl mx-auto w-full px-4 md:px-8 py-8 md:py-12 animate-page-in">
               {children}
             </main>
 

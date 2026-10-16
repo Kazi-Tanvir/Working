@@ -34,6 +34,7 @@ export interface SafeUser {
   avatarUrl: string | null;
   bio: string | null;
   customBadge: string | null;
+  role: "user" | "admin";
   authProvider: string;
   createdAt: Date;
 }
@@ -183,6 +184,7 @@ export async function syncClerkUserWithPrisma(clerkUser: any): Promise<SafeUser 
         finalUsername = `${username}_${Math.floor(Math.random() * 8999 + 1000)}`;
       }
 
+      const initialRole = clerkUser.publicMetadata?.role === "admin" ? "admin" : "user";
       user = await (prisma.user as any).create({
         data: {
           username: finalUsername,
@@ -190,19 +192,30 @@ export async function syncClerkUserWithPrisma(clerkUser: any): Promise<SafeUser 
           clerkId: clerkId,
           displayName: displayName,
           avatarUrl: avatarUrl,
+          role: initialRole,
           authProvider: "clerk",
-          customBadge: "[SYS_OPERATOR::RECRUIT]",
+          customBadge: initialRole === "admin" ? "[SYS_OPERATOR::ADMIN]" : "[SYS_OPERATOR::RECRUIT]",
         },
       });
-    } else if (!user.clerkId || user.clerkId !== clerkId) {
-      // Link clerkId if not yet linked
-      user = await (prisma.user as any).update({
-        where: { id: user.id },
-        data: {
-          clerkId: clerkId,
-          authProvider: user.authProvider === "email" ? "clerk" : user.authProvider,
-        },
-      });
+    } else {
+      const shouldBeAdmin = clerkUser.publicMetadata?.role === "admin";
+      const needsAdminUpdate = shouldBeAdmin && user.role !== "admin";
+      const needsClerkIdLink = !user.clerkId || user.clerkId !== clerkId;
+
+      if (needsAdminUpdate || needsClerkIdLink) {
+        user = await (prisma.user as any).update({
+          where: { id: user.id },
+          data: {
+            ...(needsAdminUpdate ? { role: "admin" } : {}),
+            ...(needsClerkIdLink
+              ? {
+                  clerkId: clerkId,
+                  authProvider: user.authProvider === "email" ? "clerk" : user.authProvider,
+                }
+              : {}),
+          },
+        });
+      }
     }
 
     return {
@@ -213,6 +226,7 @@ export async function syncClerkUserWithPrisma(clerkUser: any): Promise<SafeUser 
       avatarUrl: user.avatarUrl,
       bio: user.bio,
       customBadge: user.customBadge,
+      role: user.role,
       authProvider: user.authProvider,
       createdAt: user.createdAt,
     };
@@ -240,6 +254,7 @@ export async function resolveClerkUser(userId: string): Promise<SafeUser | null>
         avatarUrl: true,
         bio: true,
         customBadge: true,
+        role: true,
         authProvider: true,
         createdAt: true,
       },
@@ -305,6 +320,7 @@ export const getSessionUser = cache(async function getSessionUser(): Promise<Saf
         avatarUrl: true,
         bio: true,
         customBadge: true,
+        role: true,
         authProvider: true,
         createdAt: true,
       },
@@ -363,6 +379,7 @@ export async function getUserFromRequest(request: Request): Promise<SafeUser | n
         avatarUrl: true,
         bio: true,
         customBadge: true,
+        role: true,
         authProvider: true,
         createdAt: true,
       },

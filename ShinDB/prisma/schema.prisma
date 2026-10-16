@@ -39,6 +39,11 @@ enum FriendshipStatus {
   blocked
 }
 
+enum Role {
+  user
+  admin
+}
+
 // ----------------------------------------------------
 // 1. Users Table
 // ----------------------------------------------------
@@ -51,6 +56,7 @@ model User {
   avatarUrl       String?          @map("avatar_url") @db.VarChar(500)
   bio             String?          @db.Text
   customBadge     String?          @default("[SYS_OPERATOR::RECRUIT]") @map("custom_badge") @db.VarChar(50)
+  role            Role             @default(user)
   authProvider    String           @default("email") @map("auth_provider")
   providerId      String?          @map("provider_id") @db.VarChar(100)
   clerkId         String?          @unique @map("clerk_id") @db.VarChar(100)
@@ -140,4 +146,22 @@ model Friendship {
   @@index([addresseeId, status])
   @@index([requesterId, status])
   @@map("friendships")
+}
+
+// ----------------------------------------------------
+// 5. Audit Logs
+// ----------------------------------------------------
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  action    String   @db.VarChar(100)
+  target    String?  @db.VarChar(200)
+  details   Json?
+  ipAddress String?  @map("ip_address") @db.VarChar(45)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
 }

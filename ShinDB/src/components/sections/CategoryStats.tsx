@@ -5,6 +5,7 @@ import React from "react";
 import Link from "next/link";
 import { Tv, BookOpen, Gamepad2, Film, ArrowUpRight, LucideIcon } from "lucide-react";
 import { MediaItem } from "@/components/common/MediaCard";
+import { getCoverImage, DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
 
 interface CategoryStatsProps {
   animeList: MediaItem[];
@@ -312,9 +313,12 @@ export default function CategoryStats({
                       <div className="w-8 h-11 relative overflow-hidden rounded bg-black flex-shrink-0 border border-white/10">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={item.coverImage}
+                          src={getCoverImage(item.coverImage, item.type)}
                           alt={item.title}
                           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime;
+                          }}
                         />
                       </div>
                       <div className="flex-grow flex flex-col gap-0.5 min-w-0">

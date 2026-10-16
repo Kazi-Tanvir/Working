@@ -27,6 +27,7 @@ import { showToast } from "@/components/common/Toast";
 import { useDebounce } from "@/hooks/useDebounce";
 import { SearchResultItem } from "@/utils/apiHelpers";
 import { MediaItem } from "./MediaCard";
+import { DEFAULT_COVER_IMAGES, getCoverImage } from "@/utils/mediaDefaults";
 
 interface CreateMediaModalProps {
   isOpen: boolean;
@@ -35,13 +36,7 @@ interface CreateMediaModalProps {
   onItemAdded?: (item: MediaItem) => void;
 }
 
-const DEFAULT_COVER_IMAGES = {
-  anime: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
-  manga: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
-  game: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
-  movie: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80",
-  series: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80"
-};
+
 
 const SUGGESTIONS: Record<string, string[]> = {
   anime: ["Solo Leveling", "Frieren", "Chainsaw Man", "Demon Slayer", "Jujutsu Kaisen", "Attack on Titan"],
@@ -713,9 +708,12 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                             <div className="w-9 h-13 shrink-0 bg-black border border-white/20 overflow-hidden">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={item.coverImage}
+                                src={getCoverImage(item.coverImage, item.type)}
                                 alt={item.title}
                                 className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).src = DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime;
+                                }}
                               />
                             </div>
                             <div className="flex flex-col min-w-0">
@@ -768,12 +766,12 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                           <div className="w-12 h-16 shrink-0 bg-black border border-white/20 overflow-hidden relative">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                              src={item.coverImage || DEFAULT_COVER_IMAGES[item.type as keyof typeof DEFAULT_COVER_IMAGES] || DEFAULT_COVER_IMAGES.anime}
+                              src={getCoverImage(item.coverImage, item.type)}
                               alt={item.title}
                               className="w-full h-full object-cover"
                               onError={(e) => {
                                 (e.currentTarget as HTMLImageElement).src =
-                                  DEFAULT_COVER_IMAGES[item.type as keyof typeof DEFAULT_COVER_IMAGES] || DEFAULT_COVER_IMAGES.anime;
+                                  DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime;
                               }}
                             />
                           </div>
@@ -878,10 +876,10 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                 <div className={`relative w-full ${aspectClass} overflow-hidden border border-white/20 bg-[#000]`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={coverImage || DEFAULT_COVER_IMAGES[type]}
+                    src={getCoverImage(coverImage, type)}
                     alt="Cover Preview"
                     className="w-full h-full object-cover"
-                    onError={() => setCoverImage("")}
+                    onError={() => setCoverImage(DEFAULT_COVER_IMAGES[type] || DEFAULT_COVER_IMAGES.anime)}
                   />
                 </div>
                 <div className="flex flex-col gap-1 text-xs">

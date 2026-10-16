@@ -187,7 +187,7 @@ function ChooseUsernameContent() {
         {/* Google Verified Account Badge */}
         {googleProfile && (
           <div className="border border-cyber-cyan/40 bg-cyber-cyan/10 p-3.5 flex items-center gap-3">
-            {googleProfile.avatarUrl ? (
+            {googleProfile.avatarUrl && googleProfile.avatarUrl.trim() !== "" ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={googleProfile.avatarUrl}

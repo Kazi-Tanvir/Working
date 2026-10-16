@@ -18,6 +18,7 @@ import {
   User as UserIcon,
   Users,
   Settings as SettingsIcon,
+  ShieldAlert,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -154,6 +155,21 @@ export default function Navbar() {
                 </span>
               </Link>
 
+              {/* Admin Link (Conditional) */}
+              {user?.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className={`p-1.5 border transition-all ${
+                    pathname?.startsWith("/admin")
+                      ? "border-cyber-red bg-cyber-red/20 text-white"
+                      : "border-cyber-red/40 hover:border-cyber-red text-cyber-red bg-cyber-red/5"
+                  }`}
+                  title="Admin Console"
+                >
+                  <ShieldAlert className="w-3.5 h-3.5 text-cyber-red" />
+                </Link>
+              )}
+
               {/* Settings Link */}
               <Link
                 href="/settings"
@@ -200,6 +216,21 @@ export default function Navbar() {
                   @{user.username}
                 </span>
               </Link>
+
+              {/* Admin Link (Conditional) */}
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className={`p-1.5 border transition-all ${
+                    pathname?.startsWith("/admin")
+                      ? "border-cyber-red bg-cyber-red/20 text-white"
+                      : "border-cyber-red/40 hover:border-cyber-red text-cyber-red bg-cyber-red/5"
+                  }`}
+                  title="Admin Console"
+                >
+                  <ShieldAlert className="w-3.5 h-3.5 text-cyber-red" />
+                </Link>
+              )}
 
               {/* Settings Link */}
               <Link

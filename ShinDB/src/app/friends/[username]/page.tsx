@@ -243,7 +243,7 @@ export default function FriendProfilePage({
           {/* User Preview Snippet */}
           <div className="border border-white/20 bg-white/5 p-4 max-w-sm mx-auto mb-6 flex items-center gap-4 text-left">
             <div className="w-12 h-12 border-2 border-white bg-cyber-purple/20 flex items-center justify-center font-black text-lg text-white shrink-0 overflow-hidden shadow-[2px_2px_0px_0px_#ffffff]">
-              {targetUser?.avatarUrl ? (
+              {targetUser?.avatarUrl && targetUser.avatarUrl.trim() !== "" ? (
                 <img src={targetUser.avatarUrl} alt={username} className="w-full h-full object-cover" />
               ) : (
                 username.slice(0, 2).toUpperCase()
@@ -329,7 +329,7 @@ export default function FriendProfilePage({
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
             {/* Avatar Box */}
             <div className="w-20 h-20 md:w-24 md:h-24 border-2 border-white bg-cyber-purple/20 flex items-center justify-center font-black text-3xl text-white overflow-hidden shadow-[4px_4px_0px_0px_#ffffff] shrink-0">
-              {targetUser.avatarUrl ? (
+              {targetUser.avatarUrl && targetUser.avatarUrl.trim() !== "" ? (
                 <img src={targetUser.avatarUrl} alt={username} className="w-full h-full object-cover" />
               ) : (
                 username.slice(0, 2).toUpperCase()

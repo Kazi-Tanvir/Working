@@ -128,9 +128,9 @@ export default function OwnProfilePage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
             {/* Cyber Avatar Box */}
             <div className="w-20 h-20 md:w-24 md:h-24 border-2 border-white bg-cyber-purple/20 flex items-center justify-center font-black text-3xl text-white overflow-hidden shadow-[4px_4px_0px_0px_#ffffff] shrink-0">
-              {u?.avatarUrl || clerkUser?.imageUrl ? (
+              {(u?.avatarUrl && u.avatarUrl.trim() !== "") || (clerkUser?.imageUrl && clerkUser.imageUrl.trim() !== "") ? (
                 <img
-                  src={u?.avatarUrl || clerkUser?.imageUrl}
+                  src={(u?.avatarUrl && u.avatarUrl.trim() !== "" ? u.avatarUrl : clerkUser?.imageUrl) || ""}
                   alt={u?.username || "Profile"}
                   className="w-full h-full object-cover"
                 />
@@ -307,7 +307,7 @@ export default function OwnProfilePage() {
                 className="cyber-card border-2 border-white shadow-[3px_3px_0px_0px_#ffffff] bg-black overflow-hidden flex flex-col justify-between"
               >
                 <div className="relative aspect-[3/4] bg-white/5 overflow-hidden">
-                  {item.coverImage ? (
+                  {item.coverImage && item.coverImage.trim() !== "" ? (
                     <img
                       src={item.coverImage}
                       alt={item.title}
@@ -353,7 +353,7 @@ export default function OwnProfilePage() {
                 className="cyber-card border-2 border-white shadow-[3px_3px_0px_0px_#ffffff] bg-black overflow-hidden flex flex-col justify-between"
               >
                 <div className="relative aspect-[3/4] bg-white/5 overflow-hidden">
-                  {item.coverImage ? (
+                  {item.coverImage && item.coverImage.trim() !== "" ? (
                     <img
                       src={item.coverImage}
                       alt={item.title}

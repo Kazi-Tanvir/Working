@@ -15,6 +15,7 @@ import Badge from "./Badge";
 import MediaModal from "./MediaModal";
 import { SeasonData, formatStructuredProgress, calculateTotalWatched, calculateTotalEpisodes } from "@/utils/seasonHelpers";
 import { showToast } from "@/components/common/Toast";
+import { getCoverImage, DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
 
 export interface MediaItem {
   id: string;
@@ -643,9 +644,12 @@ export default function MediaCard({
         <div className={`relative w-full ${aspectClass} overflow-hidden rounded-lg bg-[#0e0e11] border border-white/10 ${statusTheme.glowClass} transition-all duration-300`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={item.coverImage}
+            src={getCoverImage(item.coverImage, item.type)}
             alt={item.title}
             className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime;
+            }}
           />
 
           {/* Unobtrusive colored status stripe on poster edge */}

@@ -9,6 +9,7 @@ import {
   formatStructuredProgress,
   getCanonicalExternalRating,
 } from "@/utils/seasonHelpers";
+import { getCoverImage } from "@/utils/mediaDefaults";
 
 const statusDisplayMap: Record<string, string> = {
   watching: "Watching",
@@ -89,7 +90,7 @@ export function toMediaItem(
     progressUnit: media.progressUnit,
     currentSeason,
     seasons: parsedSeasons,
-    coverImage: media.coverImage,
+    coverImage: getCoverImage(media.coverImage, media.type),
     genres: parsedGenres,
     releaseYear: media.releaseYear,
     notes: entry.notes || "",
@@ -135,7 +136,7 @@ export function catalogToMediaItem(
     progressTotal: media.totalEpisodes,
     progressUnit: media.progressUnit,
     currentSeason: 1,
-    coverImage: media.coverImage,
+    coverImage: getCoverImage(media.coverImage, media.type),
     genres: parsedGenres,
     releaseYear: media.releaseYear,
     notes: "",

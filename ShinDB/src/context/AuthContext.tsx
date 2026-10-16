@@ -10,6 +10,8 @@ export interface SafeUser {
   displayName: string;
   avatarUrl: string | null;
   bio: string | null;
+  customBadge?: string | null;
+  role?: "user" | "admin";
   authProvider: string;
   createdAt: string | Date;
 }
@@ -37,29 +39,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const SHINDB_CACHED_USER_KEY = "shindb_session_user";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Synchronous cache hydration on mount to eliminate auth delay
-  const [user, setUser] = useState<SafeUser | null>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem(SHINDB_CACHED_USER_KEY);
-        if (cached) return JSON.parse(cached);
-      } catch (err) {
-        console.warn("[AUTH_CACHE] Failed to parse cached session:", err);
-      }
-    }
-    return null;
-  });
-
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        return !localStorage.getItem(SHINDB_CACHED_USER_KEY);
-      } catch {
-        return true;
-      }
-    }
-    return true;
-  });
+  const [user, setUser] = useState<SafeUser | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const router = useRouter();
 
@@ -100,6 +81,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem(SHINDB_CACHED_USER_KEY);
+      if (cached) {
+        setUser(JSON.parse(cached));
+      }
+    } catch (err) {
+      console.warn("[AUTH_CACHE] Failed to parse cached session:", err);
+    }
     refreshUser();
   }, [refreshUser]);
 

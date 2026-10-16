@@ -17,7 +17,9 @@ import {
   Loader2,
   Lock,
   RefreshCw,
+  FileInput,
 } from "lucide-react";
+import ImportTab from "@/components/settings/ImportTab";
 
 const AVATAR_PRESETS = [
   "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=150&auto=format&fit=crop&q=80",
@@ -41,7 +43,7 @@ export default function SettingsPage() {
   const { isSignedIn, isLoaded, user: clerkUser } = useUser();
   const isAuthenticated = !!user || isSignedIn;
 
-  const [activeTab, setActiveTab] = useState<"profile" | "account" | "data">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "account" | "data" | "import">("profile");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -261,6 +263,18 @@ export default function SettingsPage() {
             <Download className="w-4 h-4" />
             <span>03 // DATA ARCHIVE</span>
           </button>
+
+          <button
+            onClick={() => setActiveTab("import")}
+            className={`w-full p-3 text-left font-extrabold text-xs uppercase border transition-all flex items-center gap-2.5 cursor-pointer ${
+              activeTab === "import"
+                ? "bg-cyber-yellow text-black border-white shadow-[3px_3px_0px_0px_#ffffff]"
+                : "bg-black text-gray-400 border-white/20 hover:border-white hover:text-white"
+            }`}
+          >
+            <FileInput className="w-4 h-4" />
+            <span>04 // IMPORT DATA</span>
+          </button>
         </div>
 
         {/* Content Area */}
@@ -281,7 +295,7 @@ export default function SettingsPage() {
                   </label>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-3">
                     <div className="w-16 h-16 border-2 border-white bg-cyber-purple/20 flex items-center justify-center font-black text-2xl text-white overflow-hidden shadow-[3px_3px_0px_0px_#ffffff] shrink-0">
-                      {avatarUrl ? (
+                      {avatarUrl && avatarUrl.trim() !== "" ? (
                         <img src={avatarUrl} alt="Avatar preview" className="w-full h-full object-cover" />
                       ) : (
                         (user?.username || "OP").slice(0, 2).toUpperCase()
@@ -531,6 +545,9 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
+
+          {/* TAB 4: IMPORT DATA */}
+          {activeTab === "import" && <ImportTab />}
         </div>
       </div>
     </div>

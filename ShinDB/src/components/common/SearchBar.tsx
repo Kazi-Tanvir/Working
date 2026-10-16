@@ -6,6 +6,7 @@ import { Search, Loader2, Plus, Check, Film, Tv, BookOpen, Gamepad2, X } from "l
 import { useDebounce } from "@/hooks/useDebounce";
 import { SearchResultItem } from "@/utils/apiHelpers";
 import Badge from "./Badge";
+import { getCoverImage, DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
 
 export default function SearchBar({ className }: { className?: string }) {
   const router = useRouter();
@@ -222,9 +223,12 @@ export default function SearchBar({ className }: { className?: string }) {
                     <div className="flex items-center gap-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={item.coverImage}
+                        src={getCoverImage(item.coverImage, item.type)}
                         alt={item.title}
                         className="w-12 h-16 object-cover border border-white grayscale group-hover:grayscale-0 transition-all duration-300"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime;
+                        }}
                       />
                       <div className="flex flex-col gap-1">
                         <h4 className="text-xs font-bold text-white uppercase group-hover:text-cyber-cyan transition-colors line-clamp-1">

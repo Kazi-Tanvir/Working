@@ -82,7 +82,7 @@ export default function ProfileHeader({
   const username = user?.username || "SENPAI_09";
   const displayName = user?.displayName || username;
   const badge = user?.customBadge || (username === "SENPAI_09" ? "[SYS_OPERATOR::ELITE]" : "[SYS_OPERATOR::RECRUIT]");
-  const avatarUrl = user?.avatarUrl || "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=80";
+  const avatarUrl = user?.avatarUrl?.trim() || "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=80";
   const bio = user?.bio || "Archiving media ephemera across multiple timelines. Obsidian-inspired central tracking environment.";
   const nodeTag = `NODE_${username.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}`;
 

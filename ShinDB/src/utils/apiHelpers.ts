@@ -1,3 +1,7 @@
+import dns from "node:dns";
+try {
+  dns.setDefaultResultOrder("ipv4first");
+} catch {}
 import { prisma } from "@/lib/prisma";
 import { MediaType } from "@prisma/client";
 import { toMediaItem } from "@/lib/media";

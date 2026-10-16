@@ -33,6 +33,7 @@ import {
   chapterToVolume,
   volumeToChapter
 } from "@/utils/mangaHelpers";
+import { DEFAULT_COVER_IMAGES, getCoverImage } from "@/utils/mediaDefaults";
 
 interface MediaModalProps {
   item: MediaItem;
@@ -61,13 +62,7 @@ export const getStatusOptionsForType = (type: string): string[] => {
   }
 };
 
-const DEFAULT_COVER_IMAGES = {
-  anime: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
-  manga: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
-  game: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
-  movie: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80",
-  series: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80"
-};
+
 
 export default function MediaModal({
   item,
@@ -994,10 +989,10 @@ export default function MediaModal({
               <div className={`relative w-full ${aspectClass} overflow-hidden border border-white/20 bg-[#000]`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={coverImage || DEFAULT_COVER_IMAGES[item.type]}
+                  src={getCoverImage(coverImage, item.type)}
                   alt="Cover Preview"
                   className="w-full h-full object-cover"
-                  onError={() => setCoverImage(DEFAULT_COVER_IMAGES[item.type])}
+                  onError={() => setCoverImage(DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime)}
                 />
               </div>
               <div className="flex flex-col gap-1.5 text-xs">
@@ -1256,9 +1251,12 @@ export default function MediaModal({
               <div className={`relative w-full ${aspectClass} overflow-hidden border border-white/10 rounded-md bg-[#000]`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={item.coverImage}
+                  src={getCoverImage(item.coverImage, item.type)}
                   alt={item.title}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime;
+                  }}
                 />
               </div>
             </div>

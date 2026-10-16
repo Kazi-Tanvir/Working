@@ -394,7 +394,7 @@ export default function FriendsHubPage() {
                         <div className="flex items-start justify-between gap-3 mb-3">
                           <div className="flex items-center gap-3">
                             <div className="w-12 h-12 border-2 border-white bg-cyber-purple/20 flex items-center justify-center font-black text-lg text-white overflow-hidden shadow-[2px_2px_0px_0px_#ffffff]">
-                              {friend.avatarUrl ? (
+                              {friend.avatarUrl && friend.avatarUrl.trim() !== "" ? (
                                 <img
                                   src={friend.avatarUrl}
                                   alt={friend.username}
@@ -451,7 +451,7 @@ export default function FriendsHubPage() {
                               CURRENTLY CONSUMING:
                             </span>
                             <div className="flex items-center gap-2">
-                              {friend.currentlyConsuming.coverImage ? (
+                              {friend.currentlyConsuming.coverImage && friend.currentlyConsuming.coverImage.trim() !== "" ? (
                                 <img
                                   src={friend.currentlyConsuming.coverImage}
                                   alt={friend.currentlyConsuming.title}
@@ -538,7 +538,7 @@ export default function FriendsHubPage() {
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 border border-white bg-white/10 flex items-center justify-center font-bold text-white overflow-hidden">
-                            {req.user.avatarUrl ? (
+                            {req.user.avatarUrl && req.user.avatarUrl.trim() !== "" ? (
                               <img src={req.user.avatarUrl} alt={req.user.username} className="w-full h-full object-cover" />
                             ) : (
                               req.user.username.slice(0, 2).toUpperCase()
@@ -596,7 +596,7 @@ export default function FriendsHubPage() {
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 border border-white/40 bg-black flex items-center justify-center font-bold text-gray-300 overflow-hidden">
-                            {req.user.avatarUrl ? (
+                            {req.user.avatarUrl && req.user.avatarUrl.trim() !== "" ? (
                               <img src={req.user.avatarUrl} alt={req.user.username} className="w-full h-full object-cover" />
                             ) : (
                               req.user.username.slice(0, 2).toUpperCase()
@@ -673,7 +673,7 @@ export default function FriendsHubPage() {
                           <div>
                             <div className="flex items-center gap-3 mb-2">
                               <div className="w-10 h-10 border border-white bg-white/10 flex items-center justify-center font-bold text-white overflow-hidden shadow-[2px_2px_0px_0px_#ffffff]">
-                                {target.avatarUrl ? (
+                                {target.avatarUrl && target.avatarUrl.trim() !== "" ? (
                                   <img src={target.avatarUrl} alt={target.username} className="w-full h-full object-cover" />
                                 ) : (
                                   target.username.slice(0, 2).toUpperCase()
@@ -755,7 +755,7 @@ export default function FriendsHubPage() {
 
             <div className="flex items-center gap-3 mb-4">
               <div className="w-14 h-14 border-2 border-white bg-cyber-purple/20 flex items-center justify-center font-black text-xl text-white overflow-hidden shadow-[3px_3px_0px_0px_#ffffff]">
-                {previewFriend.avatarUrl ? (
+                {previewFriend.avatarUrl && previewFriend.avatarUrl.trim() !== "" ? (
                   <img src={previewFriend.avatarUrl} alt={previewFriend.username} className="w-full h-full object-cover" />
                 ) : (
                   previewFriend.username.slice(0, 2).toUpperCase()

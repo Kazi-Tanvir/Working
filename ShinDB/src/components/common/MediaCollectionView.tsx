@@ -268,8 +268,14 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
         return false;
       }
       // 2. Status Filter
-      if (selectedStatus !== "all" && item.status.toLowerCase() !== selectedStatus.toLowerCase()) {
-        return false;
+      if (selectedStatus !== "all") {
+        const itemStat = (item.status || "").toLowerCase().replace(/[-_]/g, " ").trim();
+        const selStat = selectedStatus.toLowerCase().replace(/[-_]/g, " ").trim();
+        const isMatch =
+          itemStat === selStat ||
+          (selStat.includes("plan") && itemStat.includes("plan")) ||
+          (selStat.includes("hold") && itemStat.includes("hold"));
+        if (!isMatch) return false;
       }
       // 3. Genre Filter
       if (selectedGenre !== "all") {
@@ -614,32 +620,36 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
           </div>
         )}
 
-        {/* Advanced Filter Drawer */}
-        {showFilterDrawer && (
-          <div className="flex flex-col gap-3 border-t border-dashed border-white/15 pt-3">
-            {/* 1. Status Filter Pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold min-w-[70px]">
-                STATUS:
-              </span>
-              {config.statuses.map((status) => (
-                <button
-                  key={status}
-                  type="button"
-                  onClick={() => setSelectedStatus(status)}
-                  className={`text-[9px] font-mono uppercase tracking-wider px-2.5 py-1 border transition-all cursor-pointer ${
-                    selectedStatus === status
-                      ? `${config.activePillClass} shadow-[2px_2px_0px_0px_#ffffff]`
-                      : "bg-transparent text-gray-400 border-white/10 hover:border-white hover:text-white"
-                  }`}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
+        {/* Status Filter Buttons Row (Always Visible) */}
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-dashed border-white/10">
+          {config.statuses.map((status) => {
+            const label =
+              status === "all"
+                ? (type === "anime" ? "ALL ANIME" : `ALL ${type.toUpperCase()}`)
+                : status;
+            const isSelected = selectedStatus.toLowerCase() === status.toLowerCase();
+            return (
+              <button
+                key={status}
+                type="button"
+                onClick={() => setSelectedStatus(isSelected && status !== "all" ? "all" : status)}
+                className={`text-[9px] font-mono uppercase tracking-wider px-3 py-1.5 border transition-all cursor-pointer ${
+                  isSelected
+                    ? `${config.activePillClass} shadow-[2px_2px_0px_0px_#ffffff]`
+                    : "bg-transparent text-gray-400 border-white/10 hover:border-white hover:text-white"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
 
-            {/* 2. Advanced Properties Filters (Genre, Score, Era, Favorites) */}
-            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-white/5 text-xs">
+        {/* Advanced Filter Drawer (Properties: Genre, Score, Era, Favorites) */}
+        {showFilterDrawer && (
+          <div className="flex flex-col gap-2 border-t border-dashed border-white/15 pt-2.5">
+            {/* Advanced Properties Filters (Genre, Score, Era, Favorites) */}
+            <div className="flex flex-wrap items-center gap-3 text-xs">
               {/* Genre filter */}
               {allGenres.length > 0 && (
                 <div className="flex items-center gap-1.5">

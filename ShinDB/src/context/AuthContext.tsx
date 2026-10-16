@@ -34,12 +34,51 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const SHINDB_CACHED_USER_KEY = "shindb_session_user";
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<SafeUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Synchronous cache hydration on mount to eliminate auth delay
+  const [user, setUser] = useState<SafeUser | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(SHINDB_CACHED_USER_KEY);
+        if (cached) return JSON.parse(cached);
+      } catch (err) {
+        console.warn("[AUTH_CACHE] Failed to parse cached session:", err);
+      }
+    }
+    return null;
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return !localStorage.getItem(SHINDB_CACHED_USER_KEY);
+      } catch {
+        return true;
+      }
+    }
+    return true;
+  });
+
   const router = useRouter();
 
-  // Fetch current session user
+  const persistUserSession = (userData: SafeUser | null) => {
+    if (typeof window === "undefined") return;
+    try {
+      if (userData) {
+        localStorage.setItem(SHINDB_CACHED_USER_KEY, JSON.stringify(userData));
+        document.cookie = "shindb_session_active=1; path=/; max-age=604800; SameSite=Lax";
+      } else {
+        localStorage.removeItem(SHINDB_CACHED_USER_KEY);
+        document.cookie = "shindb_session_active=; path=/; max-age=0; SameSite=Lax";
+      }
+    } catch (e) {
+      console.warn("[AUTH_CACHE] Storage access error:", e);
+    }
+  };
+
+  // Fetch current session user with stale-while-revalidate
   const refreshUser = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/me", {
@@ -48,12 +87,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
-      } else {
+        persistUserSession(data.user);
+      } else if (res.status === 401) {
         setUser(null);
+        persistUserSession(null);
       }
     } catch (err) {
-      console.error("[AUTH_PROVIDER] Failed to fetch session:", err);
-      setUser(null);
+      console.error("[AUTH_PROVIDER] Network error during session validation:", err);
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUser(data.user);
+      persistUserSession(data.user);
       router.refresh();
       return { success: true };
     } catch {
@@ -103,6 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUser(data.user);
+      persistUserSession(data.user);
       router.refresh();
       return { success: true };
     } catch {
@@ -117,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("[AUTH_LOGOUT_ERROR]", err);
     } finally {
       setUser(null);
+      persistUserSession(null);
       router.push("/login");
       router.refresh();
     }
@@ -146,6 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUser(data.user);
+      persistUserSession(data.user);
       router.refresh();
       return { success: true };
     } catch {

@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Toast from "@/components/common/Toast";
 import NetworkStatusBanner from "@/components/common/NetworkStatusBanner";
+import IdlePrefetcher from "@/components/common/IdlePrefetcher";
 import { AuthProvider } from "@/context/AuthContext";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
@@ -58,6 +59,9 @@ export default function RootLayout({
           }}
         >
           <AuthProvider>
+            {/* Background Idle Route Prefetcher */}
+            <IdlePrefetcher />
+
             {/* Top Network Status Banner for Offline Detection */}
             <NetworkStatusBanner />
 

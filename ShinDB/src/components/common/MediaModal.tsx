@@ -239,6 +239,10 @@ export default function MediaModal({
   // Set episode watched in season (supports toggling down or setting directly)
   const handleSetEpisodeWatched = async (seasonNum: number, episodeNum: number) => {
     if (!seasonsState) return;
+    const prevSeas = seasonsState;
+    const prevProg = progress;
+    const prevStat = status;
+
     const updated = seasonsState.map((s) => {
       if (s.seasonNumber === seasonNum) {
         // If clicking the current episode frontier, toggle down by 1 (e.g. 8 -> 7, or 1 -> 0)
@@ -281,7 +285,7 @@ export default function MediaModal({
     if (onUpdateState) onUpdateState(newStatus, newProg);
 
     try {
-      await fetch("/api/track", {
+      const res = await fetch("/api/track", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -293,16 +297,27 @@ export default function MediaModal({
           progressCurrent: totalWatched,
         }),
       });
+      if (!res.ok) throw new Error("Sync failed");
       router.refresh();
       showToast(`Logged S${seasonNum} Ep ${episodeNum}`, "success");
     } catch {
-      showToast("Failed to save episode progress", "error");
+      setSeasonsState(prevSeas);
+      setProgress(prevProg);
+      setStatus(prevStat);
+      if (onUpdateItem) onUpdateItem(item);
+      if (onUpdateState) onUpdateState(prevStat, prevProg);
+      showToast("Failed to save episode progress. Reverted.", "error");
     }
   };
 
   // Toggle season completed status (allows marking complete or resetting back to incomplete)
   const handleToggleSeasonCompleted = async (seasonNum: number) => {
     if (!seasonsState) return;
+    const prevSeas = seasonsState;
+    const prevProg = progress;
+    const prevStat = status;
+    const prevSelSeason = selectedSeasonNum;
+
     const targetSeason = seasonsState.find((s) => s.seasonNumber === seasonNum);
     if (!targetSeason) return;
     const willBeCompleted = !targetSeason.isCompleted;
@@ -357,7 +372,7 @@ export default function MediaModal({
     setSelectedSeasonNum(nextSeasonNum);
 
     try {
-      await fetch("/api/track", {
+      const res = await fetch("/api/track", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -369,9 +384,16 @@ export default function MediaModal({
           progressCurrent: totalWatched,
         }),
       });
+      if (!res.ok) throw new Error("Sync failed");
       router.refresh();
     } catch {
-      showToast("Failed to save season update", "error");
+      setSeasonsState(prevSeas);
+      setProgress(prevProg);
+      setStatus(prevStat);
+      setSelectedSeasonNum(prevSelSeason);
+      if (onUpdateItem) onUpdateItem(item);
+      if (onUpdateState) onUpdateState(prevStat, prevProg);
+      showToast("Failed to save season update. Reverted.", "error");
     }
   };
 
@@ -451,6 +473,11 @@ export default function MediaModal({
 
   // Quick interactive episode / runtime increment/decrement
   const handleQuickEpisodeChange = async (delta: number) => {
+    const prevProgVal = directProgressCurrent;
+    const prevStatus = status;
+    const prevProgStr = progress;
+    const prevItem = { ...item };
+
     const total = item.progressTotal;
     const nextVal = Math.max(0, Math.min(total || 99999, directProgressCurrent + delta));
     setDirectProgressCurrent(nextVal);
@@ -476,7 +503,7 @@ export default function MediaModal({
     if (onUpdateState) onUpdateState(nextStatus, newProg);
 
     try {
-      await fetch("/api/track", {
+      const res = await fetch("/api/track", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -486,16 +513,27 @@ export default function MediaModal({
           status: nextStatus,
         }),
       });
+      if (!res.ok) throw new Error("Sync failed");
       router.refresh();
       showToast(meta.unitLabel.toUpperCase() === "MINS" ? `Logged ${nextVal} mins` : `Logged Ep ${nextVal}`, "success");
     } catch {
-      showToast("Failed to update progress", "error");
+      setDirectProgressCurrent(prevProgVal);
+      setStatus(prevStatus);
+      setProgress(prevProgStr);
+      if (onUpdateItem) onUpdateItem(prevItem);
+      if (onUpdateState) onUpdateState(prevStatus, prevProgStr);
+      showToast("Failed to update progress. Reverted.", "error");
     }
   };
 
   // Quick complete anime
   const handleCompleteDirect = async () => {
     if (!item.progressTotal || item.progressTotal <= 0) return;
+    const prevProgVal = directProgressCurrent;
+    const prevStatus = status;
+    const prevProgStr = progress;
+    const prevItem = { ...item };
+
     const total = item.progressTotal;
     setDirectProgressCurrent(total);
     const newProg = `${total}/${total} ${meta.unitLabel.toUpperCase()}`;
@@ -512,7 +550,7 @@ export default function MediaModal({
     if (onUpdateState) onUpdateState("Completed", newProg);
 
     try {
-      await fetch("/api/track", {
+      const res = await fetch("/api/track", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -522,15 +560,27 @@ export default function MediaModal({
           status: "Completed",
         }),
       });
+      if (!res.ok) throw new Error("Sync failed");
       router.refresh();
       showToast(`Marked "${item.title}" as Completed!`, "success");
     } catch {
-      showToast("Failed to mark as completed", "error");
+      setDirectProgressCurrent(prevProgVal);
+      setStatus(prevStatus);
+      setProgress(prevProgStr);
+      if (onUpdateItem) onUpdateItem(prevItem);
+      if (onUpdateState) onUpdateState(prevStatus, prevProgStr);
+      showToast("Failed to mark as completed. Reverted.", "error");
     }
   };
 
   // Quick manga chapter increment/decrement
   const handleQuickMangaChapterChange = async (delta: number) => {
+    const prevCh = mangaChapter;
+    const prevVol = mangaVolume;
+    const prevStatus = status;
+    const prevProgStr = progress;
+    const prevItem = { ...item };
+
     const nextCh = Math.max(0, mangaChapter + delta);
     const total = item.progressTotal;
     if (total && total > 0 && nextCh > total) return;
@@ -560,7 +610,7 @@ export default function MediaModal({
     if (onUpdateState) onUpdateState(nextStatus, newProg);
 
     try {
-      await fetch("/api/track", {
+      const res = await fetch("/api/track", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -570,15 +620,29 @@ export default function MediaModal({
           status: nextStatus,
         }),
       });
+      if (!res.ok) throw new Error("Sync failed");
       router.refresh();
       showToast(`Logged Ch ${nextCh} (Vol ${nextVol})`, "success");
     } catch {
-      showToast("Failed to update manga chapter", "error");
+      setMangaChapter(prevCh);
+      setMangaVolume(prevVol);
+      setDirectProgressCurrent(prevCh);
+      setStatus(prevStatus);
+      setProgress(prevProgStr);
+      if (onUpdateItem) onUpdateItem(prevItem);
+      if (onUpdateState) onUpdateState(prevStatus, prevProgStr);
+      showToast("Failed to update manga chapter. Reverted.", "error");
     }
   };
 
   // Quick manga volume increment/decrement
   const handleQuickMangaVolumeChange = async (delta: number) => {
+    const prevVol = mangaVolume;
+    const prevCh = mangaChapter;
+    const prevStatus = status;
+    const prevProgStr = progress;
+    const prevItem = { ...item };
+
     const nextVol = Math.max(0, mangaVolume + delta);
     const nextCh = volumeToChapter(nextVol, chaptersPerVol, item.progressTotal);
     const total = item.progressTotal;
@@ -607,7 +671,7 @@ export default function MediaModal({
     if (onUpdateState) onUpdateState(nextStatus, newProg);
 
     try {
-      await fetch("/api/track", {
+      const res = await fetch("/api/track", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -617,10 +681,18 @@ export default function MediaModal({
           status: nextStatus,
         }),
       });
+      if (!res.ok) throw new Error("Sync failed");
       router.refresh();
       showToast(`Logged Vol ${nextVol} (Ch ${nextCh})`, "success");
     } catch {
-      showToast("Failed to update manga volume", "error");
+      setMangaVolume(prevVol);
+      setMangaChapter(prevCh);
+      setDirectProgressCurrent(prevCh);
+      setStatus(prevStatus);
+      setProgress(prevProgStr);
+      if (onUpdateItem) onUpdateItem(prevItem);
+      if (onUpdateState) onUpdateState(prevStatus, prevProgStr);
+      showToast("Failed to update manga volume. Reverted.", "error");
     }
   };
 
@@ -657,6 +729,36 @@ export default function MediaModal({
       progressVal = calculateTotalWatched(seasonsToSave);
     }
 
+    const optimisticRating = cleanRating !== null ? `${cleanRating.toFixed(1)}/10` : "Unrated";
+    const optimisticProg =
+      item.type === "series" && seasonsToSave && seasonsToSave.length > 0
+        ? formatStructuredProgress(seasonsToSave, selectedSeasonNum, progressVal, item.progressTotal, meta.unitLabel)
+        : progress;
+
+    const previousItem = { ...item };
+    const previousStatus = status;
+    const previousProgress = progress;
+
+    const optimisticItem: MediaItem = {
+      ...item,
+      rating: optimisticRating,
+      status,
+      progress: optimisticProg,
+      progressCurrent: progressVal,
+      coverImage: coverImage.trim() || item.coverImage,
+      notes: notes.trim(),
+      ...(item.type === "series" && seasonsToSave && {
+        seasons: seasonsToSave,
+        currentSeason: selectedSeasonNum,
+      }),
+    };
+
+    // Optimistically update UI immediately
+    if (onUpdateItem) onUpdateItem(optimisticItem);
+    if (onUpdateState) onUpdateState(status, optimisticProg);
+    setIsEditing(false);
+    showToast(`✓ Updated personal tracking for "${item.title}"`, "success");
+
     try {
       const res = await fetch("/api/track", {
         method: "PUT",
@@ -684,15 +786,15 @@ export default function MediaModal({
       if (onUpdateItem && data.entry) {
         onUpdateItem(data.entry);
       }
-      if (onUpdateState) {
-        onUpdateState(status, progress);
-      }
       router.refresh();
-      setIsEditing(false);
-      showToast(`Updated personal tracking for "${item.title}"`, "success");
     } catch (e: any) {
+      // Revert optimistic update on failure
+      if (onUpdateItem) onUpdateItem(previousItem);
+      if (onUpdateState) onUpdateState(previousStatus, previousProgress);
+      setStatus(previousStatus);
+      setProgress(previousProgress);
       setErrorMsg(e.message || "Failed to save updates.");
-      showToast(e.message || "Failed to save updates.", "error");
+      showToast(e.message || "Failed to save updates. Reverted.", "error");
     } finally {
       setIsSubmitting(false);
     }

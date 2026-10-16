@@ -99,12 +99,16 @@ export default function MediaCard({
     if (isLocallyTracked || isAddingPlan) return;
     setIsAddingPlan(true);
 
+    // Optimistically update tracking state instantly
+    setIsLocallyTracked(true);
+    showToast(`✓ Added "${item.title}" to ${planLabel}`, "success");
+
     if (onAddPlan) {
       try {
         await onAddPlan(item);
-        setIsLocallyTracked(true);
       } catch (err) {
-        console.error("Error in onAddPlan:", err);
+        setIsLocallyTracked(false);
+        showToast("Failed to add to library. Reverted.", "error");
       } finally {
         setIsAddingPlan(false);
       }
@@ -127,17 +131,12 @@ export default function MediaCard({
         }),
       });
       const data = await res.json();
-      if (res.ok && data.success) {
-        setIsLocallyTracked(true);
-        showToast(`✓ Added "${item.title}" to ${planLabel}`, "success");
-      } else if (res.status === 409) {
-        setIsLocallyTracked(true);
-        showToast(`"${item.title}" is already in your library`, "info");
-      } else {
-        showToast(`ERROR: ${data.error || "Failed to add to your list"}`, "error");
+      if (!res.ok && res.status !== 409) {
+        throw new Error(data.error || "Failed to add to library");
       }
-    } catch {
-      showToast("ERROR: Failed to add to your list", "error");
+    } catch (err: any) {
+      setIsLocallyTracked(false);
+      showToast(err.message || "Failed to add to library. Reverted.", "error");
     } finally {
       setIsAddingPlan(false);
     }
@@ -246,9 +245,43 @@ export default function MediaCard({
     };
   };
 
+  // Optimistic sync helper with rollback
+  const syncTrackUpdate = async (
+    payload: any,
+    prevProg: string,
+    prevStat: string,
+    prevSeas?: SeasonData[]
+  ) => {
+    try {
+      const res = await fetch("/api/track", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok || (data && data.success === false)) {
+        throw new Error(data?.error || "Failed to sync updates");
+      }
+      if (onItemUpdate && data.entry) {
+        onItemUpdate(data.entry);
+      }
+    } catch (err: any) {
+      console.warn("Optimistic update failed, rolling back:", err);
+      setCurrentProgress(prevProg);
+      setCurrentStatus(prevStat);
+      if (prevSeas) setSeasonsState(prevSeas);
+      if (onProgressChange) onProgressChange(item.id, prevProg);
+      if (onStatusChange) onStatusChange(item.id, prevStat);
+      showToast(err.message || "Failed to sync progress. Reverted changes.", "error");
+    }
+  };
+
   // Handle structured progress increment
   const handleIncrement = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const prevProg = currentProgress;
+    const prevStat = currentStatus;
+    const prevSeas = seasonsState ? seasonsState.map((s) => ({ ...s })) : undefined;
 
     // 1. Season-aware increment (strictly for series)
     if (item.type === "series" && seasonsState && seasonsState.length > 0) {
@@ -275,24 +308,27 @@ export default function MediaCard({
         setSeasonsState(updatedSeasons);
         setCurrentProgress(newProg);
 
+        let newStatus = currentStatus;
         if (totalWatched >= totalEpisodes && totalEpisodes > 0) {
+          newStatus = "Completed";
           setCurrentStatus("Completed");
           if (onStatusChange) onStatusChange(item.id, "Completed");
         }
         if (onProgressChange) onProgressChange(item.id, newProg);
 
-        // Persist to database
-        fetch("/api/track", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        syncTrackUpdate(
+          {
             id: item.id,
             type: item.type,
             seasons: updatedSeasons,
             currentSeason: activeS.seasonNumber,
             progressCurrent: totalWatched,
-          }),
-        }).catch((err) => console.warn("Failed to sync card increment:", err));
+            ...(newStatus === "Completed" ? { status: "Completed" } : {}),
+          },
+          prevProg,
+          prevStat,
+          prevSeas
+        );
       }
       return;
     }
@@ -311,56 +347,62 @@ export default function MediaCard({
         const newProg = `${newVal}/${isNaN(totalVal) ? "?" : totalVal} ${unit}`;
         setCurrentProgress(newProg);
 
+        let newStatus = currentStatus;
         if (!isNaN(totalVal) && newVal >= totalVal) {
+          newStatus = "Completed";
           setCurrentStatus("Completed");
           if (onStatusChange) onStatusChange(item.id, "Completed");
         }
         if (onProgressChange) onProgressChange(item.id, newProg);
 
-        fetch("/api/track", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        syncTrackUpdate(
+          {
             id: item.id,
             type: item.type,
             progressCurrent: newVal,
-          }),
-        }).catch((err) => console.warn("Failed to sync increment:", err));
+            ...(newStatus === "Completed" ? { status: "Completed" } : {}),
+          },
+          prevProg,
+          prevStat
+        );
       }
     } else if (currentProgress.toLowerCase().includes("hrs")) {
       const val = parseInt(currentProgress) || 0;
       const newProg = `${val + 1} hrs`;
       setCurrentProgress(newProg);
       if (onProgressChange) onProgressChange(item.id, newProg);
-      fetch("/api/track", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      syncTrackUpdate(
+        {
           id: item.id,
           type: item.type,
           progressCurrent: val + 1,
-        }),
-      }).catch((err) => console.warn("Failed to sync increment:", err));
+        },
+        prevProg,
+        prevStat
+      );
     } else if (currentProgress.toLowerCase().includes("mins")) {
       const val = parseInt(currentProgress) || 0;
       const newProg = `${val + 1} mins`;
       setCurrentProgress(newProg);
       if (onProgressChange) onProgressChange(item.id, newProg);
-      fetch("/api/track", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      syncTrackUpdate(
+        {
           id: item.id,
           type: item.type,
           progressCurrent: val + 1,
-        }),
-      }).catch((err) => console.warn("Failed to sync increment:", err));
+        },
+        prevProg,
+        prevStat
+      );
     }
   };
 
   // Handle structured progress decrement
   const handleDecrement = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const prevProg = currentProgress;
+    const prevStat = currentStatus;
+    const prevSeas = seasonsState ? seasonsState.map((s) => ({ ...s })) : undefined;
 
     // 1. Season-aware decrement (strictly for series)
     if (item.type === "series" && seasonsState && seasonsState.length > 0) {
@@ -385,24 +427,27 @@ export default function MediaCard({
         setSeasonsState(updatedSeasons);
         setCurrentProgress(newProg);
 
+        let newStatus = currentStatus;
         if (currentStatus === "Completed" && totalWatched < totalEpisodes) {
-          const activeStatus = "Watching";
-          setCurrentStatus(activeStatus);
-          if (onStatusChange) onStatusChange(item.id, activeStatus);
+          newStatus = "Watching";
+          setCurrentStatus(newStatus);
+          if (onStatusChange) onStatusChange(item.id, newStatus);
         }
         if (onProgressChange) onProgressChange(item.id, newProg);
 
-        fetch("/api/track", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        syncTrackUpdate(
+          {
             id: item.id,
             type: item.type,
             seasons: updatedSeasons,
             currentSeason: activeS.seasonNumber,
             progressCurrent: totalWatched,
-          }),
-        }).catch((err) => console.warn("Failed to sync card decrement:", err));
+            ...(newStatus !== prevStat ? { status: newStatus } : {}),
+          },
+          prevProg,
+          prevStat,
+          prevSeas
+        );
       }
       return;
     }
@@ -421,27 +466,29 @@ export default function MediaCard({
         const newProg = `${newVal}/${isNaN(totalVal) ? "?" : totalVal} ${unit}`;
         setCurrentProgress(newProg);
 
+        let newStatus = currentStatus;
         if (currentStatus === "Completed" && !isNaN(totalVal) && newVal < totalVal) {
-          const activeStatus =
+          newStatus =
             item.type === "manga"
               ? "Reading"
               : item.type === "game"
                 ? "Playing"
                 : "Watching";
-          setCurrentStatus(activeStatus);
-          if (onStatusChange) onStatusChange(item.id, activeStatus);
+          setCurrentStatus(newStatus);
+          if (onStatusChange) onStatusChange(item.id, newStatus);
         }
         if (onProgressChange) onProgressChange(item.id, newProg);
 
-        fetch("/api/track", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        syncTrackUpdate(
+          {
             id: item.id,
             type: item.type,
             progressCurrent: newVal,
-          }),
-        }).catch((err) => console.warn("Failed to sync decrement:", err));
+            ...(newStatus !== prevStat ? { status: newStatus } : {}),
+          },
+          prevProg,
+          prevStat
+        );
       }
     } else if (currentProgress.toLowerCase().includes("hrs")) {
       const val = parseInt(currentProgress) || 0;
@@ -449,15 +496,15 @@ export default function MediaCard({
         const newProg = `${val - 1} hrs`;
         setCurrentProgress(newProg);
         if (onProgressChange) onProgressChange(item.id, newProg);
-        fetch("/api/track", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        syncTrackUpdate(
+          {
             id: item.id,
             type: item.type,
             progressCurrent: val - 1,
-          }),
-        }).catch((err) => console.warn("Failed to sync decrement:", err));
+          },
+          prevProg,
+          prevStat
+        );
       }
     } else if (currentProgress.toLowerCase().includes("mins")) {
       const val = parseInt(currentProgress) || 0;
@@ -465,15 +512,15 @@ export default function MediaCard({
         const newProg = `${val - 1} mins`;
         setCurrentProgress(newProg);
         if (onProgressChange) onProgressChange(item.id, newProg);
-        fetch("/api/track", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        syncTrackUpdate(
+          {
             id: item.id,
             type: item.type,
             progressCurrent: val - 1,
-          }),
-        }).catch((err) => console.warn("Failed to sync decrement:", err));
+          },
+          prevProg,
+          prevStat
+        );
       }
     }
   };
@@ -481,6 +528,10 @@ export default function MediaCard({
   // Direct complete
   const handleComplete = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const prevProg = currentProgress;
+    const prevStat = currentStatus;
+    const prevSeas = seasonsState ? seasonsState.map((s) => ({ ...s })) : undefined;
+
     setCurrentStatus("Completed");
     if (onStatusChange) onStatusChange(item.id, "Completed");
 
@@ -497,17 +548,18 @@ export default function MediaCard({
       setCurrentProgress(newProg);
       if (onProgressChange) onProgressChange(item.id, newProg);
 
-      fetch("/api/track", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      syncTrackUpdate(
+        {
           id: item.id,
           type: item.type,
           status: "Completed",
           seasons: updatedSeasons,
           progressCurrent: totalWatched,
-        }),
-      }).catch((err) => console.warn("Failed to sync complete:", err));
+        },
+        prevProg,
+        prevStat,
+        prevSeas
+      );
     } else {
       let newWatched = item.progressCurrent;
       let newProg = currentProgress;
@@ -527,21 +579,27 @@ export default function MediaCard({
       setCurrentProgress(newProg);
       if (onProgressChange) onProgressChange(item.id, newProg);
 
-      fetch("/api/track", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      syncTrackUpdate(
+        {
           id: item.id,
           type: item.type,
           status: "Completed",
           progressCurrent: newWatched,
-        }),
-      }).catch((err) => console.warn("Failed to sync complete:", err));
+        },
+        prevProg,
+        prevStat
+      );
     }
   };
 
   const handleTrackItem = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    const prevStatus = currentStatus;
+    const displayStatus =
+      item.type === "manga" ? "Reading" : item.type === "game" ? "Playing" : "Watching";
+    setCurrentStatus(displayStatus);
+    showToast(`✓ Tracking "${item.title}" (${displayStatus})`, "success");
+
     try {
       const defaultStatus =
         item.type === "manga" ? "reading" : item.type === "game" ? "playing" : "watching";
@@ -557,16 +615,15 @@ export default function MediaCard({
         }),
       });
       const data = await res.json();
-      if (data.success) {
-        const displayStatus =
-          item.type === "manga" ? "Reading" : item.type === "game" ? "Playing" : "Watching";
-        setCurrentStatus(displayStatus);
-        if (onItemUpdate && data.entry) {
-          onItemUpdate(data.entry);
-        }
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to track item");
       }
-    } catch (err) {
-      console.error("Failed to track item", err);
+      if (onItemUpdate && data.entry) {
+        onItemUpdate(data.entry);
+      }
+    } catch (err: any) {
+      setCurrentStatus(prevStatus);
+      showToast(err.message || "Failed to track item. Reverted.", "error");
     }
   };
 

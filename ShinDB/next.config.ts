@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Use standalone mode for Docker builds; Vercel deploys natively as serverless lambdas
+  output: process.env.DOCKER_BUILD ? "standalone" : undefined,
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.myanimelist.net" },
@@ -20,6 +21,7 @@ const nextConfig: NextConfig = {
     "*.ngrok-free.dev",
     "*.ngrok-free.app",
     "deranged-rekindle-venue.ngrok-free.dev",
+    "*.vercel.app",
   ],
 };
 

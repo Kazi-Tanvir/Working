@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
     "*.ngrok-free.dev",
     "*.ngrok-free.app",
     "deranged-rekindle-venue.ngrok-free.dev",
-    "*.vercel.app",
+    "shindb.vercel.app",
   ],
 };
 

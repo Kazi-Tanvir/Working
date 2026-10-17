@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.gog-statics.com" },
     ],
   },
+  allowedDevOrigins: [
+    "*.ngrok-free.dev",
+    "*.ngrok-free.app",
+    "deranged-rekindle-venue.ngrok-free.dev",
+  ],
 };
 
 export default nextConfig;

@@ -96,14 +96,48 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Cyber Hamburger Menu Icon */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-1.5 border border-white/20 hover:border-white text-gray-400 hover:text-white transition-all cursor-pointer bg-black"
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
+          {/* Mobile Direct Actions (Login & Register or User Badge) + Hamburger Toggle */}
+          <div className="flex items-center gap-2 md:hidden">
+            {!isSignedIn && !user ? (
+              <div className="flex items-center gap-1.5">
+                <Link
+                  href="/login"
+                  className="flex items-center gap-1 border border-white/40 hover:border-white text-gray-200 hover:text-white px-2.5 py-1 text-xs uppercase tracking-wider font-bold transition-all bg-black/60 active:scale-95 touch-manipulation cursor-pointer"
+                >
+                  <UserIcon className="w-3 h-3" />
+                  <span>Login</span>
+                </Link>
+                <Link
+                  href="/register"
+                  className="flex items-center gap-1 bg-white text-black font-extrabold hover:bg-cyber-purple hover:text-white border border-white px-2.5 py-1 text-xs uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(255,255,255,0.4)] active:scale-95 touch-manipulation cursor-pointer"
+                >
+                  <span>Register</span>
+                </Link>
+              </div>
+            ) : (
+              <Link
+                href="/profile"
+                className="flex items-center gap-1.5 border border-cyber-cyan/60 bg-cyber-cyan/10 text-cyber-cyan px-2 py-1 text-xs uppercase tracking-wider font-bold transition-all active:scale-95"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-pulse" />
+                <span className="max-w-[75px] truncate text-[11px]">
+                  @{clerkUser?.username || clerkUser?.firstName || user?.username || "YOU"}
+                </span>
+              </Link>
+            )}
+
+            {/* Cyber Hamburger Menu Icon */}
+            <button
+              type="button"
+              id="navbar-mobile-toggle"
+              onClick={() => setIsOpen((prev) => !prev)}
+              className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center border border-white/30 hover:border-white active:bg-white/10 text-gray-300 hover:text-white transition-all cursor-pointer bg-black touch-manipulation active:scale-95"
+              aria-label="Toggle menu"
+              aria-expanded={isOpen}
+            >
+              {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
 
         {/* Navigation Categories Router */}

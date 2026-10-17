@@ -91,7 +91,7 @@ function cleanGenres(genres: string[]): string[] {
 }
 
 async function seedCollection(filename: string, type: MediaType, baseUserId: string) {
-  const filePath = path.join(process.cwd(), "src", "database", filename);
+  const filePath = path.join(process.cwd(), "prisma", "data", filename);
   const content = await fs.readFile(filePath, "utf-8");
   const items = JSON.parse(content);
   let count = 0;

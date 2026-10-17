@@ -12,7 +12,7 @@ import {
   Clock 
 } from "lucide-react";
 import { MediaItem } from "@/components/common/MediaCard";
-import { SafeUser } from "@/lib/auth";
+import type { SafeUser } from "@/lib/auth";
 
 function useAnimatedCount(target: number, durationMs = 800) {
   const [count, setCount] = useState(0);

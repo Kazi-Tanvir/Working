@@ -22,7 +22,7 @@ import {
   Upload,
   UploadCloud,
 } from "lucide-react";
-import { parseTextList } from "@/lib/import";
+import { parseTextList } from "@/utils/textParser";
 
 interface StreamLogItem {
   title: string;

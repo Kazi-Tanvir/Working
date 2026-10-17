@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, Plus, Check, Film, Tv, BookOpen, Gamepad2, X } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
-import { SearchResultItem } from "@/utils/apiHelpers";
+import type { SearchResultItem } from "@/utils/apiHelpers";
 import Badge from "./Badge";
 import { getCoverImage, DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
 

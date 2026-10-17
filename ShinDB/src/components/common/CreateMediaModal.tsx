@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import Badge from "./Badge";
 import { showToast } from "@/components/common/Toast";
 import { useDebounce } from "@/hooks/useDebounce";
-import { SearchResultItem } from "@/utils/apiHelpers";
+import type { SearchResultItem } from "@/utils/apiHelpers";
 import { MediaItem } from "./MediaCard";
 import { DEFAULT_COVER_IMAGES, getCoverImage } from "@/utils/mediaDefaults";
 

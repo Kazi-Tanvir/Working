@@ -8,34 +8,7 @@ import { MediaStatus, MediaType } from "@prisma/client";
 // ----------------------------------------------------
 // 1. Text Parsing
 // ----------------------------------------------------
-export function parseTextList(raw: string): string[] {
-  if (!raw || typeof raw !== "string") return [];
-
-  // Split on newlines or commas
-  const items = raw.split(/[\r\n,]+/);
-
-  const cleaned = items
-    .map((line) =>
-      line
-        .replace(/^\s*\d+[\.\)\-:]\s*/, "") // remove numbered prefixes like "1.", "1)", "1-"
-        .replace(/^\s*[\-\•\*\–\—\>]\s*/, "") // remove bullet points like "-", "•", "*"
-        .trim()
-    )
-    .filter((line) => line.length > 0);
-
-  // Deduplicate case-insensitively while preserving original casing
-  const seen = new Set<string>();
-  const uniqueList: string[] = [];
-  for (const item of cleaned) {
-    const key = item.toLowerCase();
-    if (!seen.has(key)) {
-      seen.add(key);
-      uniqueList.push(item);
-    }
-  }
-
-  return uniqueList;
-}
+export { parseTextList } from "@/utils/textParser";
 
 // ----------------------------------------------------
 // 2. Status & Score Mapping

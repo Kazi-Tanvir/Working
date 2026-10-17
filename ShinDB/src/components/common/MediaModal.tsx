@@ -860,25 +860,25 @@ export default function MediaModal({
   return createPortal(
     <div 
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md select-none transition-all duration-300"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md select-none transition-all duration-300"
     >
       
       {/* Premium Neobrutalist Modal Outer Box */}
       <div 
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-4 sm:p-6 md:p-8 flex flex-col gap-6 font-sans`}
+        className={`relative w-full max-w-3xl max-h-[94vh] sm:max-h-[90vh] overflow-y-auto bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-3.5 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 font-sans`}
       >
         
         {/* Top Control Bar */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 select-none">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-center justify-between border-b border-white/10 pb-3 sm:pb-4 select-none gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <Badge status={status}>{status}</Badge>
-            <span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest">
+            <span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest hidden sm:inline truncate max-w-[120px] md:max-w-none">
               ID: {item.id}
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {isFriendView && (
               isAlreadyTracked ? (
                 <div className="flex items-center gap-1.5 px-2.5 py-1 bg-cyber-green/20 text-cyber-green border border-cyber-green/60 text-[10px] font-mono font-bold rounded-sm">
@@ -889,7 +889,7 @@ export default function MediaModal({
                 <button
                   type="button"
                   onClick={() => onAddPlan && onAddPlan(item)}
-                  className="px-3 py-1 bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[10px] border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  className="px-2.5 sm:px-3 py-1 bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[10px] border border-white tracking-widest uppercase transition-all shadow-[2px_2px_0px_0px_#ffffff] flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>+ {item.type === "manga" ? "PLAN TO READ" : item.type === "game" ? "PLAN TO PLAY" : "PLAN TO WATCH"}</span>
@@ -902,7 +902,7 @@ export default function MediaModal({
                   <button
                     onClick={handleSyncMetadata}
                     disabled={isSyncing}
-                    className={`p-1.5 border border-white/10 text-gray-400 hover:text-white transition-all cursor-pointer ${meta.accentBtn} ${isSyncing ? "text-cyber-purple" : ""}`}
+                    className={`p-2 sm:p-1.5 border border-white/10 text-gray-400 hover:text-white transition-all cursor-pointer ${meta.accentBtn} ${isSyncing ? "text-cyber-purple" : ""}`}
                     title="Sync latest episode/chapter counts from external API"
                   >
                     <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`} />
@@ -910,14 +910,14 @@ export default function MediaModal({
                 )}
                 <button
                   onClick={() => setIsEditing(true)}
-                  className={`p-1.5 border border-white/10 text-gray-400 hover:text-white transition-all cursor-pointer ${meta.accentBtn}`}
+                  className={`p-2 sm:p-1.5 border border-white/10 text-gray-400 hover:text-white transition-all cursor-pointer ${meta.accentBtn}`}
                   title="Edit Personal Tracking"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setShowConfirmDelete(true)}
-                  className="p-1.5 border border-white/10 text-gray-400 hover:text-cyber-red hover:bg-cyber-red/15 transition-all cursor-pointer"
+                  className="p-2 sm:p-1.5 border border-white/10 text-gray-400 hover:text-cyber-red hover:bg-cyber-red/15 transition-all cursor-pointer"
                   title="Delete Record"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -926,7 +926,7 @@ export default function MediaModal({
             )}
             <button
               onClick={onClose}
-              className="p-1.5 border border-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
+              className="p-2 sm:p-1.5 border border-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
               title="Close Panel"
             >
               <X className="w-4 h-4" />
@@ -961,18 +961,18 @@ export default function MediaModal({
               </p>
             </div>
 
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex flex-col-reverse sm:flex-row items-center gap-3 sm:gap-4 mt-2 w-full sm:w-auto justify-center">
               <button
                 onClick={() => setShowConfirmDelete(false)}
                 disabled={isSubmitting}
-                className="px-6 py-2 border border-white/20 text-gray-300 font-bold hover:text-white hover:border-white transition-all cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2 border border-white/20 text-gray-300 font-bold hover:text-white hover:border-white transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isSubmitting}
-                className="px-6 py-2 bg-cyber-red text-black border-2 border-white hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] font-bold transition-all cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2 bg-cyber-red text-black border-2 border-white hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] font-bold transition-all cursor-pointer"
               >
                 {isSubmitting ? "Deleting..." : "Permanently Delete"}
               </button>
@@ -983,10 +983,10 @@ export default function MediaModal({
           /* =========================================================
              EDIT MODE FORM (User Editable Fields with Locked Canonical Metadata)
              ========================================================= */
-          <form onSubmit={handleUpdateSubmit} className="flex flex-col md:flex-row gap-6">
+          <form onSubmit={handleUpdateSubmit} className="flex flex-col md:flex-row gap-5 md:gap-6">
             {/* Left Cover column */}
             <div className="w-full md:w-1/3 flex flex-col gap-3">
-              <div className={`relative w-full ${aspectClass} overflow-hidden border border-white/20 bg-[#000]`}>
+              <div className={`relative ${item.type === "game" ? "w-60 sm:w-72 md:w-full" : "w-36 sm:w-48 md:w-full"} mx-auto md:mx-0 ${aspectClass} overflow-hidden border border-white/20 bg-[#000]`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={getCoverImage(coverImage, item.type)}
@@ -1219,12 +1219,12 @@ export default function MediaModal({
               </div>
 
               {/* Form Actions */}
-              <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4 mt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 border-t border-white/10 pt-4 mt-2">
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
                   disabled={isSubmitting}
-                  className="h-10 px-6 border border-white/20 text-gray-300 font-mono text-xs uppercase tracking-wider font-bold hover:text-white hover:border-white transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  className="w-full sm:w-auto h-10 px-6 border border-white/20 text-gray-300 font-mono text-xs uppercase tracking-wider font-bold hover:text-white hover:border-white transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                 >
                   <Undo className="w-3.5 h-3.5" /> Cancel
                 </button>
@@ -1232,7 +1232,7 @@ export default function MediaModal({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-10 px-6 bg-white text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(139,92,246,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  className="w-full sm:w-auto h-10 px-6 bg-white text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(139,92,246,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                 >
                   <Save className="w-3.5 h-3.5" /> {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
@@ -1245,10 +1245,10 @@ export default function MediaModal({
           /* =========================================================
              VIEW MODE SCREEN (Tactile Command Console with Season & Episode Square Buttons)
              ========================================================= */
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+          <div className="flex flex-col md:flex-row gap-5 md:gap-8">
             {/* Left Cover Column */}
-            <div className="w-full md:w-1/3">
-              <div className={`relative w-full ${aspectClass} overflow-hidden border border-white/10 rounded-md bg-[#000]`}>
+            <div className="w-full md:w-1/3 flex justify-center md:block">
+              <div className={`relative ${item.type === "game" ? "w-60 sm:w-72 md:w-full" : "w-36 sm:w-48 md:w-full"} ${aspectClass} overflow-hidden border border-white/10 rounded-md bg-[#000] shadow-lg shrink-0`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={getCoverImage(item.coverImage, item.type)}
@@ -1262,15 +1262,15 @@ export default function MediaModal({
             </div>
 
             {/* Right Meta details column */}
-            <div className="w-full md:w-2/3 flex flex-col justify-between gap-5">
+            <div className="w-full md:w-2/3 flex flex-col justify-between gap-4 sm:gap-5">
               
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3.5 sm:gap-4">
                 {/* Header Title & Badges */}
-                <div>
-                  <h2 className="font-sans font-black text-2xl md:text-3xl text-white uppercase tracking-wider leading-tight">
+                <div className="text-center md:text-left">
+                  <h2 className="font-sans font-black text-xl sm:text-2xl md:text-3xl text-white uppercase tracking-wider leading-tight">
                     {item.title}
                   </h2>
-                  <div className="flex flex-wrap items-center gap-2 mt-2 text-xs font-mono text-gray-400">
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2 mt-2 text-xs font-mono text-gray-400">
                     <span className={`px-2 py-0.5 ${meta.accentBg} ${meta.accentText} border border-white/10 font-bold uppercase`}>
                       {item.type}
                     </span>
@@ -1288,7 +1288,7 @@ export default function MediaModal({
                 </div>
 
                 {/* Score and Overall Progress stats panel */}
-                <div className="grid grid-cols-2 gap-4 border border-white/10 p-3.5 bg-[#0a0a0c] font-mono">
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-4 border border-white/10 p-3 sm:p-3.5 bg-[#0a0a0c] font-mono">
                   
                   {/* Rating Block */}
                   <div className="flex flex-col gap-1 select-none">
@@ -1369,7 +1369,7 @@ export default function MediaModal({
                     {/* Active Season Information & Complete Season Action */}
                     {activeSeason && (
                       <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-bold text-white uppercase tracking-wider">
                               {activeSeason.title || `Season ${activeSeason.seasonNumber}`}
@@ -1383,7 +1383,7 @@ export default function MediaModal({
                             <button
                               type="button"
                               onClick={() => handleToggleSeasonCompleted(activeSeason.seasonNumber)}
-                              className={`px-2.5 py-1 text-[10px] border font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                              className={`w-full sm:w-auto justify-center px-2.5 py-1 text-[10px] border font-bold flex items-center gap-1 transition-all cursor-pointer ${
                                 activeSeason.isCompleted
                                   ? "bg-cyber-green/20 text-cyber-green border-cyber-green hover:bg-cyber-red/20 hover:text-cyber-red hover:border-cyber-red"
                                   : "bg-cyber-green/15 text-cyber-green border-cyber-green/40 hover:bg-cyber-green hover:text-black"
@@ -1401,7 +1401,7 @@ export default function MediaModal({
                         </div>
 
                         {/* Episode Grid with Small Square Buttons */}
-                        <div className="flex flex-wrap gap-1.5 mt-1">
+                        <div className="flex flex-wrap gap-1.5 mt-1 max-h-48 sm:max-h-60 overflow-y-auto pr-1">
                           {Array.from({ length: activeSeason.episodeCount }, (_, i) => i + 1).map((epNum) => {
                             const isWatched = epNum <= activeSeason.episodesWatched;
                             return (
@@ -1434,11 +1434,11 @@ export default function MediaModal({
                       </span>
                     </div>
                     {!readOnly && (
-                      <div className="flex items-center gap-1.5 self-end sm:self-center">
+                      <div className="flex flex-wrap items-center gap-1.5 justify-start sm:justify-end">
                         <button
                           type="button"
                           onClick={() => handleQuickMangaChapterChange(-1)}
-                          className="w-16 h-8 border border-white/20 text-xs hover:border-cyber-orange hover:text-cyber-orange transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          className="flex-1 sm:flex-none w-auto sm:w-16 h-8 px-2 border border-white/20 text-xs hover:border-cyber-orange hover:text-cyber-orange transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
                           title="Decrement 1 Chapter"
                         >
                           -1 Ch
@@ -1446,16 +1446,16 @@ export default function MediaModal({
                         <button
                           type="button"
                           onClick={() => handleQuickMangaChapterChange(1)}
-                          className="w-16 h-8 border border-cyber-orange/40 bg-cyber-orange/15 text-cyber-orange hover:bg-cyber-orange hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          className="flex-1 sm:flex-none w-auto sm:w-16 h-8 px-2 border border-cyber-orange/40 bg-cyber-orange/15 text-cyber-orange hover:bg-cyber-orange hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
                           title="Increment 1 Chapter"
                         >
                           +1 Ch
                         </button>
-                        <span className="text-gray-700 mx-0.5">|</span>
+                        <span className="text-gray-700 mx-0.5 hidden sm:inline">|</span>
                         <button
                           type="button"
                           onClick={() => handleQuickMangaVolumeChange(-1)}
-                          className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          className="flex-1 sm:flex-none w-auto sm:w-16 h-8 px-2 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
                           title={`Decrement 1 Volume (~${chaptersPerVol} chapters)`}
                         >
                           -1 Vol
@@ -1463,7 +1463,7 @@ export default function MediaModal({
                         <button
                           type="button"
                           onClick={() => handleQuickMangaVolumeChange(1)}
-                          className="w-16 h-8 border border-white/30 bg-white/10 text-white hover:bg-white hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          className="flex-1 sm:flex-none w-auto sm:w-16 h-8 px-2 border border-white/30 bg-white/10 text-white hover:bg-white hover:text-black transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
                           title={`Increment 1 Volume (~${chaptersPerVol} chapters)`}
                         >
                           +1 Vol
@@ -1482,11 +1482,11 @@ export default function MediaModal({
                       </span>
                     </div>
                     {!readOnly && (
-                      <div className="flex items-center gap-1.5 self-end sm:self-center">
+                      <div className="flex flex-wrap items-center gap-1.5 justify-start sm:justify-end">
                         <button
                           type="button"
                           onClick={() => handleQuickEpisodeChange(-10)}
-                          className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          className="flex-1 sm:flex-none w-auto sm:w-16 h-8 px-2 border border-white/20 text-xs text-gray-300 hover:border-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
                           title="Rewind 10 Minutes"
                         >
                           -10m
@@ -1494,7 +1494,7 @@ export default function MediaModal({
                         <button
                           type="button"
                           onClick={() => handleQuickEpisodeChange(10)}
-                          className={`w-16 h-8 border text-xs transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm ${
+                          className={`flex-1 sm:flex-none w-auto sm:w-16 h-8 px-2 border text-xs transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm ${
                             item.type === "movie"
                               ? "border-cyber-yellow/40 bg-cyber-yellow/15 text-cyber-yellow hover:bg-cyber-yellow hover:text-black"
                               : "border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white"
@@ -1507,7 +1507,7 @@ export default function MediaModal({
                           <button
                             type="button"
                             onClick={() => handleCompleteDirect()}
-                            className="h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
+                            className="w-full sm:w-auto h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
                             title="Mark Movie Completed"
                           >
                             ✓ Complete
@@ -1525,11 +1525,11 @@ export default function MediaModal({
                       </span>
                     </div>
                     {!readOnly && (
-                      <div className="flex items-center gap-1.5 self-end sm:self-center">
+                      <div className="flex flex-wrap items-center gap-1.5 justify-start sm:justify-end">
                         <button
                           type="button"
                           onClick={() => handleQuickEpisodeChange(-1)}
-                          className="w-16 h-8 border border-white/20 text-xs text-gray-300 hover:border-cyber-purple hover:text-cyber-purple transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          className="flex-1 sm:flex-none w-auto sm:w-16 h-8 px-2 border border-white/20 text-xs text-gray-300 hover:border-cyber-purple hover:text-cyber-purple transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
                           title="Previous Episode"
                         >
                           -1 EP
@@ -1537,7 +1537,7 @@ export default function MediaModal({
                         <button
                           type="button"
                           onClick={() => handleQuickEpisodeChange(1)}
-                          className="w-16 h-8 border border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
+                          className="flex-1 sm:flex-none w-auto sm:w-16 h-8 px-2 border border-cyber-purple/50 bg-cyber-purple/20 text-cyber-purple hover:bg-cyber-purple hover:text-white transition-all font-bold cursor-pointer inline-flex items-center justify-center rounded-sm"
                           title="Next Episode"
                         >
                           +1 EP
@@ -1546,7 +1546,7 @@ export default function MediaModal({
                           <button
                             type="button"
                             onClick={() => handleCompleteDirect()}
-                            className="h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
+                            className="w-full sm:w-auto h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
                             title="Mark All Episodes Completed"
                           >
                             ✓ Complete All
@@ -1591,10 +1591,10 @@ export default function MediaModal({
               </div>
 
               {/* View Mode Actions */}
-              <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4 mt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 border-t border-white/10 pt-4 mt-2">
                 <button
                   onClick={onClose}
-                  className="h-10 px-6 border border-white/20 text-gray-300 font-mono text-xs uppercase tracking-wider font-bold hover:text-white hover:border-white transition-all cursor-pointer whitespace-nowrap inline-flex items-center justify-center"
+                  className="w-full sm:w-auto h-10 px-6 border border-white/20 text-gray-300 font-mono text-xs uppercase tracking-wider font-bold hover:text-white hover:border-white transition-all cursor-pointer whitespace-nowrap inline-flex items-center justify-center"
                 >
                   Close
                 </button>
@@ -1602,7 +1602,7 @@ export default function MediaModal({
                   <button
                     type="button"
                     onClick={() => onAddPlan && onAddPlan(item)}
-                    className="h-10 px-6 bg-cyber-purple hover:bg-white text-white hover:text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                    className="w-full sm:w-auto h-10 px-6 bg-cyber-purple hover:bg-white text-white hover:text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                   >
                     <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                     <span>+ {item.type === "manga" ? "Plan to Read" : item.type === "game" ? "Plan to Play" : "Plan to Watch"}</span>
@@ -1611,7 +1611,7 @@ export default function MediaModal({
                 {!readOnly && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="h-10 px-6 bg-white text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                    className="w-full sm:w-auto h-10 px-6 bg-white text-black border-2 border-white font-mono text-xs uppercase tracking-wider font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                     <span>Edit Record</span>

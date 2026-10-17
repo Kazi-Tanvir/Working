@@ -873,7 +873,7 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
             <div className="flex flex-col md:flex-row gap-5">
               {/* Left Cover preview column */}
               <div className="w-full md:w-1/3 flex flex-col gap-3">
-                <div className={`relative w-full ${aspectClass} overflow-hidden border border-white/20 bg-[#000]`}>
+                <div className={`relative ${type === "game" ? "w-60 sm:w-72 md:w-full" : "w-36 sm:w-48 md:w-full"} mx-auto md:mx-0 ${aspectClass} overflow-hidden border border-white/20 bg-[#000]`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={getCoverImage(coverImage, type)}
@@ -1023,21 +1023,21 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                 </div>
 
                 {/* Form Actions */}
-                <div className="flex items-center justify-between border-t border-white/10 pt-3.5 mt-1">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-white/10 pt-3.5 mt-1">
                   <button
                     type="button"
                     onClick={() => setActiveTab("search")}
-                    className="text-xs font-mono text-gray-400 hover:text-white transition-colors cursor-pointer"
+                    className="text-xs font-mono text-gray-400 hover:text-white transition-colors cursor-pointer text-center sm:text-left py-1"
                   >
                     ← Back to Search
                   </button>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={onClose}
                       disabled={isSubmitting}
-                      className="px-4 py-2 border border-white/20 text-gray-300 font-bold hover:text-white hover:border-white transition-all cursor-pointer text-xs"
+                      className="flex-1 sm:flex-none px-4 py-2 border border-white/20 text-gray-300 font-bold hover:text-white hover:border-white transition-all cursor-pointer text-xs text-center"
                     >
                       Cancel
                     </button>
@@ -1045,7 +1045,7 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-5 py-2 bg-white text-black border-2 border-white hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,255,102,1)] font-bold transition-all flex items-center gap-1.5 cursor-pointer text-xs"
+                      className="flex-1 sm:flex-none px-5 py-2 bg-white text-black border-2 border-white hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,255,102,1)] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs"
                     >
                       <Plus className="w-4 h-4" /> {isSubmitting ? "Saving..." : "Save Record"}
                     </button>

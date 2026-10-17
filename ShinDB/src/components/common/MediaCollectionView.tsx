@@ -359,9 +359,9 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
   return (
     <div className="w-full flex flex-col gap-6 font-mono select-none">
       {/* Sticky Filter & Search Control Console */}
-      <div className="sticky top-0 z-20 bg-black/95 backdrop-blur-md pt-2 pb-3 border-b border-white/20 flex flex-col gap-3">
-        <section className="flex flex-wrap items-center justify-between gap-4 text-xs text-gray-400">
-          <div className="flex items-center gap-3 flex-wrap">
+      <div className="sticky top-0 z-20 bg-black/95 backdrop-blur-md pt-2 pb-3 border-b border-white/20 flex flex-col gap-3 w-full">
+        <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 text-xs text-gray-400 w-full">
+          <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3 flex-wrap w-full sm:w-auto">
             <div className="flex items-center gap-2">
               {config.icon}
               <span className="font-sans font-bold text-white tracking-wide uppercase text-sm">
@@ -372,10 +372,12 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
               </span>
             </div>
 
-            <ChevronsUpDown className="w-3.5 h-3.5 text-gray-500" />
-            <span className="text-[10px] text-gray-500 font-medium">
-              {filteredItems.length} / {items.length} shown
-            </span>
+            <div className="flex items-center gap-2">
+              <ChevronsUpDown className="w-3.5 h-3.5 text-gray-500" />
+              <span className="text-[10px] text-gray-500 font-medium whitespace-nowrap">
+                {filteredItems.length} / {items.length} shown
+              </span>
+            </div>
 
             {/* Active Filter Badges with 1-click Clear */}
             {hasActiveFilters && (
@@ -445,7 +447,7 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
           </div>
 
           {/* Action Toolbar */}
-          <div className="flex items-center gap-3.5 relative">
+          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3.5 relative w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-white/10 sm:border-transparent">
             {/* 1. Sync Button with Hover Dropdown (Airing + All Entries) */}
             <div
               className="relative"
@@ -455,18 +457,19 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
               <button
                 onClick={() => handleBatchSync("airing")}
                 disabled={!!syncModeInProgress}
-                className={`flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer py-1 ${
+                className={`flex items-center gap-1 sm:gap-1.5 hover:text-white transition-colors cursor-pointer py-1 shrink-0 ${
                   syncModeInProgress ? "text-cyber-purple font-bold" : ""
                 }`}
                 title="Sync Airing / Overall Data (hover to see all sync options)"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${syncModeInProgress ? "animate-spin" : ""}`} />
-                <span>{syncModeInProgress ? `Syncing (${syncModeInProgress})...` : "Sync Airing"}</span>
-                <ChevronDown className="w-3 h-3 text-gray-500 hover:text-white" />
+                <span>{syncModeInProgress ? `Syncing...` : "Sync"}</span>
+                <span className="hidden sm:inline">{syncModeInProgress ? "" : " Airing"}</span>
+                <ChevronDown className="w-3 h-3 text-gray-500 hover:text-white hidden sm:inline" />
               </button>
 
               {showSyncMenu && (
-                <div className="absolute right-0 top-full mt-1 w-64 bg-black/95 border border-white/20 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] p-1.5 z-30 font-mono text-xs flex flex-col gap-1 backdrop-blur-md">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-1 w-64 max-w-[calc(100vw-2rem)] bg-black/95 border border-white/20 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] p-1.5 z-30 font-mono text-xs flex flex-col gap-1 backdrop-blur-md">
                   <div className="text-[10px] uppercase text-gray-500 font-bold px-2 py-1 border-b border-white/10 flex items-center justify-between">
                     <span>Sync APIs</span>
                     <span className="text-[9px] text-gray-400">External API</span>
@@ -517,20 +520,21 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
                   const next = cycleKeys[(currentIdx + 1) % cycleKeys.length];
                   setSortBy(next);
                 }}
-                className={`flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer py-1 ${
+                className={`flex items-center gap-1 sm:gap-1.5 hover:text-white transition-colors cursor-pointer py-1 shrink-0 ${
                   sortBy !== "status" ? `${config.accentText} font-bold` : ""
                 }`}
                 title="Sort collection (click to cycle, hover for menu)"
               >
                 <ArrowUpDown className="w-3.5 h-3.5" />
-                <span>
-                  Sort ({SORT_OPTIONS.find((s) => s.key === sortBy)?.label.split(" ")[0] || "Status"})
+                <span>Sort</span>
+                <span className="hidden sm:inline">
+                  {" "}({SORT_OPTIONS.find((s) => s.key === sortBy)?.label.split(" ")[0] || "Status"})
                 </span>
-                <ChevronDown className="w-3 h-3 text-gray-500 hover:text-white" />
+                <ChevronDown className="w-3 h-3 text-gray-500 hover:text-white hidden sm:inline" />
               </button>
 
               {showSortMenu && (
-                <div className="absolute right-0 top-full mt-1 w-64 bg-black/95 border border-white/20 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] p-1.5 z-30 font-mono text-xs flex flex-col gap-1 backdrop-blur-md">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-1 w-64 max-w-[calc(100vw-2rem)] bg-black/95 border border-white/20 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] p-1.5 z-30 font-mono text-xs flex flex-col gap-1 backdrop-blur-md">
                   <div className="text-[10px] uppercase text-gray-500 font-bold px-2 py-1 border-b border-white/10 flex items-center justify-between">
                     <span>Sort Mode</span>
                     <span className="text-[9px] text-gray-400">5 Options</span>
@@ -563,7 +567,7 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
             {/* 3. Advanced Filter Button (Hide/Unhide Drawer) */}
             <button
               onClick={() => setShowFilterDrawer(!showFilterDrawer)}
-              className={`flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer py-1 ${
+              className={`flex items-center gap-1 sm:gap-1.5 hover:text-white transition-colors cursor-pointer py-1 shrink-0 ${
                 showFilterDrawer || (selectedStatus !== "all" || selectedGenre !== "all" || selectedMinRating !== "all" || selectedEra !== "all" || favoritesOnly)
                   ? "text-cyber-cyan font-bold"
                   : ""
@@ -571,13 +575,14 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
               title="Toggle Advanced Filter Drawer"
             >
               <Filter className="w-3.5 h-3.5" />
-              <span>Advanced Filter</span>
+              <span className="hidden sm:inline">Advanced </span>
+              <span>Filter</span>
             </button>
 
             {/* 4. Search Button */}
             <button
               onClick={() => setShowSearchDrawer(!showSearchDrawer)}
-              className={`flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer py-1 ${
+              className={`flex items-center gap-1 sm:gap-1.5 hover:text-white transition-colors cursor-pointer py-1 shrink-0 ${
                 showSearchDrawer ? `${config.accentText} font-bold` : ""
               }`}
               title="Toggle Search Input"
@@ -591,7 +596,7 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
               id="btn-add-new-media"
               data-testid="btn-add-new-media"
               onClick={() => setIsCreateOpen(true)}
-              className={`flex items-center gap-1 text-white hover:${config.accentText} transition-colors cursor-pointer py-1`}
+              className={`flex items-center gap-1 text-white hover:${config.accentText} transition-colors cursor-pointer py-1 shrink-0 font-bold`}
             >
               <Plus className="w-3.5 h-3.5" />
               <span>New</span>
@@ -621,7 +626,7 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
         )}
 
         {/* Status Filter Buttons Row (Always Visible) */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-dashed border-white/10">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1 border-t border-dashed border-white/10 w-full">
           {config.statuses.map((status) => {
             const label =
               status === "all"
@@ -737,7 +742,7 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
 
       {/* Main Grid View */}
       {filteredItems.length > 0 ? (
-        <div className={`grid ${config.gridCols} gap-x-4 gap-y-6`}>
+        <div className={`grid ${config.gridCols} gap-x-3 sm:gap-x-4 gap-y-5 sm:gap-y-6 w-full`}>
           {filteredItems.map((item) => (
             <MediaCard
               key={item.id}

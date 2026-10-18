@@ -1,0 +1,371 @@
+// prisma/schema.prisma
+// BD F-Commerce Conversion & Automation Engine (v2.0)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// 1. ENUMS (EXPLICIT STATE MACHINES)
+// ==========================================
+
+enum StaffRole {
+  ADMIN
+  MODERATOR
+}
+
+enum DeliveryZone {
+  INSIDE_DHAKA  // Default 70 BDT
+  SUB_DHAKA     // Savar, Ashulia, Gazipur, Keraniganj, Narayanganj - Default 100 BDT
+  OUTSIDE_DHAKA // All other 63 districts - Default 130 BDT
+}
+
+enum PaymentMethod {
+  COD
+  BKASH_MANUAL
+  NAGAD_MANUAL
+}
+
+enum PaymentStatus {
+  UNPAID
+  ADVANCE_PENDING_VERIFICATION
+  PARTIALLY_PAID
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING           // Newly submitted by customer
+  ON_HOLD           // Customer requested later delivery / stock check
+  NO_ANSWER         // Moderator called, customer did not pick up
+  AWAITING_ADVANCE  // Waiting for advance delivery charge via bKash
+  CONFIRMED         // Phone verified by Moderator, ready to pack
+  PACKED            // Invoice printed & parcel packed
+  SHIPPED           // Booked with Steadfast / handed to courier
+  DELIVERED         // Courier delivered parcel to customer
+  PARTIAL_DELIVERED // Customer kept part of multi-item order
+  CANCELLED         // Cancelled before shipping (restocks inventory)
+  RETURNED          // Customer refused / returned via courier (restocks if intact)
+}
+
+enum DispatchStatus {
+  NOT_SENT
+  DISPATCHING          // In-flight lock to prevent double-click duplicate parcels
+  BOOKED               // Consignment ID received from Steadfast
+  IN_TRANSIT           // Picked up by courier rider
+  DELIVERED            // Courier confirmed delivery
+  RETURNED             // Courier confirmed return (RTO)
+  FAILED               // API rejected request (safe to retry)
+  NEEDS_RECONCILIATION // Network timeout during booking; check status by invoiceNo first
+}
+
+enum LeadStatus {
+  OPEN
+  CONVERTED
+  DISMISSED
+  EXPIRED
+}
+
+// ==========================================
+// 2. CLERK STAFF USERS & RBAC
+// ==========================================
+
+model User {
+  id                  String               @id @default(cuid())
+  clerkId             String               @unique
+  email               String               @unique
+  name                String
+  role                StaffRole
+  isActive            Boolean              @default(true)
+  processedOrders     Order[]              @relation("ProcessedByStaff")
+  verifiedPayments    PaymentTransaction[] @relation("VerifiedByStaff")
+  statusHistoryLogs   OrderStatusHistory[]
+  dismissedLeads      IncompleteOrder[]    @relation("DismissedByStaff")
+  createdBlocks       BlockedCustomer[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+// ==========================================
+// 3. CATALOG, PRODUCTS & VARIANT INVENTORY
+// ==========================================
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  sortOrder Int       @default(0)
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+model Product {
+  id               String           @id @default(cuid())
+  name             String           // Bangla/English product title
+  slug             String           @unique
+  description      String           @db.Text
+  images           Json             // Validated string[] of image URLs
+  features         Json             // Validated string[] of Bangla funnel bullet points
+  reviewsImages    Json?            // Consented/redacted customer review image URLs
+  bundleConfig     Json?            // e.g., [{"qty": 2, "discountBdt": 130, "label": "২ টি কম্বো"}]
+  offerEndsAt      DateTime?        // Real promotion end timestamp (null = no countdown)
+  isFeaturedFunnel Boolean          @default(false)
+  isActive         Boolean          @default(true)
+  deletedAt        DateTime?        // Soft delete timestamp
+  categoryId       String?
+  category         Category?        @relation(fields: [categoryId], references: [id])
+  variants         ProductVariant[]
+  orderItems       OrderItem[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([isActive, isFeaturedFunnel])
+}
+
+model ProductVariant {
+  id           String      @id @default(cuid())
+  productId    String
+  sku          String      @unique
+  label        String      // e.g., "Size: XL" or "1kg Jar"
+  regularPrice Int         // Authoritative regular price in BDT (e.g., 1850)
+  salePrice    Int         // Authoritative sale price in BDT (e.g., 1290)
+  costPrice    Int         @default(0) // Unit wholesale cost in BDT for profit tracking
+  stock        Int         @default(0) // Atomic variant-level stock counter
+  sortOrder    Int         @default(0)
+  isActive     Boolean     @default(true)
+  deletedAt    DateTime?
+  product      Product     @relation(fields: [productId], references: [id])
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([productId, isActive])
+}
+
+// ==========================================
+// 4. ATOMIC INVOICE COUNTER & ORDERS
+// ==========================================
+
+model InvoiceCounter {
+  id         String @id @default("default")
+  lastNumber Int    @default(1000) // Incremented atomically inside order transaction
+}
+
+model Order {
+  id                  String               @id @default(cuid())
+  invoiceNo           String               @unique // Staff & Courier label ID: "INV-1001"
+  publicToken         String               @unique @default(cuid()) // Unguessable URL token
+  idempotencyKey      String               @unique // Client UUID to prevent duplicate double-taps
+  customerName        String
+  customerPhone       String               // Canonical 11-digit BD format: 01XXXXXXXXX
+  customerAddress     String               @db.Text
+  customerNote        String?              @db.Text
+  staffNote           String?              @db.Text
+  deliveryZone        DeliveryZone         @default(INSIDE_DHAKA)
+  deliveryCharge      Int                  // Server-computed from StoreSettings
+  subTotal            Int                  // Server-computed sum of OrderItems
+  discountAmount      Int                  @default(0)
+  totalAmount         Int                  // subTotal + deliveryCharge - discountAmount
+  advancePaid         Int                  @default(0) // Verified advance amount only
+  codCollectible      Int                  // totalAmount - advancePaid (never < 0)
+  paymentMethod       PaymentMethod        @default(COD)
+  paymentStatus       PaymentStatus        @default(UNPAID)
+  status              OrderStatus          @default(PENDING)
+  returnReason        String?              // Logged if CANCELLED or RETURNED
+  isStockRestocked    Boolean              @default(false) // Prevents double restocking
+
+  // Fraud & Risk Enrichment (IP is a weak signal, never a hard block)
+  ipAddress           String?
+  userAgent           String?              @db.Text
+  riskScore           Int                  @default(0) // 0-100 composite risk score
+  courierSuccessPct   Float?
+  courierRatioSource  String?
+  courierRatioCheckedAt DateTime?
+
+  // Marketing & Meta CAPI Attribution
+  landingSlug         String?
+  utmSource           String?
+  utmMedium           String?
+  utmCampaign         String?
+  fbclid              String?
+  fbp                 String?              // _fbp cookie for Meta CAPI match quality
+  fbc                 String?              // _fbc cookie for Meta CAPI match quality
+  capiPurchaseSentAt  DateTime?            // Guards against duplicate CAPI Purchase firing
+
+  processedById       String?
+  processedBy         User?                @relation("ProcessedByStaff", fields: [processedById], references: [id])
+  items               OrderItem[]
+  payments            PaymentTransaction[]
+  courierDispatch     CourierDispatch?
+  statusHistory       OrderStatusHistory[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([customerPhone, createdAt])
+  @@index([ipAddress, createdAt])
+  @@index([status, createdAt])
+}
+
+model OrderItem {
+  id           String         @id @default(cuid())
+  orderId      String
+  productId    String
+  variantId    String
+  productName  String         // Snapshot at sale time
+  variantLabel String         // Snapshot at sale time (e.g., "Size: XL")
+  skuSnapshot  String         // Snapshot at sale time
+  quantity     Int
+  unitPrice    Int            // Authoritative server salePrice at sale time
+  unitCost     Int            // Authoritative server costPrice at sale time (for profit calc)
+  totalPrice   Int            // unitPrice * quantity
+  order        Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product        @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([variantId])
+}
+
+// ==========================================
+// 5. PAYMENT VERIFICATION & COURIER DISPATCH
+// ==========================================
+
+model PaymentTransaction {
+  id            String        @id @default(cuid())
+  orderId       String
+  method        PaymentMethod
+  amount        Int           // Amount claimed or verified in BDT
+  senderPhone   String?       // Customer bKash/Nagad number
+  trxId         String?       @unique // Prevents reusing the same TrxID across orders
+  status        PaymentStatus @default(ADVANCE_PENDING_VERIFICATION)
+  verifiedById  String?
+  verifiedBy    User?         @relation("VerifiedByStaff", fields: [verifiedById], references: [id])
+  verifiedAt    DateTime?
+  rejectionNote String?
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt     DateTime      @default(now())
+
+  @@index([orderId, status])
+}
+
+model CourierDispatch {
+  id                String         @id @default(cuid())
+  orderId           String         @unique
+  provider          String         @default("STEADFAST")
+  dispatchStatus    DispatchStatus @default(NOT_SENT)
+  idempotencyKey    String         @unique // Prevents duplicate parcel booking
+  consignmentId     String?        @unique
+  trackingCode      String?
+  codAmountSent     Int            // Exact COD collectible sent to courier
+  courierFeeBdt     Int            @default(0) // Actual courier delivery charge for profit calc
+  codFeeBdt         Int            @default(0) // 1% COD fee if applicable
+  returnPenaltyBdt  Int            @default(0) // RTO return cost if parcel is returned
+  attemptCount      Int            @default(0)
+  lastError         String?        @db.Text
+  rawResponse       Json?
+  dispatchedAt      DateTime?
+  deliveredAt       DateTime?
+  settledAt         DateTime?      // When courier settles COD cash to merchant bank/bKash
+  order             Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([dispatchStatus, updatedAt])
+}
+
+model OrderStatusHistory {
+  id         String       @id @default(cuid())
+  orderId    String
+  actorId    String?      // Null if system/webhook action
+  actor      User?        @relation(fields: [actorId], references: [id])
+  fromStatus OrderStatus?
+  toStatus   OrderStatus
+  action     String       // e.g., "CONFIRM_ORDER", "EDIT_ADDRESS", "STEADFAST_BOOKED"
+  note       String?      @db.Text
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+// ==========================================
+// 6. SESSION-SCOPED INCOMPLETE ORDER LEADS
+// ==========================================
+
+model IncompleteOrder {
+  id                 String        @id @default(cuid())
+  sessionKey         String        @unique // Client checkout session UUID (NOT unique on phone)
+  customerPhone      String        // Canonical 11-digit BD number
+  customerName       String?
+  customerAddress    String?       @db.Text
+  deliveryZone       DeliveryZone?
+  productSlug        String?
+  variantLabel       String?
+  quantity           Int           @default(1)
+  estimatedTotal     Int?
+  consentNoticeShown Boolean       @default(true)
+  status             LeadStatus    @default(OPEN)
+  callAttempts       Int           @default(0)
+  staffNote          String?       @db.Text
+  convertedOrderId   String?
+  dismissedById      String?
+  dismissedBy        User?         @relation("DismissedByStaff", fields: [dismissedById], references: [id])
+  dismissedAt        DateTime?
+  expiresAt          DateTime      // Set to createdAt + 30 days for automatic privacy purge
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([status, updatedAt])
+  @@index([customerPhone, status])
+  @@index([expiresAt])
+}
+
+// ==========================================
+// 7. BLACKLIST, AD SPEND & NON-SECRET SETTINGS
+// ==========================================
+
+model BlockedCustomer {
+  id          String    @id @default(cuid())
+  phone       String    @unique // Normalized 01XXXXXXXXX (Hard block)
+  reason      String
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([phone, isActive])
+}
+
+model AdSpend {
+  id           String   @id @default(cuid())
+  spendDate    DateTime @db.Date // Daily ad spend date
+  campaignName String   @default("All Campaigns")
+  productSlug  String?
+  amountBdt    Int      // Daily ad spend converted to BDT for net profit calculation
+  createdAt    DateTime @default(now())
+
+  @@index([spendDate])
+}
+
+model StoreSettings {
+  id                    String   @id @default("default")
+  storeName             String   @default("আমার শপ (Amar Shop)")
+  supportPhone          String   @default("01700000000")
+  whatsappNumber        String   @default("8801700000000")
+  insideDhakaCharge     Int      @default(70)
+  subDhakaCharge        Int      @default(100)
+  outsideDhakaCharge    Int      @default(130)
+  bkashMerchantNumber   String?  // Public display number for manual bKash advance
+  requireOutsideAdvance Boolean  @default(false)
+  orderCooldownMinutes  Int      @default(15)
+  capiPurchaseTrigger   String   @default("ON_CONFIRM") // "ON_CONFIRM" | "ON_SUBMIT"
+  updatedAt             DateTime @updatedAt
+}

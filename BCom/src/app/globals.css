@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-hind: 'Hind Siliguri', sans-serif;
+    --font-inter: 'Inter', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-hind), system-ui, -apple-system, sans-serif;
+    color: #0F172A;
+    background-color: #F8FAFC;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent mobile webview auto-zoom on inputs */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Print Styles for 80mm POS Thermal Label & Standard A4 */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  @page {
+    size: 80mm auto;
+    margin: 2mm;
+  }
+}
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}

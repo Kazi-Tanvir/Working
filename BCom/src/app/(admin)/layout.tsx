@@ -1,7 +1,7 @@
 // src/app/(admin)/layout.tsx
-// Wrapped in ClerkProvider with staff navigation bar
+// Protected staff navigation bar layout with Clerk UserButton
 
-import { ClerkProvider, UserButton } from '@clerk/nextjs';
+import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 
 export default function AdminLayout({
@@ -10,8 +10,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <div className="min-h-dvh flex flex-col bg-slate-100 text-slate-900">
+    <div className="min-h-dvh flex flex-col bg-slate-100 text-slate-900">
         {/* Admin Navigation Bar */}
         <header className="bg-slate-900 text-white shadow-sm border-b border-slate-800 sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -95,6 +94,5 @@ export default function AdminLayout({
         {/* Content Body */}
         <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">{children}</main>
       </div>
-    </ClerkProvider>
   );
 }

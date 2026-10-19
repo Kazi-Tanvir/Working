@@ -89,6 +89,8 @@ export default async function OfferPage({ params }: PageProps) {
     subDhakaCharge: settings.subDhakaCharge,
     outsideDhakaCharge: settings.outsideDhakaCharge,
     bkashMerchantNumber: settings.bkashMerchantNumber,
+    whatsappNumber: settings.whatsappNumber,
+    supportPhone: settings.supportPhone,
   };
 
   return (

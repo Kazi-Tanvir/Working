@@ -12,12 +12,17 @@ interface PageProps {
 export default async function OrderSuccessPage({ params }: PageProps) {
   const { publicToken } = await params;
 
-  const order = await prisma.order.findUnique({
-    where: { publicToken },
-    include: {
-      items: true,
-    },
-  });
+  const [order, settings] = await Promise.all([
+    prisma.order.findUnique({
+      where: { publicToken },
+      include: {
+        items: true,
+      },
+    }),
+    prisma.storeSettings.findUnique({
+      where: { id: 'default' },
+    }),
+  ]);
 
   if (!order) {
     notFound();
@@ -91,7 +96,7 @@ export default async function OrderSuccessPage({ params }: PageProps) {
         {/* Action Buttons */}
         <div className="space-y-3 pt-2">
           <a
-            href={`https://wa.me/8801712345678?text=${encodeURIComponent(`হ্যালো, আমার অর্ডার নং ${order.invoiceNo} সম্পর্কে জানতে চাই।`)}`}
+            href={`https://wa.me/${(settings?.whatsappNumber || '8801712345678').replace(/[^\d]/g, '')}?text=${encodeURIComponent(`হ্যালো, আমার অর্ডার নং ${order.invoiceNo} সম্পর্কে জানতে চাই।`)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition"

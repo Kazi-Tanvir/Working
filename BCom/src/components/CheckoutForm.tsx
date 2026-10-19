@@ -19,6 +19,8 @@ export interface StoreSettingsData {
   subDhakaCharge: number;
   outsideDhakaCharge: number;
   bkashMerchantNumber?: string | null;
+  whatsappNumber?: string | null;
+  supportPhone?: string | null;
 }
 
 export interface BundleConfigItem {
@@ -528,7 +530,7 @@ export default function CheckoutForm({
             <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center justify-between">
               <span>⚠️ {errorMessage}</span>
               <a
-                href={`https://wa.me/8801712345678?text=${encodeURIComponent(`হ্যালো, আমি ${productName} অর্ডার করতে পারছি না। সাহায্য করবেন?`)}`}
+                href={`https://wa.me/${(settings.whatsappNumber || '8801712345678').replace(/[^\d]/g, '')}?text=${encodeURIComponent(`হ্যালো, আমি ${productName} অর্ডার করতে পারছি না। সাহায্য করবেন?`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-semibold text-green-700 underline"

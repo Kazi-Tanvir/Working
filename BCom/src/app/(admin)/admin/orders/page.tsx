@@ -2,6 +2,7 @@
 // Mobile-First Order Operations & Management Page
 
 import { prisma } from '@/lib/prisma';
+import { OrderStatus } from '@prisma/client';
 import AdminOrderCard, { AdminOrderData } from '@/components/AdminOrderCard';
 import Link from 'next/link';
 
@@ -14,7 +15,7 @@ interface PageProps {
 export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const { status } = await searchParams;
 
-  const whereClause = status ? { status: status as any } : {};
+  const whereClause = status ? { status: status as OrderStatus } : {};
 
   const orders = await prisma.order
     .findMany({

@@ -27,13 +27,13 @@ async function main() {
     },
   });
 
-  // 2. Invoice Counter Singleton
+  // 2. Invoice Counter Singleton (Set above seed orders to prevent collision)
   await prisma.invoiceCounter.upsert({
     where: { id: 'default' },
     update: {},
     create: {
       id: 'default',
-      lastNumber: 1040,
+      lastNumber: 2000,
     },
   });
 
@@ -150,7 +150,136 @@ async function main() {
     },
   });
 
+  // Additional Storefront Showcase Products
+  await prisma.product.upsert({
+    where: { slug: 'premium-linen-panjabi-emerald' },
+    update: {},
+    create: {
+      name: 'প্রিমিয়াম সফট লিনেন পাঞ্জাবি (Emerald Green)',
+      slug: 'premium-linen-panjabi-emerald',
+      description:
+        'প্রাকৃতিক লিনেন ও সুতি ব্লেন্ডের আধুনিক ডিজাইনের এক্সক্লুসিভ পাঞ্জাবি। দারুণ শ্বাস-প্রশ্বাসযোগ্য ফেব্রিক ও আকর্ষণীয় এমারেল্ড গ্রিন শেড।',
+      images: [
+        'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
+      ],
+      features: [
+        'প্রিমিয়াম সফট লিনেন কটন ব্লেন্ড',
+        'রুচিশীল হ্যান্ডক্রাফটেড বোতাম ও সূক্ষ্ম স্টিচিং',
+        'সারাদিন পরে থাকার উপযোগী আরামদায়ক ফিটিং',
+        'ক্যাশ অন ডেলিভারি ও দ্রুত হোম ডেলিভারি',
+      ],
+      bundleConfig: [
+        { qty: 1, discountBdt: 0, label: '১ টি পাঞ্জাবি — ৳১,৩৫০' },
+        { qty: 2, discountBdt: 150, label: '২ টি কম্বো প্যাক — ৳২,৫৫০ (৳১৫০ সাশ্রয়!)' },
+      ],
+      isFeaturedFunnel: false,
+      isActive: true,
+      categoryId: category.id,
+      variants: {
+        create: [
+          {
+            sku: 'LIN-GRN-M',
+            label: 'Size: M (Chest 38", Length 40")',
+            regularPrice: 1950,
+            salePrice: 1350,
+            costPrice: 900,
+            stock: 20,
+            sortOrder: 1,
+            isActive: true,
+          },
+          {
+            sku: 'LIN-GRN-L',
+            label: 'Size: L (Chest 40", Length 42")',
+            regularPrice: 1950,
+            salePrice: 1350,
+            costPrice: 900,
+            stock: 25,
+            sortOrder: 2,
+            isActive: true,
+          },
+          {
+            sku: 'LIN-GRN-XL',
+            label: 'Size: XL (Chest 42", Length 44")',
+            regularPrice: 1950,
+            salePrice: 1350,
+            costPrice: 900,
+            stock: 15,
+            sortOrder: 3,
+            isActive: true,
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.upsert({
+    where: { slug: 'pure-cotton-kabli-set-white' },
+    update: {},
+    create: {
+      name: 'খাঁটি সুতি কাবলি সেট (Off-White Platinum)',
+      slug: 'pure-cotton-kabli-set-white',
+      description:
+        'মার্জিত ও আভিজাত্যপূর্ণ কাবলি সেট (পাঞ্জাবি ও পায়জামা সহ)। ১০০% আরামদায়ক সুতি কাপড়, প্রিমিয়াম কলার ফিনিশিং।',
+      images: [
+        'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
+      ],
+      features: [
+        'পাঞ্জাবি ও পায়জামা সম্পূর্ণ সেট',
+        '১০০% প্রিমিয়াম সুতি কাপড় — কালার ও ফেব্রিক গ্যারান্টি',
+        'রয়েল মেটাল বাটন ও আভিজাত্যপূর্ণ কাট',
+        'পণ্য দেখে মূল্য পরিশোধের সুবিধা',
+      ],
+      bundleConfig: [
+        { qty: 1, discountBdt: 0, label: '১ টি কাবলি সেট — ৳১,৬৫০' },
+        { qty: 2, discountBdt: 200, label: '২ টি কম্বো সেট — ৳৩,১০০ (৳২০০ সাশ্রয়!)' },
+      ],
+      isFeaturedFunnel: false,
+      isActive: true,
+      categoryId: category.id,
+      variants: {
+        create: [
+          {
+            sku: 'KAB-WHT-M',
+            label: 'Size: M (Chest 38", Length 40")',
+            regularPrice: 2250,
+            salePrice: 1650,
+            costPrice: 1100,
+            stock: 18,
+            sortOrder: 1,
+            isActive: true,
+          },
+          {
+            sku: 'KAB-WHT-L',
+            label: 'Size: L (Chest 40", Length 42")',
+            regularPrice: 2250,
+            salePrice: 1650,
+            costPrice: 1100,
+            stock: 22,
+            sortOrder: 2,
+            isActive: true,
+          },
+          {
+            sku: 'KAB-WHT-XL',
+            label: 'Size: XL (Chest 42", Length 44")',
+            regularPrice: 2250,
+            salePrice: 1650,
+            costPrice: 1100,
+            stock: 12,
+            sortOrder: 3,
+            isActive: true,
+          },
+        ],
+      },
+    },
+  });
+
   // 6. Test Orders for Admin Dashboard
+  const xlVariant = await prisma.productVariant.findUniqueOrThrow({
+    where: { sku: 'EGY-BLK-XL' },
+  });
+
   const order1 = await prisma.order.upsert({
     where: { invoiceNo: 'INV-1041' },
     update: {},
@@ -175,7 +304,7 @@ async function main() {
       items: {
         create: {
           productId: product.id,
-          variantId: 'temp_var_id', // Replaced or connected if using relations
+          variantId: xlVariant.id,
           productName: 'প্রিমিয়াম ইজিপশিয়ান কটন পাঞ্জাবি (Royal Black)',
           variantLabel: 'Size: XL (Chest 42", Length 44")',
           skuSnapshot: 'EGY-BLK-XL',

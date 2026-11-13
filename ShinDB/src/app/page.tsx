@@ -5,6 +5,7 @@ import CurrentlyConsuming from "@/components/sections/CurrentlyConsuming";
 import RecentlyCompleted from "@/components/sections/RecentlyCompleted";
 import CategoryStats from "@/components/sections/CategoryStats";
 import SearchBar from "@/components/common/SearchBar";
+import LandingPage from "@/components/landing/LandingPage";
 import { getAllMediaGrouped } from "@/lib/media";
 import { getSessionUser } from "@/lib/auth";
 import { ACTIVE_SEARCH_GATEWAYS } from "@/utils/apiHelpers";
@@ -12,9 +13,14 @@ import { ACTIVE_SEARCH_GATEWAYS } from "@/utils/apiHelpers";
 export default async function DashboardPage() {
   const sessionUser = await getSessionUser();
 
-  // Load user's personal library if logged in, otherwise empty library
+  // If user is not authenticated, show the public landing page
+  if (!sessionUser) {
+    return <LandingPage />;
+  }
+
+  // Load user's personal library for authenticated dashboard
   const { animeList, mangaList, gamesList, moviesList, seriesList } = await getAllMediaGrouped(
-    sessionUser?.id
+    sessionUser.id
   );
 
   const allMedia = [...animeList, ...mangaList, ...gamesList, ...moviesList, ...seriesList];

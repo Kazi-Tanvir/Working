@@ -42,7 +42,7 @@ function normalizeStatusInput(status: string | undefined, type: MediaType): Medi
   return "watching";
 }
 
-function parseRatingInput(rating?: string | number): number | null {
+function parseRatingInput(rating?: string | number | null): number | null {
   if (rating === undefined || rating === null || rating === "N/A" || rating === "Unrated") return null;
   if (typeof rating === "number") return Math.min(10, Math.max(0, rating));
   const num = parseFloat(String(rating).split("/")[0]);
@@ -50,7 +50,7 @@ function parseRatingInput(rating?: string | number): number | null {
 }
 
 function parseProgressInput(
-  progress: string | undefined,
+  progress: string | undefined | null,
   type: MediaType
 ): {
   progressCurrent: number;
@@ -235,7 +235,7 @@ export async function POST(request: NextRequest) {
         mediaId: media.id,
         status: normalizeStatusInput(status, type),
         rating: parseRatingInput(rating),
-        progressCurrent: progressCurrent !== undefined ? progressCurrent : prog.progressCurrent,
+        progressCurrent: progressCurrent !== undefined && progressCurrent !== null ? progressCurrent : prog.progressCurrent,
         currentSeason: currentSeason || 1,
         seasons: seasons ? (seasons as any) : undefined,
         notes: notes || null,
@@ -344,7 +344,7 @@ export async function PUT(request: NextRequest) {
         isCompleted: Boolean(s.isCompleted || (s.episodeCount > 0 && s.episodesWatched >= s.episodeCount)),
       }));
       calculatedWatched = (validatedSeasons as any[]).reduce((sum, s) => sum + s.episodesWatched, 0);
-    } else if (progressCurrent !== undefined) {
+    } else if (progressCurrent !== undefined && progressCurrent !== null) {
       calculatedWatched = Math.max(
         0,
         userEntry.media.totalEpisodes
@@ -402,7 +402,7 @@ export async function PUT(request: NextRequest) {
         ...(rating !== undefined && { rating: parseRatingInput(rating) }),
         progressCurrent: calculatedWatched,
         ...(validatedSeasons !== undefined && { seasons: validatedSeasons }),
-        ...(currentSeason !== undefined && { currentSeason }),
+        ...(currentSeason !== undefined && currentSeason !== null && { currentSeason: currentSeason || 1 }),
         ...(notes !== undefined && { notes }),
         ...(isFavorite !== undefined && { isFavorite }),
       },

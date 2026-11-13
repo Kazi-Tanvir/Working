@@ -29,9 +29,12 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState<number>(0);
 
-  // Poll or check pending friend requests if user is logged in
+  // Check pending friend requests once on mount if user is logged in
   useEffect(() => {
-    if (!user && !isSignedIn) return;
+    if (!user && !isSignedIn) {
+      setPendingRequestsCount(0);
+      return;
+    }
 
     let isMounted = true;
     const fetchPendingCount = async () => {
@@ -49,12 +52,10 @@ export default function Navbar() {
     };
 
     fetchPendingCount();
-    const interval = setInterval(fetchPendingCount, 30000); // 30s poll
     return () => {
       isMounted = false;
-      clearInterval(interval);
     };
-  }, [user, isSignedIn]);
+  }, [user?.id, isSignedIn]);
 
   // Track scroll position for backdrop blur
   useEffect(() => {

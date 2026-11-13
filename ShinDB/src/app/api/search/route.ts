@@ -14,7 +14,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const results = await searchMedia(query, type, sessionUser?.id);
-    return NextResponse.json({ success: true, results });
+    return NextResponse.json(
+      { success: true, results },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=30, stale-while-revalidate=60",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("Search API Route error:", error);
     return NextResponse.json(

@@ -155,7 +155,8 @@ async function runSmokeTests() {
     assert(Array.isArray(searchData.results), "Search returns array of normalized results");
     assert(searchData.results.length > 0, "Search returns matching catalog items");
 
-    // 4.2 Add new media entry
+    // 4.2 Add new media entry from verified search result
+    const targetItem = searchData.results[0];
     const createRes = await fetch(`${BASE_URL}/api/track`, {
       method: "POST",
       headers: {
@@ -163,14 +164,16 @@ async function runSmokeTests() {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        title: `Smoke Test Media ${ts}`,
-        type: "anime",
+        title: targetItem.title,
+        type: targetItem.type,
+        mediaId: targetItem.mediaId || (targetItem.id.includes("-") ? undefined : targetItem.id),
+        coverImage: targetItem.coverImage,
+        releaseYear: targetItem.releaseYear ? parseInt(targetItem.releaseYear, 10) : 2002,
         status: "WATCHING",
         progressCurrent: 3,
         progressTotal: 12,
         progressUnit: "episodes",
         rating: 9,
-        releaseYear: 2026,
         genres: ["Action", "Sci-Fi"],
         notes: "Automated smoke test entry",
         isFavorite: true,

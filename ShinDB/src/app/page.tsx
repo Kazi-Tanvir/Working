@@ -9,8 +9,6 @@ import { getAllMediaGrouped } from "@/lib/media";
 import { getSessionUser } from "@/lib/auth";
 import { ACTIVE_SEARCH_GATEWAYS } from "@/utils/apiHelpers";
 
-export const dynamic = "force-dynamic";
-
 export default async function DashboardPage() {
   const sessionUser = await getSessionUser();
 

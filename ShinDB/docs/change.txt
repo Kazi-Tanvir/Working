@@ -46,3 +46,17 @@ now we will be editing the section in screenshot
 - remove properties button thats useless
 - search and new works perfectly 
 
+
+
+here are the things that need to be fixed 
+problem during importing 
+-  first of all while importing if a entry is not found this goes as custom entry 
+fix and changes in importing 
+- if a exact match for any of the entry is not found in particular api it hsould be inside the failed list 
+- there should be any option or any way to to add custom entries
+- you should only be able to add entries from a api that is provided nothing else [for both importing or normal options]
+- and there should be option to select api while importing 
+- like while giving mal list you may choose api or it will go to default 
+- anime type , series type and game type data should be extracted from their own sources [ anime from [ainlist maybe ] sources , series and tv from tmdb and game rom rawg]
+- finally for anime first it would searh with english title and if not found it will search for romanji and then japaneese title [a lot of the entires get false entries becayse the import only searches for english title ]
+

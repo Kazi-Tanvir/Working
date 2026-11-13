@@ -145,6 +145,8 @@ export function catalogToMediaItem(
   };
 }
 
+import { unstable_cache } from "next/cache";
+
 export async function getDefaultUserId(): Promise<string | null> {
   return null;
 }
@@ -153,47 +155,69 @@ export async function getMediaByType(
   type: MediaType,
   userId?: string | null
 ): Promise<MediaItem[]> {
-  // If user is provided, get their personal library for this category
-  if (userId) {
-    const userEntries = await prisma.userMediaEntry.findMany({
-      where: {
-        userId,
-        media: { type },
-      },
-      include: { media: true },
-      orderBy: { updatedAt: "desc" },
-    });
-    return userEntries.map(toMediaItem);
+  // Without a user, return empty list (individual personal library)
+  if (!userId) {
+    return [];
   }
 
-  // Without a user, return empty list (individual personal library)
-  return [];
+  // Cache per user and category with tag for instant invalidation
+  return unstable_cache(
+    async () => {
+      const userEntries = await prisma.userMediaEntry.findMany({
+        where: {
+          userId,
+          media: { type },
+        },
+        include: { media: true },
+        orderBy: { updatedAt: "desc" },
+      });
+      return userEntries.map(toMediaItem);
+    },
+    [`media-type-${type}-${userId}`],
+    {
+      revalidate: 60,
+      tags: [`media-user-${userId}`],
+    }
+  )();
 }
 
 export async function getAllMediaGrouped(userId?: string | null) {
-  if (userId) {
-    const userEntries = await prisma.userMediaEntry.findMany({
-      where: { userId },
-      include: { media: true },
-      orderBy: { updatedAt: "desc" },
-    });
-
-    const items = userEntries.map(toMediaItem);
+  // Unauthenticated visitors have empty lists
+  if (!userId) {
     return {
-      animeList: items.filter((i) => i.type === "anime"),
-      mangaList: items.filter((i) => i.type === "manga"),
-      gamesList: items.filter((i) => i.type === "game"),
-      moviesList: items.filter((i) => i.type === "movie"),
-      seriesList: items.filter((i) => i.type === "series"),
+      animeList: [],
+      mangaList: [],
+      gamesList: [],
+      moviesList: [],
+      seriesList: [],
     };
   }
 
-  // Unauthenticated visitors have empty lists
-  return {
-    animeList: [],
-    mangaList: [],
-    gamesList: [],
-    moviesList: [],
-    seriesList: [],
-  };
+  // Cache grouped dashboard items with tag for instant invalidation
+  return unstable_cache(
+    async () => {
+      const userEntries = await prisma.userMediaEntry.findMany({
+        where: { userId },
+        include: { media: true },
+        orderBy: { updatedAt: "desc" },
+      });
+
+      const items = userEntries.map(toMediaItem);
+      return {
+        animeList: items.filter((i) => i.type === "anime"),
+        mangaList: items.filter((i) => i.type === "manga"),
+        gamesList: items.filter((i) => i.type === "game"),
+        moviesList: items.filter((i) => i.type === "movie"),
+        seriesList: items.filter((i) => i.type === "series"),
+      };
+    },
+    [`media-grouped-${userId}`],
+    {
+      revalidate: 60,
+      tags: [`media-user-${userId}`],
+    }
+  )();
 }
+
+export const getCachedMediaByType = getMediaByType;
+export const getCachedAllMediaGrouped = getAllMediaGrouped;

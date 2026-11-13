@@ -55,6 +55,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2013",
       coverImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
       rating: "9.1/10",
+      apiSource: "AniList",
     },
     {
       id: "trend-a2",
@@ -63,6 +64,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2006",
       coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80",
       rating: "9.0/10",
+      apiSource: "AniList",
     },
     {
       id: "trend-a3",
@@ -71,6 +73,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2019",
       coverImage: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
       rating: "8.7/10",
+      apiSource: "AniList",
     },
     {
       id: "trend-a4",
@@ -79,6 +82,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2001",
       coverImage: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=600&auto=format&fit=crop&q=80",
       rating: "8.9/10",
+      apiSource: "AniList",
     },
   ],
   manga: [
@@ -89,6 +93,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "1997",
       coverImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
       rating: "9.2/10",
+      apiSource: "AniList",
     },
     {
       id: "trend-m2",
@@ -97,6 +102,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2001",
       coverImage: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&auto=format&fit=crop&q=80",
       rating: "9.1/10",
+      apiSource: "AniList",
     },
     {
       id: "trend-m3",
@@ -105,6 +111,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2018",
       coverImage: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=600&auto=format&fit=crop&q=80",
       rating: "8.6/10",
+      apiSource: "AniList",
     },
     {
       id: "trend-m4",
@@ -113,6 +120,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2018",
       coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80",
       rating: "8.8/10",
+      apiSource: "AniList",
     },
   ],
   game: [
@@ -123,6 +131,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2015",
       coverImage: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
       rating: "9.8/10",
+      apiSource: "RAWG",
     },
     {
       id: "trend-g2",
@@ -131,6 +140,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2017",
       coverImage: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
       rating: "9.5/10",
+      apiSource: "RAWG",
     },
     {
       id: "trend-g3",
@@ -139,6 +149,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2017",
       coverImage: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80",
       rating: "9.7/10",
+      apiSource: "RAWG",
     },
     {
       id: "trend-g4",
@@ -147,6 +158,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2022",
       coverImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
       rating: "9.6/10",
+      apiSource: "RAWG",
     },
   ],
   movie: [
@@ -157,6 +169,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2010",
       coverImage: "https://images.unsplash.com/photo-1539651044458-b092c41d2ec4?w=600&auto=format&fit=crop&q=80",
       rating: "8.8/10",
+      apiSource: "TMDB",
     },
     {
       id: "trend-mv2",
@@ -165,6 +178,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "1999",
       coverImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80",
       rating: "8.7/10",
+      apiSource: "TMDB",
     },
     {
       id: "trend-mv3",
@@ -173,6 +187,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2008",
       coverImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80",
       rating: "9.0/10",
+      apiSource: "TMDB",
     },
     {
       id: "trend-mv4",
@@ -181,6 +196,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2014",
       coverImage: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
       rating: "8.7/10",
+      apiSource: "TMDB",
     },
   ],
   series: [
@@ -191,6 +207,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2016",
       coverImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80",
       rating: "8.7/10",
+      apiSource: "TMDB",
     },
     {
       id: "trend-s2",
@@ -199,6 +216,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2023",
       coverImage: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
       rating: "8.8/10",
+      apiSource: "TMDB",
     },
     {
       id: "trend-s3",
@@ -207,6 +225,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2017",
       coverImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80",
       rating: "8.9/10",
+      apiSource: "TMDB",
     },
     {
       id: "trend-s4",
@@ -215,6 +234,7 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
       releaseYear: "2022",
       coverImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80",
       rating: "8.7/10",
+      apiSource: "TMDB",
     },
   ],
 };
@@ -222,7 +242,6 @@ const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
 export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemAdded }: CreateMediaModalProps) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<"search" | "manual">("search");
 
   // Search state
   const [searchQuery, setSearchQuery] = useState("");
@@ -235,18 +254,6 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
 
   const debouncedQuery = useDebounce(searchQuery, 350);
 
-  // Manual Form Fields
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState<"anime" | "manga" | "game" | "movie" | "series">(defaultType);
-  const [releaseYear, setReleaseYear] = useState(String(new Date().getFullYear()));
-  const [rating, setRating] = useState("");
-  const [status, setStatus] = useState("");
-  const [progress, setProgress] = useState("");
-  const [genres, setGenres] = useState("");
-  const [coverImage, setCoverImage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -254,22 +261,11 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
   // Sync types and clear form on open
   useEffect(() => {
     if (isOpen) {
-      setActiveTab("search");
       setSearchQuery("");
       setSearchType(defaultType);
       setSearchResults([]);
       setAddedIds({});
       setAddingIds({});
-
-      setTitle("");
-      setType(defaultType);
-      setReleaseYear(String(new Date().getFullYear()));
-      setRating("");
-      setStatus("");
-      setProgress("");
-      setGenres("");
-      setCoverImage("");
-      setErrorMsg("");
 
       setTimeout(() => {
         searchInputRef.current?.focus();
@@ -297,26 +293,6 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
     }
   }, [isOpen, onClose]);
 
-  // Set type-specific defaults when manual type changes
-  useEffect(() => {
-    if (type === "manga") {
-      setStatus("Plan to Read");
-      setProgress("0/? CH");
-    } else if (type === "game") {
-      setStatus("Plan to Play");
-      setProgress("0 hrs");
-    } else if (type === "movie") {
-      setStatus("Plan to Watch");
-      setProgress("0 mins");
-    } else if (type === "series") {
-      setStatus("Plan to Watch");
-      setProgress("S1E01");
-    } else {
-      setStatus("Plan to Watch");
-      setProgress("0/? EP");
-    }
-  }, [type]);
-
   // Search API execution
   useEffect(() => {
     async function executeSearch() {
@@ -343,10 +319,8 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
       }
     }
 
-    if (activeTab === "search") {
-      executeSearch();
-    }
-  }, [debouncedQuery, searchType, activeTab]);
+    executeSearch();
+  }, [debouncedQuery, searchType]);
 
   if (!isOpen || !mounted) return null;
 
@@ -471,71 +445,7 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
     }
   };
 
-  // Manual Form Submission
-  const handleManualSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) {
-      setErrorMsg("Title is required.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setErrorMsg("");
-
-    let cleanRating = "N/A";
-    const rateVal = parseFloat(rating);
-    if (!isNaN(rateVal)) {
-      cleanRating = `${rateVal.toFixed(1)}/10`;
-    }
-
-    const genreArray = genres
-      .split(",")
-      .map(g => g.trim())
-      .filter(g => g !== "");
-
-    try {
-      const res = await fetch("/api/track", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: title.trim(),
-          type,
-          releaseYear: parseInt(releaseYear) || new Date().getFullYear(),
-          rating: cleanRating,
-          status,
-          progress: progress.trim(),
-          genres: genreArray,
-          coverImage: coverImage.trim() || DEFAULT_COVER_IMAGES[type]
-        })
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to create item.");
-      }
-
-      if (onItemAdded && data.entry) {
-        onItemAdded(data.entry);
-      }
-      router.refresh();
-      onClose();
-      showToast(`Successfully created record: "${title.trim()}"`, "success");
-    } catch (e: any) {
-      setErrorMsg(e.message || "Failed to create item.");
-      showToast(e.message || "Failed to create item.", "error");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const switchToManualWithTitle = (customTitle: string) => {
-    setTitle(customTitle);
-    setType(defaultType);
-    setActiveTab("manual");
-  };
-
   const currentSuggestions = SUGGESTIONS[defaultType] || SUGGESTIONS.anime;
-  const aspectClass = type === "game" ? "aspect-video md:aspect-[16/10]" : "aspect-[2/3]";
 
   return createPortal(
     <div 
@@ -547,50 +457,18 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
         onClick={(e) => e.stopPropagation()}
         className={`relative w-full max-w-3xl max-h-[92vh] overflow-hidden bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-5 sm:p-7 flex flex-col gap-4 font-sans`}
       >
-        {/* Top Control Bar & Tab Switcher */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-3.5 select-none">
+        {/* Top Control Bar */}
+        <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3.5 select-none">
           <div className="flex items-center gap-2.5">
             <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase ${meta.accentBg} text-black border border-white`}>
               ADD {defaultType.toUpperCase()}
             </span>
-            <span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest hidden sm:inline">
-              GLOBAL_DATABASE_SYNC
+            <span className="font-mono text-[10px] text-gray-400 uppercase tracking-widest hidden sm:inline">
+              OFFICIAL ARCHIVE DISCOVERY ONLY
             </span>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-            <div className="flex items-center border border-white/20 bg-black p-0.5 text-xs font-mono">
-              <button
-                id="btn-tab-search"
-                type="button"
-                onClick={() => {
-                  setActiveTab("search");
-                  setTimeout(() => searchInputRef.current?.focus(), 50);
-                }}
-                className={`px-3 py-1 flex items-center gap-1.5 transition-all cursor-pointer ${
-                  activeTab === "search"
-                    ? `${meta.accentBg} text-black font-bold shadow-[2px_2px_0px_0px_#ffffff]`
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                <Search className="w-3.5 h-3.5" />
-                <span>Search</span>
-              </button>
-              <button
-                id="btn-tab-manual"
-                type="button"
-                onClick={() => setActiveTab("manual")}
-                className={`px-3 py-1 flex items-center gap-1.5 transition-all cursor-pointer ${
-                  activeTab === "manual"
-                    ? "bg-white text-black font-bold shadow-[2px_2px_0px_0px_#ffffff]"
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Custom Manual</span>
-              </button>
-            </div>
-
+          <div className="flex items-center gap-2">
             <button
               id="btn-close-modal"
               onClick={onClose}
@@ -602,9 +480,8 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
           </div>
         </div>
 
-        {/* TAB 1: SEARCH & INSTANT DISCOVERY */}
-        {activeTab === "search" && (
-          <div className="flex flex-col gap-4 overflow-hidden">
+        {/* SEARCH & INSTANT DISCOVERY */}
+        <div className="flex flex-col gap-4 overflow-hidden">
             {/* Search Input Box */}
             <div className="flex flex-col gap-2">
               <div className="relative flex items-center bg-black border-2 border-white shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] focus-within:shadow-[3px_3px_0px_0px_var(--cyber-cyan)] transition-all">
@@ -720,9 +597,26 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                               <span className="font-bold text-xs text-white truncate leading-tight">
                                 {item.title}
                               </span>
-                              <span className="text-[10px] text-gray-400 font-mono">
-                                {item.releaseYear} · ★ {item.rating}
-                              </span>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                {item.apiSource && (
+                                  <span
+                                    className={`text-[8px] font-mono font-bold uppercase px-1 py-0.2 border ${
+                                      item.apiSource === "AniList"
+                                        ? "border-cyber-purple/60 text-cyber-purple bg-cyber-purple/10"
+                                        : item.apiSource === "TMDB"
+                                        ? "border-cyber-cyan/60 text-cyber-cyan bg-cyber-cyan/10"
+                                        : item.apiSource === "RAWG"
+                                        ? "border-cyber-green/60 text-cyber-green bg-cyber-green/10"
+                                        : "border-white/40 text-gray-300 bg-white/5"
+                                    }`}
+                                  >
+                                    {item.apiSource}
+                                  </span>
+                                )}
+                                <span className="text-[10px] text-gray-400 font-mono">
+                                  {item.releaseYear} · ★ {item.rating}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
@@ -786,6 +680,21 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                                 {getMediaIcon(item.type)}
                                 {item.type}
                               </span>
+                              {item.apiSource && (
+                                <span
+                                  className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 border ${
+                                    item.apiSource === "AniList"
+                                      ? "border-cyber-purple/60 text-cyber-purple bg-cyber-purple/10"
+                                      : item.apiSource === "TMDB"
+                                      ? "border-cyber-cyan/60 text-cyber-cyan bg-cyber-cyan/10"
+                                      : item.apiSource === "RAWG"
+                                      ? "border-cyber-green/60 text-cyber-green bg-cyber-green/10"
+                                      : "border-white/40 text-gray-300 bg-white/5"
+                                  }`}
+                                >
+                                  {item.apiSource}
+                                </span>
+                              )}
                               {item.releaseYear && <span>{item.releaseYear}</span>}
                               {item.rating && (
                                 <span className="flex items-center gap-0.5 text-cyber-yellow">
@@ -838,223 +747,19 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                     );
                   })
                 ) : !isSearching ? (
-                  <div className="border border-dashed border-white/20 p-8 text-center flex flex-col items-center justify-center gap-2.5 font-mono">
-                    <span className="text-gray-400 text-xs font-bold uppercase">
+                  <div className="border border-dashed border-white/20 p-8 text-center flex flex-col items-center justify-center gap-2 font-mono">
+                    <AlertTriangle className="w-6 h-6 text-cyber-yellow" />
+                    <span className="text-gray-300 text-xs font-bold uppercase tracking-wider">
                       NO MATCHING RECORDS LOCATED IN EXTERNAL ARCHIVES
                     </span>
                     <span className="text-[11px] text-gray-500">
-                      Cannot find &ldquo;{searchQuery}&rdquo; online? You can create a custom record manually.
+                      No exact matches found in official database for &ldquo;{searchQuery}&rdquo;. Check spelling or try searching another title.
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => switchToManualWithTitle(searchQuery)}
-                      className="mt-2 px-4 py-1.5 bg-white text-black text-xs font-bold font-mono border border-white hover:bg-cyber-yellow transition-all flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <span>Create custom &ldquo;{searchQuery}&rdquo; manually</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
                   </div>
                 ) : null}
               </div>
             )}
           </div>
-        )}
-
-        {/* TAB 2: MANUAL FORM */}
-        {activeTab === "manual" && (
-          <form onSubmit={handleManualSubmit} className="flex flex-col gap-4 overflow-y-auto max-h-[70vh] pr-1">
-            {errorMsg && (
-              <div className="border border-cyber-red bg-cyber-red/10 text-cyber-red text-xs px-4 py-2 flex items-center gap-2 font-mono">
-                <AlertTriangle className="w-4 h-4 shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
-
-            <div className="flex flex-col md:flex-row gap-5">
-              {/* Left Cover preview column */}
-              <div className="w-full md:w-1/3 flex flex-col gap-3">
-                <div className={`relative ${type === "game" ? "w-60 sm:w-72 md:w-full" : "w-36 sm:w-48 md:w-full"} mx-auto md:mx-0 ${aspectClass} overflow-hidden border border-white/20 bg-[#000]`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={getCoverImage(coverImage, type)}
-                    alt="Cover Preview"
-                    className="w-full h-full object-cover"
-                    onError={() => setCoverImage(DEFAULT_COVER_IMAGES[type] || DEFAULT_COVER_IMAGES.anime)}
-                  />
-                </div>
-                <div className="flex flex-col gap-1 text-xs">
-                  <label className="text-gray-400 font-mono flex items-center gap-1 text-[11px]">
-                    <ImageIcon className="w-3.5 h-3.5" /> COVER IMAGE URL
-                  </label>
-                  <input
-                    type="text"
-                    value={coverImage}
-                    onChange={e => setCoverImage(e.target.value)}
-                    placeholder="Optional image URL"
-                    className="w-full bg-[#111] text-white border border-white/20 p-2 font-mono text-[11px] focus:border-white outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Right fields column */}
-              <div className="w-full md:w-2/3 flex flex-col gap-3.5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  
-                  {/* Title */}
-                  <div className="col-span-1 sm:col-span-2 flex flex-col gap-1 text-xs">
-                    <label className="text-gray-400 font-mono text-[11px]">MEDIA TITLE *</label>
-                    <input
-                      type="text"
-                      required
-                      value={title}
-                      onChange={e => setTitle(e.target.value)}
-                      placeholder="e.g. Solo Leveling"
-                      className="w-full bg-[#111] text-white border border-white/20 p-2 font-bold focus:border-white outline-none"
-                    />
-                  </div>
-
-                  {/* Media Type */}
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-gray-400 font-mono text-[11px]">MEDIA CLASSIFICATION</label>
-                    <select
-                      value={type}
-                      onChange={e => setType(e.target.value as any)}
-                      className="w-full bg-[#111] text-white border border-white/20 p-2 focus:border-white outline-none font-bold"
-                    >
-                      <option value="anime">Anime</option>
-                      <option value="manga">Manga</option>
-                      <option value="game">Game</option>
-                      <option value="movie">Movie</option>
-                      <option value="series">Series</option>
-                    </select>
-                  </div>
-
-                  {/* Release Year */}
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-gray-400 font-mono flex items-center gap-1 text-[11px]">
-                      <Calendar className="w-3.5 h-3.5" /> RELEASE YEAR
-                    </label>
-                    <input
-                      type="number"
-                      value={releaseYear}
-                      onChange={e => setReleaseYear(e.target.value)}
-                      className="w-full bg-[#111] text-white border border-white/20 p-2 font-mono focus:border-white outline-none"
-                    />
-                  </div>
-
-                  {/* Rating */}
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-gray-400 font-mono flex items-center gap-1 text-[11px]">
-                      <Star className="w-3.5 h-3.5" /> SCORE (0.0 - 10.0)
-                    </label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="10"
-                      value={rating}
-                      onChange={e => setRating(e.target.value)}
-                      placeholder="e.g. 9.0"
-                      className="w-full bg-[#111] text-white border border-white/20 p-2 font-mono focus:border-white outline-none"
-                    />
-                  </div>
-
-                  {/* Status */}
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-gray-400 font-mono flex items-center gap-1 text-[11px]">
-                      <Sliders className="w-3.5 h-3.5" /> TRACKING STATUS
-                    </label>
-                    <select
-                      value={status}
-                      onChange={e => setStatus(e.target.value)}
-                      className="w-full bg-[#111] text-white border border-white/20 p-2 focus:border-white outline-none font-bold"
-                    >
-                      {type === "manga" ? (
-                        <>
-                          <option value="Plan to Read">Plan to Read</option>
-                          <option value="Reading">Reading</option>
-                        </>
-                      ) : type === "game" ? (
-                        <>
-                          <option value="Plan to Play">Plan to Play</option>
-                          <option value="Playing">Playing</option>
-                        </>
-                      ) : type === "movie" ? (
-                        <>
-                          <option value="Plan to Watch">Plan to Watch</option>
-                        </>
-                      ) : (
-                        <>
-                          <option value="Plan to Watch">Plan to Watch</option>
-                          <option value="Watching">Watching</option>
-                        </>
-                      )}
-                      <option value="Completed">Completed</option>
-                      {type !== "movie" && <option value="On Hold">On Hold</option>}
-                      <option value="Dropped">Dropped</option>
-                    </select>
-                  </div>
-
-                  {/* Progress */}
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-gray-400 font-mono flex items-center gap-1 text-[11px]">
-                      <Hash className="w-3.5 h-3.5" /> INITIAL PROGRESS
-                    </label>
-                    <input
-                      type="text"
-                      value={progress}
-                      onChange={e => setProgress(e.target.value)}
-                      placeholder={meta.progressPlaceholder}
-                      className="w-full bg-[#111] text-white border border-white/20 p-2 font-mono focus:border-white outline-none"
-                    />
-                  </div>
-
-                  {/* Genres */}
-                  <div className="col-span-1 sm:col-span-2 flex flex-col gap-1 text-xs">
-                    <label className="text-gray-400 font-mono text-[11px]">GENRES (COMMA-SEPARATED)</label>
-                    <input
-                      type="text"
-                      value={genres}
-                      onChange={e => setGenres(e.target.value)}
-                      placeholder="Action, Adventure, Fantasy"
-                      className="w-full bg-[#111] text-white border border-white/20 p-2 focus:border-white outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Form Actions */}
-                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-white/10 pt-3.5 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("search")}
-                    className="text-xs font-mono text-gray-400 hover:text-white transition-colors cursor-pointer text-center sm:text-left py-1"
-                  >
-                    ← Back to Search
-                  </button>
-
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      disabled={isSubmitting}
-                      className="flex-1 sm:flex-none px-4 py-2 border border-white/20 text-gray-300 font-bold hover:text-white hover:border-white transition-all cursor-pointer text-xs text-center"
-                    >
-                      Cancel
-                    </button>
-                    
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="flex-1 sm:flex-none px-5 py-2 bg-white text-black border-2 border-white hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,255,102,1)] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs"
-                    >
-                      <Plus className="w-4 h-4" /> {isSubmitting ? "Saving..." : "Save Record"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        )}
       </div>
     </div>,
     document.body

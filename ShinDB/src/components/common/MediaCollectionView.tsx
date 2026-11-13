@@ -17,8 +17,13 @@ import {
   ChevronDown,
   AlertTriangle,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import MediaCard, { MediaItem } from "@/components/common/MediaCard";
-import CreateMediaModal from "@/components/common/CreateMediaModal";
+
+const CreateMediaModal = dynamic(() => import("@/components/common/CreateMediaModal"), {
+  ssr: false,
+  loading: () => null,
+});
 import { showToast } from "@/components/common/Toast";
 import { useRouter } from "next/navigation";
 
@@ -836,12 +841,14 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
         </div>
       )}
 
-      <CreateMediaModal
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        defaultType={type}
-        onItemAdded={handleItemAdded}
-      />
+      {isCreateOpen && (
+        <CreateMediaModal
+          isOpen={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+          defaultType={type}
+          onItemAdded={handleItemAdded}
+        />
+      )}
     </div>
   );
 }

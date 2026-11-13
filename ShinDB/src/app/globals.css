@@ -1,10 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap');
 @import "tailwindcss";
 
 :root {
   --background: #000000;
   --foreground: #ffffff;
-  
+
   --cyber-purple: #8b5cf6;
   --cyber-green: #00ff66;
   --cyber-cyan: #00f0ff;
@@ -25,15 +24,15 @@
   --color-cyber-yellow: var(--cyber-yellow);
   --color-cyber-orange: var(--cyber-orange);
   --color-cyber-red: var(--cyber-red);
-  
-  --font-sans: 'Space Grotesk', Arial, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+
+  --font-sans: var(--font-space-grotesk), 'Space Grotesk', Arial, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Space Grotesk', Arial, sans-serif;
+  font-family: var(--font-space-grotesk), 'Space Grotesk', Arial, sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -271,6 +270,7 @@ html {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -287,6 +287,7 @@ html {
     opacity: 0;
     transform: translateX(-16px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -299,8 +300,15 @@ html {
 
 /* Subtle stat number shimmer */
 @keyframes statShimmer {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .stat-shimmer {
@@ -313,13 +321,11 @@ html {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px);
   z-index: 1;
 }
 
@@ -341,7 +347,7 @@ html {
 /* Hover lift for stat cards */
 .stat-card-hover {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .stat-card-hover:hover {
@@ -364,8 +370,15 @@ html {
 
 /* Badge pulse for active items */
 @keyframes badgePulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.3); }
-  50% { box-shadow: 0 0 0 4px rgba(0, 240, 255, 0); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px rgba(0, 240, 255, 0);
+  }
 }
 
 .badge-pulse {
@@ -378,6 +391,7 @@ html {
     transform: translateX(110%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -392,6 +406,7 @@ html {
   from {
     width: 100%;
   }
+
   to {
     width: 0%;
   }
@@ -403,6 +418,7 @@ html {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -414,6 +430,7 @@ html {
 }
 
 /* Mobile tap polish */
-button, a {
+button,
+a {
   touch-action: manipulation;
 }

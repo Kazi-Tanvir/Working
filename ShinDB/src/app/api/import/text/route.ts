@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
     type = "anime",
     skipExisting = true,
     preview = false,
+    apiSource,
   } = body;
 
   const validTypes = ["anime", "manga", "game", "movie", "series"];
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
     // Preview up to the first 15 entries for speed
     const sampleTitles = parsedTitles.slice(0, 15);
     for (const raw of sampleTitles) {
-      const resolved = await resolveTitle(raw, mediaType);
+      const resolved = await resolveTitle(raw, mediaType, apiSource);
       const isTracked = trackedTitleSet.has(resolved.title.toLowerCase()) || trackedTitleSet.has(raw.toLowerCase());
       previewResults.push({
         rawTitle: raw,
@@ -109,10 +110,39 @@ export async function POST(request: NextRequest) {
       for (let i = 0; i < total; i++) {
         const rawTitle = parsedTitles[i];
         try {
-          // 1. Resolve title via local DB then external API
-          const resolved = await resolveTitle(rawTitle, mediaType);
+          // 1. Resolve title via local DB then dedicated external API
+          const resolved = await resolveTitle(rawTitle, mediaType, apiSource);
 
-          // 2. Find or create master catalog record
+          // STRICT: If no exact match located in chosen external API, do not create custom record
+          if (!resolved.matched) {
+            failed++;
+            const targetApiName =
+              apiSource === "jikan" || apiSource === "mal"
+                ? "MyAnimeList"
+                : mediaType === "game"
+                ? "RAWG"
+                : mediaType === "series" || mediaType === "movie"
+                ? "TMDB"
+                : "AniList";
+
+            const errChunk =
+              JSON.stringify({
+                type: "progress",
+                current: i + 1,
+                total,
+                percentage: Math.round(((i + 1) / total) * 100),
+                item: {
+                  title: rawTitle,
+                  type: mediaType,
+                  action: "failed",
+                  error: `No exact match found in ${targetApiName}`,
+                },
+              }) + "\n";
+            controller.enqueue(encoder.encode(errChunk));
+            continue;
+          }
+
+          // 2. Find or create master catalog record (only for verified API entries)
           const media = await findOrCreateMedia({
             title: resolved.title,
             type: mediaType,

@@ -29,6 +29,7 @@ interface StreamLogItem {
   type: string;
   action: string;
   matched?: boolean;
+  error?: string;
 }
 
 export default function ImportTab() {
@@ -54,6 +55,7 @@ export default function ImportTab() {
   const [malUsername, setMalUsername] = useState("");
   const [malAnime, setMalAnime] = useState(true);
   const [malManga, setMalManga] = useState(true);
+  const [malApiSource, setMalApiSource] = useState<"anilist" | "jikan">("anilist");
   const [malOverwrite, setMalOverwrite] = useState(false);
   const [malLoading, setMalLoading] = useState(false);
   const [malProgress, setMalProgress] = useState<{ current: number; total: number; percentage: number } | null>(null);
@@ -64,6 +66,7 @@ export default function ImportTab() {
 
   // MAL XML file upload state
   const [malXmlFile, setMalXmlFile] = useState<File | null>(null);
+  const [malXmlApiSource, setMalXmlApiSource] = useState<"anilist" | "jikan">("anilist");
   const [malXmlOverwrite, setMalXmlOverwrite] = useState(false);
   const [malXmlLoading, setMalXmlLoading] = useState(false);
   const [malXmlProgress, setMalXmlProgress] = useState<{ current: number; total: number; percentage: number } | null>(null);
@@ -79,6 +82,7 @@ export default function ImportTab() {
   // ----------------------------------------------------
   const [textRaw, setTextRaw] = useState("");
   const [textMediaType, setTextMediaType] = useState<"anime" | "manga" | "game" | "movie" | "series">("anime");
+  const [textApiSource, setTextApiSource] = useState<"anilist" | "jikan">("anilist");
   const [textSkipExisting, setTextSkipExisting] = useState(true);
   const [textLoading, setTextLoading] = useState(false);
   const [textProgress, setTextProgress] = useState<{ current: number; total: number; percentage: number } | null>(null);
@@ -153,6 +157,7 @@ export default function ImportTab() {
                     type: data.item.type,
                     action: data.item.action,
                     matched: data.item.matched,
+                    error: data.item.error,
                   },
                   ...prev.slice(0, 49), // retain last 50
                 ]);
@@ -267,6 +272,7 @@ export default function ImportTab() {
           importTypes,
           overwriteExisting: malOverwrite,
           preview: true,
+          apiSource: malApiSource,
         }),
       });
 
@@ -299,6 +305,7 @@ export default function ImportTab() {
         importTypes,
         overwriteExisting: malOverwrite,
         preview: false,
+        apiSource: malApiSource,
       },
       setMalProgress,
       setMalLogs,
@@ -334,6 +341,7 @@ export default function ImportTab() {
       const formData = new FormData();
       formData.append("file", malXmlFile);
       formData.append("preview", "true");
+      formData.append("apiSource", malXmlApiSource);
       const res = await fetch("/api/import/mal-xml", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Preview failed");
@@ -357,6 +365,7 @@ export default function ImportTab() {
       formData.append("file", malXmlFile);
       formData.append("overwriteExisting", malXmlOverwrite ? "true" : "false");
       formData.append("preview", "false");
+      formData.append("apiSource", malXmlApiSource);
       const response = await fetch("/api/import/mal-xml", { method: "POST", body: formData });
       if (!response.ok || !response.body) {
         const errData = await response.json().catch(() => ({}));
@@ -377,7 +386,7 @@ export default function ImportTab() {
             const event = JSON.parse(line);
             if (event.type === "progress") {
               setMalXmlProgress({ current: event.current, total: event.total, percentage: event.percentage });
-              if (event.item) setMalXmlLogs((prev) => [...prev, { title: event.item.title, type: event.item.type, action: event.item.action }]);
+              if (event.item) setMalXmlLogs((prev) => [...prev, { title: event.item.title, type: event.item.type, action: event.item.action, error: event.item.error }]);
             } else if (event.type === "complete") {
               setMalXmlSummary(event.summary);
             }
@@ -413,6 +422,7 @@ export default function ImportTab() {
           type: textMediaType,
           skipExisting: textSkipExisting,
           preview: true,
+          apiSource: textApiSource,
         }),
       });
 
@@ -441,6 +451,7 @@ export default function ImportTab() {
         type: textMediaType,
         skipExisting: textSkipExisting,
         preview: false,
+        apiSource: textApiSource,
       },
       setTextProgress,
       setTextLogs,
@@ -641,14 +652,33 @@ export default function ImportTab() {
               </div>
 
               {anilistSummary && (
-                <div className="p-3 bg-cyber-green/20 border border-cyber-green text-xs text-white space-y-1">
-                  <div className="font-black text-cyber-green uppercase flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4" />
-                    IMPORT COMPLETE!
+                <div className="space-y-2">
+                  <div className="p-3 bg-cyber-green/20 border border-cyber-green text-xs text-white space-y-1">
+                    <div className="font-black text-cyber-green uppercase flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      IMPORT COMPLETE!
+                    </div>
+                    <div>
+                      Imported: <span className="font-bold text-cyber-green">{anilistSummary.imported}</span> • Updated: <span className="font-bold text-cyber-cyan">{anilistSummary.updated}</span> • Skipped: <span className="font-bold text-cyber-yellow">{anilistSummary.skipped}</span> • Failed: <span className="font-bold text-red-400">{anilistSummary.failed}</span>
+                    </div>
                   </div>
-                  <div>
-                    Imported: <span className="font-bold text-cyber-green">{anilistSummary.imported}</span> • Updated: <span className="font-bold text-cyber-cyan">{anilistSummary.updated}</span> • Skipped: <span className="font-bold text-cyber-yellow">{anilistSummary.skipped}</span> • Failed: <span className="font-bold text-red-400">{anilistSummary.failed}</span>
-                  </div>
+
+                  {anilistSummary.failed > 0 && (
+                    <div className="p-3 bg-red-950/40 border border-red-500 text-xs text-white space-y-2">
+                      <div className="font-black text-red-400 uppercase flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                        FAILED ENTRIES LIST ({anilistSummary.failed} Unmatched — Excluded from Database)
+                      </div>
+                      <div className="max-h-36 overflow-y-auto space-y-1">
+                        {anilistLogs.filter((l) => l.action === "failed").map((item, idx) => (
+                          <div key={idx} className="flex justify-between items-center py-1 border-b border-red-900/30 text-[11px]">
+                            <span className="text-gray-200 font-bold truncate max-w-[260px]">{item.title}</span>
+                            <span className="text-red-400 text-[10px] shrink-0">{item.error || "No exact API match"}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -701,6 +731,20 @@ export default function ImportTab() {
                 placeholder="e.g. tanvir_mal"
                 className="w-full sm:w-80 px-3 py-2 bg-black border-2 border-white text-xs text-white font-mono uppercase focus:outline-none focus:border-cyber-purple"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
+                Metadata Resolution API
+              </label>
+              <select
+                value={malApiSource}
+                onChange={(e) => setMalApiSource(e.target.value as any)}
+                className="w-full sm:w-80 px-3 py-2 bg-black border-2 border-white text-xs text-white font-mono uppercase focus:outline-none focus:border-cyber-purple cursor-pointer"
+              >
+                <option value="anilist">AniList GraphQL (Default - HD Covers & Scores)</option>
+                <option value="jikan">MyAnimeList / Jikan API</option>
+              </select>
             </div>
 
             <div className="space-y-2">
@@ -819,14 +863,33 @@ export default function ImportTab() {
               </div>
 
               {malSummary && (
-                <div className="p-3 bg-cyber-green/20 border border-cyber-green text-xs text-white space-y-1">
-                  <div className="font-black text-cyber-green uppercase flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4" />
-                    IMPORT COMPLETE!
+                <div className="space-y-2">
+                  <div className="p-3 bg-cyber-green/20 border border-cyber-green text-xs text-white space-y-1">
+                    <div className="font-black text-cyber-green uppercase flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      IMPORT COMPLETE!
+                    </div>
+                    <div>
+                      Imported: <span className="font-bold text-cyber-green">{malSummary.imported}</span> • Updated: <span className="font-bold text-cyber-cyan">{malSummary.updated}</span> • Skipped: <span className="font-bold text-cyber-yellow">{malSummary.skipped}</span> • Failed: <span className="font-bold text-red-400">{malSummary.failed}</span>
+                    </div>
                   </div>
-                  <div>
-                    Imported: <span className="font-bold text-cyber-green">{malSummary.imported}</span> • Updated: <span className="font-bold text-cyber-cyan">{malSummary.updated}</span> • Skipped: <span className="font-bold text-cyber-yellow">{malSummary.skipped}</span> • Failed: <span className="font-bold text-red-400">{malSummary.failed}</span>
-                  </div>
+
+                  {malSummary.failed > 0 && (
+                    <div className="p-3 bg-red-950/40 border border-red-500 text-xs text-white space-y-2">
+                      <div className="font-black text-red-400 uppercase flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                        FAILED ENTRIES LIST ({malSummary.failed} Unmatched — Excluded from Database)
+                      </div>
+                      <div className="max-h-36 overflow-y-auto space-y-1">
+                        {malLogs.filter((l) => l.action === "failed").map((item, idx) => (
+                          <div key={idx} className="flex justify-between items-center py-1 border-b border-red-900/30 text-[11px]">
+                            <span className="text-gray-200 font-bold truncate max-w-[260px]">{item.title}</span>
+                            <span className="text-red-400 text-[10px] shrink-0">{item.error || "No exact API match"}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -913,6 +976,20 @@ export default function ImportTab() {
                   </div>
                 </div>
               )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
+                Metadata Resolution API
+              </label>
+              <select
+                value={malXmlApiSource}
+                onChange={(e) => setMalXmlApiSource(e.target.value as any)}
+                className="w-full sm:w-80 px-3 py-2 bg-black border-2 border-white text-xs text-white font-mono uppercase focus:outline-none focus:border-cyber-purple cursor-pointer"
+              >
+                <option value="anilist">AniList GraphQL (Default - HD Covers & Scores)</option>
+                <option value="jikan">MyAnimeList / Jikan API</option>
+              </select>
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer text-xs text-gray-300">
@@ -1004,13 +1081,32 @@ export default function ImportTab() {
                   <div className="bg-cyber-purple h-full transition-all duration-150" style={{ width: `${malXmlProgress.percentage}%` }} />
                 </div>
                 {malXmlSummary && (
-                  <div className="p-3 bg-cyber-green/20 border border-cyber-green text-xs text-white space-y-1">
-                    <div className="font-black text-cyber-green uppercase flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4" /> IMPORT COMPLETE!
+                  <div className="space-y-2">
+                    <div className="p-3 bg-cyber-green/20 border border-cyber-green text-xs text-white space-y-1">
+                      <div className="font-black text-cyber-green uppercase flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4" /> IMPORT COMPLETE!
+                      </div>
+                      <div>
+                        Imported: <span className="font-bold text-cyber-green">{malXmlSummary.imported}</span> • Updated: <span className="font-bold text-cyber-cyan">{malXmlSummary.updated}</span> • Skipped: <span className="font-bold text-cyber-yellow">{malXmlSummary.skipped}</span> • Failed: <span className="font-bold text-red-400">{malXmlSummary.failed}</span>
+                      </div>
                     </div>
-                    <div>
-                      Imported: <span className="font-bold text-cyber-green">{malXmlSummary.imported}</span> • Updated: <span className="font-bold text-cyber-cyan">{malXmlSummary.updated}</span> • Skipped: <span className="font-bold text-cyber-yellow">{malXmlSummary.skipped}</span> • Failed: <span className="font-bold text-red-400">{malXmlSummary.failed}</span>
-                    </div>
+
+                    {malXmlSummary.failed > 0 && (
+                      <div className="p-3 bg-red-950/40 border border-red-500 text-xs text-white space-y-2">
+                        <div className="font-black text-red-400 uppercase flex items-center gap-1.5">
+                          <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                          FAILED ENTRIES LIST ({malXmlSummary.failed} Unmatched — Excluded from Database)
+                        </div>
+                        <div className="max-h-36 overflow-y-auto space-y-1">
+                          {malXmlLogs.filter((l) => l.action === "failed").map((item, idx) => (
+                            <div key={idx} className="flex justify-between items-center py-1 border-b border-red-900/30 text-[11px]">
+                              <span className="text-gray-200 font-bold truncate max-w-[260px]">{item.title}</span>
+                              <span className="text-red-400 text-[10px] shrink-0">{item.error || "No exact API match"}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="max-h-40 overflow-y-auto border border-white/20 bg-black p-2 space-y-1 text-[11px]">
@@ -1078,6 +1174,30 @@ export default function ImportTab() {
                 placeholder={`Death Note\nAttack on Titan\nSteins;Gate\nFullmetal Alchemist: Brotherhood\nMob Psycho 100`}
                 className="w-full px-3 py-2.5 bg-black border-2 border-white text-xs text-white font-mono placeholder:text-gray-600 focus:outline-none focus:border-cyber-yellow"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
+                Metadata Source API
+              </label>
+              {textMediaType === "anime" || textMediaType === "manga" ? (
+                <select
+                  value={textApiSource}
+                  onChange={(e) => setTextApiSource(e.target.value as any)}
+                  className="w-full sm:w-80 px-3 py-2 bg-black border-2 border-white text-xs text-white font-mono uppercase focus:outline-none focus:border-cyber-yellow cursor-pointer"
+                >
+                  <option value="anilist">AniList GraphQL (English/Romaji/Native)</option>
+                  <option value="jikan">MyAnimeList / Jikan API</option>
+                </select>
+              ) : textMediaType === "movie" || textMediaType === "series" ? (
+                <div className="w-full sm:w-80 px-3 py-2 bg-white/5 border border-white/20 text-xs text-cyber-cyan font-bold font-mono uppercase">
+                  TMDB (The Movie Database)
+                </div>
+              ) : (
+                <div className="w-full sm:w-80 px-3 py-2 bg-white/5 border border-white/20 text-xs text-cyber-green font-bold font-mono uppercase">
+                  RAWG Video Games Database
+                </div>
+              )}
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer text-xs text-gray-300">
@@ -1152,7 +1272,7 @@ export default function ImportTab() {
                       {item.matched ? (
                         <span className="text-cyber-green font-bold">[METADATA FOUND]</span>
                       ) : (
-                        <span className="text-cyber-yellow">[BARE ENTRY]</span>
+                        <span className="text-red-400 font-bold">[WILL FAIL: NO EXACT API MATCH]</span>
                       )}
                       {item.alreadyTracked ? (
                         <span className="text-gray-500">[ALREADY IN LIBRARY]</span>
@@ -1183,14 +1303,33 @@ export default function ImportTab() {
               </div>
 
               {textSummary && (
-                <div className="p-3 bg-cyber-green/20 border border-cyber-green text-xs text-white space-y-1">
-                  <div className="font-black text-cyber-green uppercase flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4" />
-                    IMPORT COMPLETED!
+                <div className="space-y-2">
+                  <div className="p-3 bg-cyber-green/20 border border-cyber-green text-xs text-white space-y-1">
+                    <div className="font-black text-cyber-green uppercase flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      IMPORT COMPLETED!
+                    </div>
+                    <div>
+                      Added to Plan to Consume: <span className="font-bold text-cyber-green">{textSummary.imported}</span> • Skipped (Already Tracked): <span className="font-bold text-cyber-yellow">{textSummary.skipped}</span> • Failed: <span className="font-bold text-red-400">{textSummary.failed}</span>
+                    </div>
                   </div>
-                  <div>
-                    Added to Plan to Consume: <span className="font-bold text-cyber-green">{textSummary.imported}</span> • Skipped (Already Tracked): <span className="font-bold text-cyber-yellow">{textSummary.skipped}</span> • Failed: <span className="font-bold text-red-400">{textSummary.failed}</span>
-                  </div>
+
+                  {textSummary.failed > 0 && (
+                    <div className="p-3 bg-red-950/40 border border-red-500 text-xs text-white space-y-2">
+                      <div className="font-black text-red-400 uppercase flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                        FAILED ENTRIES LIST ({textSummary.failed} Unmatched — Excluded from Database)
+                      </div>
+                      <div className="max-h-36 overflow-y-auto space-y-1">
+                        {textLogs.filter((l) => l.action === "failed").map((item, idx) => (
+                          <div key={idx} className="flex justify-between items-center py-1 border-b border-red-900/30 text-[11px]">
+                            <span className="text-gray-200 font-bold truncate max-w-[260px]">{item.title}</span>
+                            <span className="text-red-400 text-[10px] shrink-0">{item.error || "No exact API match"}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

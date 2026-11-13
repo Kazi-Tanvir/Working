@@ -1,3 +1,7 @@
+import dns from "node:dns";
+try {
+  dns.setDefaultResultOrder("ipv4first");
+} catch {}
 import { PrismaClient } from "@prisma/client";
 
 // PrismaClient singleton instance for Next.js App Router

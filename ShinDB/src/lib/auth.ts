@@ -277,6 +277,31 @@ export async function resolveClerkUser(userId: string): Promise<SafeUser | null>
         userCache.set(userId, { user: syncedUser, expiresAt: Date.now() + CACHE_TTL_MS });
         return syncedUser;
       }
+
+      // Resilient fallback: If database is temporarily slow/recovering during sync,
+      // return a valid SafeUser from Clerk profile so the user is never locked out with a 401
+      const primaryEmail =
+        clerkUser.emailAddresses?.find((e: any) => e.id === clerkUser.primaryEmailAddressId)
+          ?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress || null;
+      const username =
+        clerkUser.username ||
+        (primaryEmail ? primaryEmail.split("@")[0] : `user_${userId.slice(-6)}`);
+      const displayName =
+        [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || username;
+
+      const fallbackUser: SafeUser = {
+        id: clerkUser.id,
+        username,
+        email: primaryEmail || `${userId}@clerk.shindb.internal`,
+        displayName,
+        avatarUrl: clerkUser.imageUrl || null,
+        bio: null,
+        customBadge: clerkUser.publicMetadata?.role === "admin" ? "[SYS_OPERATOR::ADMIN]" : "[SYS_OPERATOR::RECRUIT]",
+        role: clerkUser.publicMetadata?.role === "admin" ? "admin" : "user",
+        authProvider: "clerk",
+        createdAt: new Date(),
+      };
+      return fallbackUser;
     }
   } catch (err) {
     console.error("[AUTH] Error during first-time Clerk user sync:", err);

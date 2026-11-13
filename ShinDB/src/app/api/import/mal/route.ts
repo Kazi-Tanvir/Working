@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
     importTypes = ["anime", "manga"],
     overwriteExisting = false,
     preview = false,
+    apiSource = "anilist",
   } = body;
 
   if (!malUsername || typeof malUsername !== "string" || !malUsername.trim()) {
@@ -266,7 +267,8 @@ export async function POST(request: NextRequest) {
       let metadataMap = new Map();
       try {
         metadataMap = await batchResolveMalMetadata(
-          collectedEntries.map((e) => ({ malId: e.externalId, type: e.type, title: e.title }))
+          collectedEntries.map((e) => ({ malId: e.externalId, type: e.type, title: e.title })),
+          apiSource as "anilist" | "jikan"
         );
       } catch (err) {
         console.warn("[MAL_API_METADATA_BATCH_WARN]:", err);
@@ -275,11 +277,33 @@ export async function POST(request: NextRequest) {
       for (let i = 0; i < total; i++) {
         const item = collectedEntries[i];
         const resolved = metadataMap.get(item.externalId);
-        const finalTitle = resolved?.title || item.title;
-        const finalCover = item.coverImage || resolved?.coverImage || "";
-        const finalYear = resolved?.releaseYear || item.releaseYear;
-        const finalGenres = resolved?.genres || item.genres;
-        const finalEpisodes = resolved?.totalEpisodes || item.totalEpisodes;
+
+        // STRICT: If not found in the selected API, place in failed list and do not import
+        if (!resolved || !resolved.matched) {
+          failed++;
+          const errChunk =
+            JSON.stringify({
+              type: "progress",
+              current: i + 1,
+              total,
+              percentage: Math.round(((i + 1) / total) * 100),
+              item: {
+                title: item.title,
+                type: item.type,
+                action: "failed",
+                error: `No exact match found in ${apiSource === "jikan" ? "MyAnimeList" : "AniList"} API`,
+              },
+            }) + "\n";
+          controller.enqueue(encoder.encode(errChunk));
+          continue;
+        }
+
+        const finalTitle = resolved.title || item.title;
+        const finalCover = resolved.coverImage || item.coverImage || "";
+        const finalYear = resolved.releaseYear || item.releaseYear;
+        const finalGenres = resolved.genres || item.genres;
+        const finalEpisodes = resolved.totalEpisodes || item.totalEpisodes;
+        const sourceName = resolved.externalSource || (apiSource === "jikan" ? "mal" : "anilist");
 
         try {
           const media = await findOrCreateMedia({
@@ -289,9 +313,9 @@ export async function POST(request: NextRequest) {
             releaseYear: finalYear,
             genres: finalGenres,
             totalEpisodes: finalEpisodes,
-            externalId: item.externalId,
-            externalSource: "mal",
-            externalRating: item.externalRating,
+            externalId: resolved.externalId || item.externalId,
+            externalSource: sourceName,
+            externalRating: resolved.externalRating ?? item.externalRating,
           });
 
           const action = await upsertUserMediaEntry({

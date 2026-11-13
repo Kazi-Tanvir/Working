@@ -1,11 +1,13 @@
 // src/app/api/track/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { MediaType, MediaStatus, ProgressUnit } from "@prisma/client";
 import { toMediaItem } from "@/lib/media";
 import { getCanonicalExternalRating } from "@/utils/seasonHelpers";
 import { getUserFromRequest } from "@/lib/auth";
+import { resolveTitle } from "@/lib/import";
 
 const CreateTrackSchema = z.object({
   mediaId: z.string().optional(),
@@ -155,18 +157,31 @@ export async function POST(request: NextRequest) {
     }
 
     if (!media) {
+      // STRICT: Must be a verified entry from an external API
+      const resolved = await resolveTitle(cleanTitle, type);
+      if (!resolved.matched) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Only verified entries from supported APIs can be added. Custom entries are not permitted.",
+          },
+          { status: 400 }
+        );
+      }
+
       media = await prisma.media.create({
         data: {
-          title: cleanTitle,
+          title: resolved.title,
           type,
-          coverImage:
-            coverImage ||
-            "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
-          releaseYear: releaseYear ? Number(releaseYear) : new Date().getFullYear(),
-          genres: genres || [],
-          externalRating: canonicalRating,
-          totalEpisodes: prog.progressTotal,
+          coverImage: coverImage || resolved.coverImage,
+          releaseYear: releaseYear ? Number(releaseYear) : resolved.releaseYear,
+          genres: resolved.genres.length > 0 ? resolved.genres : (genres || []),
+          externalRating: resolved.externalRating ?? canonicalRating,
+          totalEpisodes: prog.progressTotal || resolved.totalEpisodes,
           progressUnit: prog.progressUnit,
+          externalId: resolved.externalId,
+          externalSource: resolved.externalSource,
         },
       });
     }
@@ -203,6 +218,13 @@ export async function POST(request: NextRequest) {
       },
       include: { media: true },
     });
+
+    // Invalidate cached user media queries
+    try {
+      revalidateTag(`media-user-${userId}`, { expire: 0 });
+    } catch (err) {
+      console.warn("[TRACK_API_CACHE_INVALIDATE]", err);
+    }
 
     return NextResponse.json({
       success: true,
@@ -373,6 +395,13 @@ export async function PUT(request: NextRequest) {
       });
     }
 
+    // Invalidate cached user media queries
+    try {
+      revalidateTag(`media-user-${userId}`, { expire: 0 });
+    } catch (err) {
+      console.warn("[TRACK_API_CACHE_INVALIDATE]", err);
+    }
+
     return NextResponse.json({
       success: true,
       entry: toMediaItem(updated),
@@ -414,6 +443,13 @@ export async function DELETE(request: NextRequest) {
     await prisma.userMediaEntry.delete({
       where: { id: existing.id },
     });
+
+    // Invalidate cached user media queries
+    try {
+      revalidateTag(`media-user-${userId}`, { expire: 0 });
+    } catch (err) {
+      console.warn("[TRACK_API_CACHE_INVALIDATE]", err);
+    }
 
     return NextResponse.json({ success: true, message: `Removed entry ${id} from your library` });
   } catch (error) {

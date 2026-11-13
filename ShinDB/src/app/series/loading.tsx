@@ -1,12 +1,11 @@
-import React from "react";
 import CategorySkeleton from "@/components/common/CategorySkeleton";
 
-export default function Loading() {
+export default function SeriesLoading() {
   return (
     <CategorySkeleton
       cardAspect="portrait"
-      accentColorClass="border-cyber-cyan/40 hover:border-cyber-cyan"
-      titlePlaceholder="LOADING SERIES LOGS..."
+      accentColorClass="border-cyber-orange"
+      titlePlaceholder="LOADING SERIES DATABASE..."
     />
   );
 }

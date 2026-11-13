@@ -11,8 +11,13 @@ import {
   Minus,
   Check
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Badge from "./Badge";
-import MediaModal from "./MediaModal";
+
+const MediaModal = dynamic(() => import("./MediaModal"), {
+  ssr: false,
+  loading: () => null,
+});
 import { SeasonData, formatStructuredProgress, calculateTotalWatched, calculateTotalEpisodes } from "@/utils/seasonHelpers";
 import { showToast } from "@/components/common/Toast";
 import { getCoverImage, DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
@@ -646,6 +651,8 @@ export default function MediaCard({
           <img
             src={getCoverImage(item.coverImage, item.type)}
             alt={item.title}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime;
@@ -955,32 +962,34 @@ export default function MediaCard({
 
       </div>
 
-      <MediaModal
-        item={{
-          ...item,
-          status: currentStatus,
-          progress: currentProgress,
-          currentSeason: activeSeasonNum,
-          seasons: seasonsState,
-        }}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        readOnly={readOnly || isFriendView}
-        isFriendView={isFriendView}
-        isAlreadyTracked={isLocallyTracked}
-        onAddPlan={() => handlePlanClick()}
-        onUpdateItem={(updatedItem) => {
-          setCurrentStatus(updatedItem.status);
-          setCurrentProgress(updatedItem.progress);
-          if (updatedItem.currentSeason) setActiveSeasonNum(updatedItem.currentSeason);
-          if (updatedItem.seasons) setSeasonsState(updatedItem.seasons);
-          if (onItemUpdate) onItemUpdate(updatedItem);
-        }}
-        onUpdateState={(newStatus, newProgress) => {
-          setCurrentStatus(newStatus);
-          setCurrentProgress(newProgress);
-        }}
-      />
+      {isModalOpen && (
+        <MediaModal
+          item={{
+            ...item,
+            status: currentStatus,
+            progress: currentProgress,
+            currentSeason: activeSeasonNum,
+            seasons: seasonsState,
+          }}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          readOnly={readOnly || isFriendView}
+          isFriendView={isFriendView}
+          isAlreadyTracked={isLocallyTracked}
+          onAddPlan={() => handlePlanClick()}
+          onUpdateItem={(updatedItem) => {
+            setCurrentStatus(updatedItem.status);
+            setCurrentProgress(updatedItem.progress);
+            if (updatedItem.currentSeason) setActiveSeasonNum(updatedItem.currentSeason);
+            if (updatedItem.seasons) setSeasonsState(updatedItem.seasons);
+            if (onItemUpdate) onItemUpdate(updatedItem);
+          }}
+          onUpdateState={(newStatus, newProgress) => {
+            setCurrentStatus(newStatus);
+            setCurrentProgress(newProgress);
+          }}
+        />
+      )}
     </>
   );
 }

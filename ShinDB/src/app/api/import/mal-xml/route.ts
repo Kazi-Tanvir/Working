@@ -102,6 +102,7 @@ export async function POST(request: NextRequest) {
   let xmlText: string;
   let overwriteExisting = false;
   let preview = false;
+  let apiSource: "anilist" | "jikan" = "anilist";
 
   // Accept multipart/form-data (file upload)
   const contentType = request.headers.get("content-type") || "";
@@ -122,6 +123,9 @@ export async function POST(request: NextRequest) {
       xmlText = await file.text();
       overwriteExisting = formData.get("overwriteExisting") === "true";
       preview = formData.get("preview") === "true";
+      if (formData.get("apiSource") === "jikan") {
+        apiSource = "jikan";
+      }
     } catch (err: any) {
       return NextResponse.json({ error: `Failed to read uploaded file: ${err.message}` }, { status: 400 });
     }
@@ -132,6 +136,9 @@ export async function POST(request: NextRequest) {
       xmlText = body.xmlContent;
       overwriteExisting = body.overwriteExisting ?? false;
       preview = body.preview ?? false;
+      if (body.apiSource === "jikan") {
+        apiSource = "jikan";
+      }
       if (!xmlText) {
         return NextResponse.json({ error: "xmlContent is required" }, { status: 400 });
       }
@@ -214,10 +221,10 @@ export async function POST(request: NextRequest) {
       let skipped = 0;
       let failed = 0;
 
-      // Pre-resolve all entries in batches via AniList to acquire English titles and actual cover images
+      // Pre-resolve all entries in batches via AniList or Jikan
       let metadataMap = new Map();
       try {
-        metadataMap = await batchResolveMalMetadata(entries);
+        metadataMap = await batchResolveMalMetadata(entries, apiSource);
       } catch (err) {
         console.warn("[MAL_XML_METADATA_BATCH_WARN]:", err);
       }
@@ -225,11 +232,33 @@ export async function POST(request: NextRequest) {
       for (let i = 0; i < total; i++) {
         const item = entries[i];
         const resolved = metadataMap.get(item.malId);
-        const finalTitle = resolved?.title || item.title;
-        const finalCover = resolved?.coverImage || "";
-        const finalYear = resolved?.releaseYear || new Date().getFullYear();
-        const finalGenres = resolved?.genres || [mediaType === "anime" ? "Anime" : "Manga"];
-        const finalEpisodes = resolved?.totalEpisodes || item.totalEpisodes;
+
+        // STRICT: If not found in the selected API, send to failed list and DO NOT import
+        if (!resolved || !resolved.matched) {
+          failed++;
+          const errChunk =
+            JSON.stringify({
+              type: "progress",
+              current: i + 1,
+              total,
+              percentage: Math.round(((i + 1) / total) * 100),
+              item: {
+                title: item.title,
+                type: item.type,
+                action: "failed",
+                error: `No exact match found in ${apiSource === "jikan" ? "MyAnimeList" : "AniList"} API`,
+              },
+            }) + "\n";
+          controller.enqueue(encoder.encode(errChunk));
+          continue;
+        }
+
+        const finalTitle = resolved.title || item.title;
+        const finalCover = resolved.coverImage || "";
+        const finalYear = resolved.releaseYear || new Date().getFullYear();
+        const finalGenres = resolved.genres || [mediaType === "anime" ? "Anime" : "Manga"];
+        const finalEpisodes = resolved.totalEpisodes || item.totalEpisodes;
+        const sourceName = resolved.externalSource || (apiSource === "jikan" ? "mal" : "anilist");
 
         try {
           const mappedStatus = mapExternalStatus(item.status, mediaType as "anime" | "manga");
@@ -242,9 +271,9 @@ export async function POST(request: NextRequest) {
             releaseYear: finalYear,
             genres: finalGenres,
             totalEpisodes: finalEpisodes,
-            externalId: item.malId || undefined,
-            externalSource: "mal",
-            externalRating: mappedScore,
+            externalId: resolved.externalId || item.malId,
+            externalSource: sourceName,
+            externalRating: resolved.externalRating ?? mappedScore,
           });
 
           const action = await upsertUserMediaEntry({

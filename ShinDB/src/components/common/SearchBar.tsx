@@ -241,6 +241,21 @@ export default function SearchBar({ className }: { className?: string }) {
                               {item.type}
                             </span>
                           </Badge>
+                          {item.apiSource && (
+                            <span
+                              className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 border ${
+                                item.apiSource === "AniList"
+                                  ? "border-cyber-purple/60 text-cyber-purple bg-cyber-purple/10"
+                                  : item.apiSource === "TMDB"
+                                  ? "border-cyber-cyan/60 text-cyber-cyan bg-cyber-cyan/10"
+                                  : item.apiSource === "RAWG"
+                                  ? "border-cyber-green/60 text-cyber-green bg-cyber-green/10"
+                                  : "border-white/40 text-gray-300 bg-white/5"
+                              }`}
+                            >
+                              {item.apiSource}
+                            </span>
+                          )}
                           {item.releaseYear && (
                             <span className="text-[10px] text-gray-500 font-mono">
                               [{item.releaseYear}]

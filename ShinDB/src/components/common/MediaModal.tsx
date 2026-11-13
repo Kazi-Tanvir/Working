@@ -764,7 +764,7 @@ export default function MediaModal({
           rating: cleanRating,
           status,
           progressCurrent: progressVal,
-          coverImage: coverImage.trim(),
+          coverImage: coverImage.trim() || undefined,
           notes: notes.trim(),
           ...(item.type === "series" && seasonsToSave && {
             seasons: seasonsToSave,
@@ -866,7 +866,7 @@ export default function MediaModal({
       {/* Premium Neobrutalist Modal Outer Box */}
       <div 
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-3xl max-h-[94vh] sm:max-h-[90vh] overflow-y-auto bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-3.5 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 font-sans`}
+        className={`relative w-full max-w-3xl max-h-[94vh] sm:max-h-[90vh] overflow-y-auto bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 font-sans`}
       >
         
         {/* Top Control Bar */}

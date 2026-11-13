@@ -5,6 +5,7 @@ try {
 import { prisma } from "@/lib/prisma";
 import { MediaType } from "@prisma/client";
 import { toMediaItem } from "@/lib/media";
+import { DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
 
 export const ACTIVE_SEARCH_GATEWAYS = ["AniList", "RAWG", "TMDB"] as const;
 export interface SearchResultItem {
@@ -113,7 +114,9 @@ async function searchTMDB(query: string, type: "movie" | "tv"): Promise<SearchRe
       const releaseYear = releaseDate ? releaseDate.split("-")[0] : undefined;
       const posterPath = item.poster_path
         ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-        : "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80";
+        : item.backdrop_path
+        ? `https://image.tmdb.org/t/p/w500${item.backdrop_path}`
+        : DEFAULT_COVER_IMAGES[type === "movie" ? "movie" : "series"];
 
       return {
         id: `tmdb-${type}-${item.id}`,
@@ -157,7 +160,7 @@ async function searchRAWG(query: string): Promise<SearchResultItem[]> {
 
   try {
     const endpoint = `https://api.rawg.io/api/games?search=${encodeURIComponent(query)}&key=${apiKey}`;
-    const response = await fetch(endpoint, { signal: AbortSignal.timeout(4000) });
+    const response = await fetch(endpoint, { signal: AbortSignal.timeout(10000) });
 
     if (!response.ok) {
       throw new Error(`RAWG returned status ${response.status}`);
@@ -168,12 +171,13 @@ async function searchRAWG(query: string): Promise<SearchResultItem[]> {
 
     return results.slice(0, 8).map((item: any) => {
       const releaseYear = item.released ? item.released.split("-")[0] : undefined;
+      const coverImage = item.background_image || item.short_screenshots?.[0]?.image || DEFAULT_COVER_IMAGES.game;
       return {
         id: `rawg-${item.id}`,
         title: item.name || "Unknown Game",
         type: "game" as const,
         releaseYear,
-        coverImage: item.background_image || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+        coverImage,
         rating: item.metacritic ? `${(item.metacritic / 10).toFixed(1)}/10` : (item.rating ? `${(item.rating * 2).toFixed(1)}/10` : undefined),
         apiSource: "RAWG" as const,
       };

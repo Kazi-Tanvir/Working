@@ -13,16 +13,16 @@ const CreateTrackSchema = z.object({
   mediaId: z.string().optional(),
   title: z.string().min(1).max(250),
   type: z.enum(["anime", "manga", "game", "movie", "series"]),
-  releaseYear: z.union([z.number(), z.string()]).optional(),
-  coverImage: z.string().optional(),
-  rating: z.union([z.string(), z.number()]).optional(),
+  releaseYear: z.union([z.number(), z.string()]).nullable().optional(),
+  coverImage: z.string().nullable().optional(),
+  rating: z.union([z.string(), z.number()]).nullable().optional(),
   status: z.string().optional(),
-  progress: z.string().optional(),
+  progress: z.string().nullable().optional(),
   genres: z.array(z.string()).optional(),
-  seasons: z.array(z.any()).optional(),
-  currentSeason: z.number().optional(),
-  progressCurrent: z.number().optional(),
-  notes: z.string().optional(),
+  seasons: z.array(z.any()).nullable().optional(),
+  currentSeason: z.number().nullable().optional(),
+  progressCurrent: z.number().nullable().optional(),
+  notes: z.string().nullable().optional(),
   isFavorite: z.boolean().optional(),
 });
 
@@ -374,6 +374,8 @@ export async function PUT(request: NextRequest) {
           isCompleted: true,
         }));
         calculatedWatched = (validatedSeasons as any[]).reduce((sum, s) => sum + s.episodesWatched, 0);
+      } else if (progressCurrent !== undefined && progressCurrent !== null) {
+        calculatedWatched = progressCurrent;
       } else if (userEntry.media.totalEpisodes && userEntry.media.totalEpisodes > 0) {
         calculatedWatched = userEntry.media.totalEpisodes;
       }

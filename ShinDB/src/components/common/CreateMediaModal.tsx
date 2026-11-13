@@ -18,7 +18,6 @@ import {
   Tv,
   BookOpen,
   Gamepad2,
-  Sparkles,
   ArrowRight
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -37,207 +36,6 @@ interface CreateMediaModalProps {
 }
 
 
-
-const SUGGESTIONS: Record<string, string[]> = {
-  anime: ["Solo Leveling", "Frieren", "Chainsaw Man", "Demon Slayer", "Jujutsu Kaisen", "Attack on Titan"],
-  manga: ["Berserk", "One Piece", "Vagabond", "Monster", "Chainsaw Man", "Tokyo Ghoul"],
-  game: ["Elden Ring", "Cyberpunk 2077", "Hades", "The Witcher 3", "Hollow Knight", "Sekiro"],
-  movie: ["Oppenheimer", "Dune: Part Two", "Interstellar", "The Dark Knight", "Inception", "Spider-Man"],
-  series: ["Severance", "Shogun", "The Last of Us", "Dark", "Breaking Bad", "Stranger Things"],
-};
-
-const TRENDING_CATALOG: Record<string, SearchResultItem[]> = {
-  anime: [
-    {
-      id: "trend-a1",
-      title: "Attack on Titan",
-      type: "anime",
-      releaseYear: "2013",
-      coverImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
-      rating: "9.1/10",
-      apiSource: "AniList",
-    },
-    {
-      id: "trend-a2",
-      title: "Death Note",
-      type: "anime",
-      releaseYear: "2006",
-      coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80",
-      rating: "9.0/10",
-      apiSource: "AniList",
-    },
-    {
-      id: "trend-a3",
-      title: "Demon Slayer",
-      type: "anime",
-      releaseYear: "2019",
-      coverImage: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
-      rating: "8.7/10",
-      apiSource: "AniList",
-    },
-    {
-      id: "trend-a4",
-      title: "Spirited Away",
-      type: "anime",
-      releaseYear: "2001",
-      coverImage: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=600&auto=format&fit=crop&q=80",
-      rating: "8.9/10",
-      apiSource: "AniList",
-    },
-  ],
-  manga: [
-    {
-      id: "trend-m1",
-      title: "One Piece",
-      type: "manga",
-      releaseYear: "1997",
-      coverImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
-      rating: "9.2/10",
-      apiSource: "AniList",
-    },
-    {
-      id: "trend-m2",
-      title: "Fullmetal Alchemist",
-      type: "manga",
-      releaseYear: "2001",
-      coverImage: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&auto=format&fit=crop&q=80",
-      rating: "9.1/10",
-      apiSource: "AniList",
-    },
-    {
-      id: "trend-m3",
-      title: "Jujutsu Kaisen",
-      type: "manga",
-      releaseYear: "2018",
-      coverImage: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=600&auto=format&fit=crop&q=80",
-      rating: "8.6/10",
-      apiSource: "AniList",
-    },
-    {
-      id: "trend-m4",
-      title: "Chainsaw Man",
-      type: "manga",
-      releaseYear: "2018",
-      coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80",
-      rating: "8.8/10",
-      apiSource: "AniList",
-    },
-  ],
-  game: [
-    {
-      id: "trend-g1",
-      title: "The Witcher 3: Wild Hunt",
-      type: "game",
-      releaseYear: "2015",
-      coverImage: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
-      rating: "9.8/10",
-      apiSource: "RAWG",
-    },
-    {
-      id: "trend-g2",
-      title: "Hollow Knight",
-      type: "game",
-      releaseYear: "2017",
-      coverImage: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
-      rating: "9.5/10",
-      apiSource: "RAWG",
-    },
-    {
-      id: "trend-g3",
-      title: "The Legend of Zelda: Breath of the Wild",
-      type: "game",
-      releaseYear: "2017",
-      coverImage: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80",
-      rating: "9.7/10",
-      apiSource: "RAWG",
-    },
-    {
-      id: "trend-g4",
-      title: "Elden Ring",
-      type: "game",
-      releaseYear: "2022",
-      coverImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
-      rating: "9.6/10",
-      apiSource: "RAWG",
-    },
-  ],
-  movie: [
-    {
-      id: "trend-mv1",
-      title: "Inception",
-      type: "movie",
-      releaseYear: "2010",
-      coverImage: "https://images.unsplash.com/photo-1539651044458-b092c41d2ec4?w=600&auto=format&fit=crop&q=80",
-      rating: "8.8/10",
-      apiSource: "TMDB",
-    },
-    {
-      id: "trend-mv2",
-      title: "The Matrix",
-      type: "movie",
-      releaseYear: "1999",
-      coverImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80",
-      rating: "8.7/10",
-      apiSource: "TMDB",
-    },
-    {
-      id: "trend-mv3",
-      title: "The Dark Knight",
-      type: "movie",
-      releaseYear: "2008",
-      coverImage: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80",
-      rating: "9.0/10",
-      apiSource: "TMDB",
-    },
-    {
-      id: "trend-mv4",
-      title: "Interstellar",
-      type: "movie",
-      releaseYear: "2014",
-      coverImage: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
-      rating: "8.7/10",
-      apiSource: "TMDB",
-    },
-  ],
-  series: [
-    {
-      id: "trend-s1",
-      title: "Stranger Things",
-      type: "series",
-      releaseYear: "2016",
-      coverImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80",
-      rating: "8.7/10",
-      apiSource: "TMDB",
-    },
-    {
-      id: "trend-s2",
-      title: "The Last of Us",
-      type: "series",
-      releaseYear: "2023",
-      coverImage: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
-      rating: "8.8/10",
-      apiSource: "TMDB",
-    },
-    {
-      id: "trend-s3",
-      title: "Dark",
-      type: "series",
-      releaseYear: "2017",
-      coverImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80",
-      rating: "8.9/10",
-      apiSource: "TMDB",
-    },
-    {
-      id: "trend-s4",
-      title: "Severance",
-      type: "series",
-      releaseYear: "2022",
-      coverImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80",
-      rating: "8.7/10",
-      apiSource: "TMDB",
-    },
-  ],
-};
 
 export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemAdded }: CreateMediaModalProps) {
   const router = useRouter();
@@ -445,8 +243,6 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
     }
   };
 
-  const currentSuggestions = SUGGESTIONS[defaultType] || SUGGESTIONS.anime;
-
   return createPortal(
     <div 
       onClick={onClose}
@@ -538,107 +334,16 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
               </div>
             </div>
 
-            {/* Rich Idle State with Trending Items & Quick Suggestion Chips */}
+            {/* Idle Search State */}
             {!searchQuery && (
-              <div className="flex flex-col gap-3 py-3 border-t border-dashed border-white/10 overflow-hidden">
-                {/* Suggestion Chips */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-1.5 text-xs font-mono text-gray-400">
-                    <Sparkles className="w-3.5 h-3.5 text-cyber-yellow" />
-                    <span className="uppercase font-bold tracking-wider">Quick Suggestions for {defaultType.toUpperCase()}:</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {currentSuggestions.map((sug) => (
-                      <button
-                        key={sug}
-                        type="button"
-                        onClick={() => setSearchQuery(sug)}
-                        className="px-2.5 py-1 text-xs font-mono bg-[#141417] border border-white/15 text-gray-300 hover:text-white hover:border-white transition-all cursor-pointer"
-                      >
-                        + {sug}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Popular & Trending Discovery Showcase */}
-                <div className="flex flex-col gap-2 mt-1">
-                  <div className="flex items-center justify-between text-xs font-mono text-gray-400 border-t border-white/5 pt-2.5">
-                    <span className="uppercase font-bold tracking-wider flex items-center gap-1.5">
-                      <Sparkles className="w-3 h-3 text-cyber-cyan" />
-                      Trending in {defaultType.toUpperCase()}:
-                    </span>
-                    <span className="text-[10px] text-gray-500">Instant 1-Click Add</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[35vh] overflow-y-auto pr-1">
-                    {(TRENDING_CATALOG[defaultType] || TRENDING_CATALOG.anime).map((item) => {
-                      const isAdded = Boolean(addedIds[item.id]);
-                      const isAdding = Boolean(addingIds[item.id]);
-
-                      return (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between gap-2.5 p-2 bg-[#111115] hover:bg-[#181820] border border-white/10 transition-colors"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="w-9 h-13 shrink-0 bg-black border border-white/20 overflow-hidden">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={getCoverImage(item.coverImage, item.type)}
-                                alt={item.title}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  (e.currentTarget as HTMLImageElement).src = DEFAULT_COVER_IMAGES[item.type] || DEFAULT_COVER_IMAGES.anime;
-                                }}
-                              />
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                              <span className="font-bold text-xs text-white truncate leading-tight">
-                                {item.title}
-                              </span>
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                {item.apiSource && (
-                                  <span
-                                    className={`text-[8px] font-mono font-bold uppercase px-1 py-0.2 border ${
-                                      item.apiSource === "AniList"
-                                        ? "border-cyber-purple/60 text-cyber-purple bg-cyber-purple/10"
-                                        : item.apiSource === "TMDB"
-                                        ? "border-cyber-cyan/60 text-cyber-cyan bg-cyber-cyan/10"
-                                        : item.apiSource === "RAWG"
-                                        ? "border-cyber-green/60 text-cyber-green bg-cyber-green/10"
-                                        : "border-white/40 text-gray-300 bg-white/5"
-                                    }`}
-                                  >
-                                    {item.apiSource}
-                                  </span>
-                                )}
-                                <span className="text-[10px] text-gray-400 font-mono">
-                                  {item.releaseYear} · ★ {item.rating}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => handleQuickAdd(item)}
-                            disabled={isAdded || isAdding}
-                            className={`px-2.5 py-1 text-[10px] font-mono font-bold uppercase shrink-0 border transition-all cursor-pointer ${
-                              isAdded
-                                ? "bg-cyber-green text-black border-cyber-green cursor-default"
-                                : isAdding
-                                ? "bg-cyber-cyan/20 text-cyber-cyan border-cyber-cyan animate-pulse"
-                                : "bg-white text-black border-white hover:bg-cyber-purple hover:text-white"
-                            }`}
-                          >
-                            {isAdded ? "✓ Added" : isAdding ? "..." : "+ Add"}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+              <div className="py-12 border-t border-dashed border-white/10 flex flex-col items-center justify-center text-center gap-2 font-mono text-xs text-gray-500">
+                <Search className="w-6 h-6 text-gray-600 mb-1" />
+                <span className="font-bold uppercase tracking-wider text-gray-400">
+                  Search {defaultType.toUpperCase()} Database
+                </span>
+                <span className="text-[11px] text-gray-600 max-w-sm">
+                  Type a title above to locate official verified records across AniList, TMDB, and RAWG.
+                </span>
               </div>
             )}
 

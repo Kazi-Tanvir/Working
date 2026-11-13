@@ -57,14 +57,17 @@ function parseMALXml(xmlText: string): {
         return m?.[1]?.trim() ?? "";
       };
 
-      const title = getText(mediaType === "anime" ? "series_title" : "manga_title");
-      const malId = getText("series_animedb_id") || getText("manga_animedb_id");
+      const title = getText(mediaType === "anime" ? "series_title" : "manga_title") || getText("manga_title") || getText("series_title");
+      const malId = getText("manga_mangadb_id") || getText("series_animedb_id") || getText("manga_animedb_id");
       const rawStatus = getText("my_status");
       const score = parseFloat(getText("my_score")) || 0;
       const progress = mediaType === "anime"
         ? parseInt(getText("my_watched_episodes"), 10) || 0
         : parseInt(getText("my_read_chapters"), 10) || 0;
-      const totalEpsRaw = parseInt(getText("series_episodes") || getText("series_chapters"), 10);
+      const totalEpsRaw = parseInt(
+        getText("manga_chapters_total") || getText("series_chapters") || getText("series_episodes"),
+        10
+      );
       const totalEpisodes = isNaN(totalEpsRaw) || totalEpsRaw === 0 ? null : totalEpsRaw;
       const rewatchCount = parseInt(getText("my_times_watched") || getText("my_times_read"), 10) || 0;
       const notes = getText("my_comments") || undefined;
@@ -183,7 +186,7 @@ export async function POST(request: NextRequest) {
       sample: await (async () => {
         const topSample = entries.slice(0, 12);
         try {
-          const sampleMap = await batchResolveMalMetadata(topSample);
+          const sampleMap = await batchResolveMalMetadata(topSample, apiSource);
           return topSample.map((e) => {
             const resolved = sampleMap.get(e.malId);
             return {

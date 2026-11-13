@@ -72,7 +72,7 @@ export default async function DashboardPage() {
       {allMedia.length === 0 && (
         <section className="w-full border-2 border-dashed border-cyber-purple/50 bg-[#09090b]/80 p-8 md:p-12 text-center flex flex-col items-center justify-center gap-4 shadow-[4px_4px_0px_0px_rgba(139,92,246,0.3)] animate-section-in font-mono">
           <div className="bg-cyber-purple/20 text-cyber-purple border border-cyber-purple px-3 py-1 text-xs font-bold uppercase tracking-widest">
-            [EMPTY LIBRARY]
+            [ARCHIVE_EMPTY]
           </div>
           <h2 className="font-sans font-black text-xl md:text-2xl text-white uppercase tracking-wider">
             Ready // No Media Tracked Yet

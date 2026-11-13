@@ -458,7 +458,7 @@ export async function resolveGameFromRAWG(query: string) {
     const endpoint = `https://api.rawg.io/api/games?search=${encodeURIComponent(
       query
     )}&key=${apiKey}`;
-    const res = await fetch(endpoint, { signal: AbortSignal.timeout(4000) });
+    const res = await fetch(endpoint, { signal: AbortSignal.timeout(10000) });
     if (!res.ok) return null;
     const json = await res.json();
     const results = json.results || [];
@@ -480,7 +480,7 @@ export async function resolveGameFromRAWG(query: string) {
       return {
         title: matchedItem.name,
         type: "game" as MediaType,
-        coverImage: matchedItem.background_image || "",
+        coverImage: matchedItem.background_image || matchedItem.short_screenshots?.[0]?.image || "",
         releaseYear: isNaN(releaseYear) ? new Date().getFullYear() : releaseYear,
         genres: Array.isArray(matchedItem.genres)
           ? matchedItem.genres.map((g: any) => g.name)
@@ -500,42 +500,42 @@ export async function resolveGameFromRAWG(query: string) {
         id: "rawg-3328",
         title: "The Witcher 3: Wild Hunt",
         year: 2015,
-        cover: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+        cover: "https://media.rawg.io/media/games/618/618c2031a07bbff6b4f611f10b6bcdbc.jpg",
         rating: 9.8,
       },
       {
         id: "rawg-58134",
         title: "Elden Ring",
         year: 2022,
-        cover: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
+        cover: "https://media.rawg.io/media/games/b29/b2960c74da69e2c81de0436117441692.jpg",
         rating: 9.6,
       },
       {
         id: "rawg-9767",
         title: "Hollow Knight",
         year: 2017,
-        cover: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
+        cover: "https://media.rawg.io/media/games/4cf/4cfc6b7f1850590a4634b08bfab308ab.jpg",
         rating: 9.5,
       },
       {
         id: "rawg-22509",
         title: "The Legend of Zelda: Breath of the Wild",
         year: 2017,
-        cover: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80",
+        cover: "https://media.rawg.io/media/games/cc4/cc446663f97e6005b7f9d86a57e2713c.jpg",
         rating: 9.7,
       },
       {
         id: "rawg-41494",
         title: "Cyberpunk 2077",
         year: 2020,
-        cover: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+        cover: "https://media.rawg.io/media/games/26d/26d44377d59b077516ec50f73dd778ac.jpg",
         rating: 8.6,
       },
       {
         id: "rawg-28262",
         title: "Hades",
         year: 2020,
-        cover: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
+        cover: "https://media.rawg.io/media/games/1f4/1f4dd015e100366eb5121b65e921d7b1.jpg",
         rating: 9.3,
       },
     ];
@@ -755,6 +755,54 @@ export async function batchResolveMalMetadata(
         externalSource: "mal",
         matched: true,
       });
+    }
+
+    // Batch enrich covers and details via AniList GraphQL
+    const chunkSize = 50;
+    for (let i = 0; i < validEntries.length; i += chunkSize) {
+      const chunk = validEntries.slice(i, i + chunkSize);
+      const idMalIn = chunk.map((c) => Number(c.malId)).filter((id) => !isNaN(id));
+      try {
+        const query = `
+          query ($idMalIn: [Int]) {
+            Page(page: 1, perPage: 50) {
+              media(idMal_in: $idMalIn) {
+                idMal
+                type
+                coverImage { extraLarge large }
+                genres
+                episodes
+                chapters
+                averageScore
+              }
+            }
+          }
+        `;
+        const res = await fetchWithRetry("https://graphql.anilist.co", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ query, variables: { idMalIn } }),
+          signal: AbortSignal.timeout(10000),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const mediaList = json.data?.Page?.media || [];
+          for (const m of mediaList) {
+            if (!m.idMal) continue;
+            const existing = result.get(String(m.idMal));
+            if (existing) {
+              const cover = m.coverImage?.extraLarge || m.coverImage?.large || "";
+              if (cover) existing.coverImage = cover;
+              if (m.genres && Array.isArray(m.genres) && m.genres.length > 0) existing.genres = m.genres;
+              if (m.episodes || m.chapters) existing.totalEpisodes = m.episodes || m.chapters;
+              if (m.averageScore) existing.externalRating = Math.round((m.averageScore / 10) * 10) / 10;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("[JIKAN_BATCH_ENRICH_WARN]:", err);
+      }
+      await new Promise((r) => setTimeout(r, 200));
     }
     return result;
   }

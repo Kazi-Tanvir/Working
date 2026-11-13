@@ -28,7 +28,15 @@ export default function Toast() {
       const { message, type, duration = 3000 } = customEvent.detail;
       const id = Math.random().toString(36).substring(2, 9);
       
-      setToasts((prev) => [...prev, { id, message, type, duration }]);
+      setToasts((prev) => {
+        // Prevent duplicate toasts if the same message is already visible
+        if (prev.some((t) => t.message === message)) {
+          return prev;
+        }
+        // Limit to max 2 active toasts to prevent dominating screen real estate
+        const trimmed = prev.length >= 2 ? prev.slice(-1) : prev;
+        return [...trimmed, { id, message, type, duration }];
+      });
 
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -88,25 +96,27 @@ export default function Toast() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3.5 max-w-sm w-full pointer-events-none select-none font-mono">
+    <div className="fixed top-3 inset-x-3 sm:top-auto sm:bottom-6 sm:right-6 sm:inset-x-auto sm:max-w-sm sm:w-full z-[70] flex flex-col gap-2 sm:gap-3.5 pointer-events-none select-none font-mono">
       {toasts.map((toast) => {
         const styles = getToastStyles(toast.type);
         const duration = toast.duration || 3000;
         return (
           <div
             key={toast.id}
-            className={`pointer-events-auto relative overflow-hidden flex items-start gap-3 border-2 p-4 animate-slide-in-right ${styles.bg} ${styles.border} ${styles.shadow}`}
+            className={`pointer-events-auto relative overflow-hidden flex items-center sm:items-start gap-2.5 sm:gap-3 border sm:border-2 px-3 py-2 sm:p-4 animate-slide-in-down sm:animate-slide-in-right shadow-[2px_2px_0px_0px_rgba(0,0,0,0.8)] sm:${styles.shadow} ${styles.bg} ${styles.border}`}
           >
-            <div className="shrink-0 mt-0.5">{styles.icon}</div>
-            <div className="flex-grow flex flex-col gap-1 pr-2">
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-extrabold">
+            <div className="shrink-0">{styles.icon}</div>
+            <div className="flex-grow flex flex-col gap-0.5 sm:gap-1 pr-1 min-w-0">
+              <span className="hidden sm:block text-[9px] text-gray-500 uppercase tracking-widest font-extrabold truncate">
                 {toast.type === "system" ? "SYSTEM LOG" : `NOTIFICATION::${toast.type.toUpperCase()}`}
               </span>
-              <p className="text-xs text-white uppercase tracking-wider">{toast.message}</p>
+              <p className="text-[11px] sm:text-xs text-white uppercase tracking-wider font-medium truncate sm:whitespace-normal">
+                {toast.message}
+              </p>
             </div>
             <button
               onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
-              className="shrink-0 text-gray-500 hover:text-white transition-colors cursor-pointer p-0.5"
+              className="shrink-0 text-gray-400 hover:text-white transition-colors cursor-pointer p-0.5"
               aria-label="Dismiss notification"
             >
               <X className="w-3.5 h-3.5" />
@@ -114,7 +124,7 @@ export default function Toast() {
 
             {/* Countdown progress bar */}
             <div
-              className={`absolute bottom-0 left-0 h-1 ${styles.bg.includes("green") ? "bg-cyber-green" : toast.type === "error" ? "bg-cyber-red" : toast.type === "warning" ? "bg-cyber-yellow" : toast.type === "system" ? "bg-cyber-purple" : "bg-cyber-cyan"}`}
+              className={`absolute bottom-0 left-0 h-0.5 ${styles.bg.includes("green") ? "bg-cyber-green" : toast.type === "error" ? "bg-cyber-red" : toast.type === "warning" ? "bg-cyber-yellow" : toast.type === "system" ? "bg-cyber-purple" : "bg-cyber-cyan"}`}
               style={{
                 animation: `toastProgress ${duration}ms linear forwards`,
               }}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { UserButton, useUser } from "@clerk/nextjs";
 import {
   Activity,
@@ -28,6 +29,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState<number>(0);
+  const { isVisible } = useScrollDirection();
+  const shouldShowNavbar = isVisible || isOpen;
 
   // Check pending friend requests once on mount if user is logged in
   useEffect(() => {
@@ -82,8 +85,12 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={`w-full border-b-2 border-white sticky top-0 z-40 select-none font-mono transition-all duration-300 ${scrolled ? "navbar-scrolled" : "bg-black"
-      }`}>
+    <nav
+      style={{ transform: shouldShowNavbar ? "translateY(0)" : "translateY(-100%)" }}
+      className={`w-full border-b-2 border-white sticky top-0 z-40 select-none font-mono transition-transform duration-300 ease-in-out ${
+        scrolled ? "navbar-scrolled" : "bg-black"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-3.5">
         {/* Mobile Header containing Branding, Status, and Hamburger */}
         <div className="flex items-center justify-between w-full md:w-auto">

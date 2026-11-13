@@ -26,6 +26,7 @@ const CreateMediaModal = dynamic(() => import("@/components/common/CreateMediaMo
 });
 import { showToast } from "@/components/common/Toast";
 import { useRouter } from "next/navigation";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 
 export type MediaCategoryType = "anime" | "manga" | "game" | "movie" | "series";
 export type SortOption = "status" | "updated" | "title" | "time" | "rating";
@@ -214,8 +215,6 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
       }
       return [updatedItem, ...prev];
     });
-
-    showToast(`✓ Updated "${updatedItem.title}" in library!`, "success");
   };
 
   const handleItemAdded = (newItem: MediaItem) => {
@@ -361,10 +360,22 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
     setQuery("");
   };
 
+  const { isVisible } = useScrollDirection();
+  const isConsoleVisible = isVisible || showFilterDrawer || showSearchDrawer || showSortMenu || showSyncMenu || !!query;
+
   return (
     <div className="w-full flex flex-col gap-6 font-mono select-none">
       {/* Sticky Filter & Search Control Console */}
-      <div className="sticky top-0 z-20 bg-black/95 backdrop-blur-md pt-2 pb-3 border-b border-white/20 flex flex-col gap-3 w-full">
+      <div
+        style={{
+          transform: isConsoleVisible ? "translateY(0)" : "translateY(calc(-100% - 80px))",
+        }}
+        className={`sticky top-[57px] md:top-[65px] z-30 bg-black/95 backdrop-blur-md pt-2 pb-3 border-b border-white/20 flex flex-col gap-3 w-full transition-all duration-300 ease-in-out ${
+          isConsoleVisible
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
         <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 text-xs text-gray-400 w-full">
           <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3 flex-wrap w-full sm:w-auto">
             <div className="flex items-center gap-2">

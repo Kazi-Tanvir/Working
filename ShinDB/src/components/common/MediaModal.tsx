@@ -860,13 +860,13 @@ export default function MediaModal({
   return createPortal(
     <div 
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md select-none transition-all duration-300"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 md:p-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] bg-black/85 backdrop-blur-md select-none transition-all duration-300"
     >
       
       {/* Premium Neobrutalist Modal Outer Box */}
       <div 
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-3xl max-h-[94vh] sm:max-h-[90vh] overflow-y-auto bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 font-sans`}
+        className={`relative w-full max-w-3xl max-h-[82vh] max-h-[82dvh] sm:max-h-[88vh] sm:max-h-[88dvh] overflow-y-auto bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 font-sans`}
       >
         
         {/* Top Control Bar */}

@@ -246,12 +246,12 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
   return createPortal(
     <div 
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md select-none transition-all duration-300"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] bg-black/85 backdrop-blur-md select-none transition-all duration-300"
     >
       {/* Neobrutalist Modal Outer Box */}
       <div 
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-3xl max-h-[92vh] overflow-hidden bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-5 sm:p-7 flex flex-col gap-4 font-sans`}
+        className={`relative w-full max-w-3xl max-h-[82vh] max-h-[82dvh] sm:max-h-[88vh] sm:max-h-[88dvh] overflow-hidden bg-[#09090b] border-2 text-white ${meta.borderClass} ${meta.shadowClass} p-5 sm:p-7 flex flex-col gap-4 font-sans`}
       >
         {/* Top Control Bar */}
         <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3.5 select-none">

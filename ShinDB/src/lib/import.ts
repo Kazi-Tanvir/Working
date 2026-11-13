@@ -161,12 +161,38 @@ export async function findOrCreateMedia(data: {
 // ----------------------------------------------------
 // 4. Media Resolution for Import Protocols
 // ----------------------------------------------------
+export async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 3
+): Promise<Response> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (res.status === 429) {
+        const retryHeader = res.headers.get("retry-after");
+        const waitSec = retryHeader ? parseInt(retryHeader, 10) : (attempt + 1) * 2;
+        console.warn(`[API_429_RATE_LIMIT] ${url} hit rate limit. Backing off ${waitSec}s (attempt ${attempt + 1}/${maxRetries})...`);
+        await new Promise((r) => setTimeout(r, waitSec * 1000 + 400));
+        continue;
+      }
+      return res;
+    } catch (err: any) {
+      if (attempt === maxRetries) throw err;
+      console.warn(`[API_FETCH_RETRY] ${url}: ${err.message}. Retrying in 1.5s...`);
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+  }
+  throw new Error(`Max retries reached for ${url}`);
+}
+
 export function cleanTitleForComparison(title: string): string {
   return (title || "")
     .toLowerCase()
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/['"’“”`]/g, "")
+    .replace(/\s*\((?:tv|movie|ova|ona|special)\)\s*$/gi, "")
     .replace(/[:\-–—_]/g, " ")
     .replace(/[^\p{L}\p{N}\s]/gu, "")
     .replace(/\s+/g, " ")
@@ -218,7 +244,7 @@ export async function resolveAnimeFromAniList(
   `;
 
   try {
-    const res = await fetch("https://graphql.anilist.co", {
+    const res = await fetchWithRetry("https://graphql.anilist.co", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -231,7 +257,7 @@ export async function resolveAnimeFromAniList(
           type: mediaTypeEnum,
         },
       }),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!res.ok) return null;
@@ -715,35 +741,29 @@ export async function batchResolveMalMetadata(
   if (validEntries.length === 0) return result;
 
   if (apiSource === "jikan") {
-    // Resolve via Jikan API
+    // When importing via MAL (XML or username), valid malIds are already verified MyAnimeList entries.
     for (const item of validEntries) {
-      const resolved = await resolveAnimeFromJikan(
-        item.title,
-        item.type === "manga" ? "manga" : "anime"
-      );
-      if (resolved && resolved.matched) {
-        result.set(String(item.malId), {
-          title: resolved.title,
-          type: item.type as MediaType,
-          coverImage: resolved.coverImage,
-          releaseYear: resolved.releaseYear,
-          genres: resolved.genres,
-          totalEpisodes: resolved.totalEpisodes || undefined,
-          externalRating: resolved.externalRating,
-          externalId: resolved.externalId,
-          externalSource: "mal",
-          matched: true,
-        });
-      }
+      result.set(String(item.malId), {
+        title: item.title,
+        type: item.type as MediaType,
+        coverImage: "",
+        releaseYear: new Date().getFullYear(),
+        genres: [item.type === "manga" ? "Manga" : "Anime"],
+        externalRating: null,
+        totalEpisodes: undefined,
+        externalId: String(item.malId),
+        externalSource: "mal",
+        matched: true,
+      });
     }
     return result;
   }
 
   // Default: Batch resolve via AniList GraphQL with exact title fallback
-  const chunkSize = 40;
+  const chunkSize = 25;
   for (let i = 0; i < validEntries.length; i += chunkSize) {
     const chunk = validEntries.slice(i, i + chunkSize);
-    const idMalIn = chunk.map((c) => Number(c.malId));
+    const idMalIn = chunk.map((c) => Number(c.malId)).filter((id) => !isNaN(id));
 
     try {
       const query = `
@@ -774,7 +794,7 @@ export async function batchResolveMalMetadata(
         }
       `;
 
-      const res = await fetch("https://graphql.anilist.co", {
+      const res = await fetchWithRetry("https://graphql.anilist.co", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -784,7 +804,7 @@ export async function batchResolveMalMetadata(
           query,
           variables: { idMalIn },
         }),
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(12000),
       });
 
       if (res.ok) {
@@ -803,7 +823,7 @@ export async function batchResolveMalMetadata(
             ? Math.round((m.averageScore / 10) * 10) / 10
             : null;
 
-          const targetItem = chunk.find((c) => c.malId === malKey);
+          const targetItem = chunk.find((c) => String(c.malId) === malKey);
           if (targetItem) {
             const expectedAniListType =
               targetItem.type === "manga" ? "MANGA" : "ANIME";
@@ -828,9 +848,13 @@ export async function batchResolveMalMetadata(
       console.warn("[BATCH_RESOLVE_WARN]:", err);
     }
 
+    // Polite pause between batch queries to respect rate limits
+    await new Promise((r) => setTimeout(r, 350));
+
     // For any chunk items not matched by idMal, do exact title fallback search: English -> Romaji -> Native
     const unmatched = chunk.filter((c) => !result.has(String(c.malId)));
     for (const item of unmatched) {
+      await new Promise((r) => setTimeout(r, 250));
       const fallback = await resolveAnimeFromAniList(
         item.title,
         item.type === "manga" ? "manga" : "anime"

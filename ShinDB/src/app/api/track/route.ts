@@ -184,6 +184,31 @@ export async function POST(request: NextRequest) {
           externalSource: resolved.externalSource,
         },
       });
+    } else if (!media.coverImage || !media.externalSource || !media.externalId) {
+      // Legacy unverified or incomplete media record in database: upgrade with external API metadata
+      const resolved = await resolveTitle(cleanTitle, type);
+      if (resolved.matched) {
+        media = await prisma.media.update({
+          where: { id: media.id },
+          data: {
+            coverImage: resolved.coverImage || media.coverImage,
+            releaseYear: resolved.releaseYear || media.releaseYear,
+            externalId: resolved.externalId || media.externalId,
+            externalSource: resolved.externalSource || media.externalSource,
+            totalEpisodes: resolved.totalEpisodes || media.totalEpisodes,
+            externalRating: resolved.externalRating ?? media.externalRating,
+          },
+        });
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Only verified entries from supported APIs can be added. This unverified item cannot be tracked.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // 2. Check if THIS user already tracks this media

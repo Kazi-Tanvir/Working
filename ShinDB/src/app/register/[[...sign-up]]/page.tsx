@@ -15,11 +15,12 @@ export default function RegisterPage() {
 
       {/* Terminal Title Bar */}
       <div className="flex items-center justify-between bg-black border-2 border-white px-4 py-2.5 shadow-[4px_4px_0px_0px_#ffffff]">
-        <div className="flex items-center gap-2">
-          <div className="bg-cyber-purple p-1 border border-white">
-            <Terminal className="w-4 h-4 text-white" />
+        <div className="flex items-center gap-3">
+          <div className="bg-black p-1 border-2 border-white flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#ffffff]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.png" alt="ShinDB" className="w-7 h-7 sm:w-8 sm:h-8 object-contain" />
           </div>
-          <span className="font-extrabold text-xs tracking-widest uppercase text-white">
+          <span className="font-extrabold text-sm tracking-widest uppercase text-white">
             [CREATE ACCOUNT]
           </span>
         </div>

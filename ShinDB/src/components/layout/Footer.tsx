@@ -60,7 +60,9 @@ export default function Footer() {
 
       {/* Sleek Minimal Status Bar (always clean & unobtrusive) */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-2 flex items-center justify-between text-[10px] text-gray-500">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon.png" alt="ShinDB" className="w-6 h-6 object-contain" />
           <span className="w-1.5 h-1.5 bg-cyber-green rounded-full" />
           <span className="text-gray-400 font-sans tracking-wide">ShinDB</span>
         </div>

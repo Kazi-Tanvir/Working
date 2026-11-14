@@ -87,8 +87,9 @@ export default function AdminSidebar({ adminUser }: AdminSidebarProps) {
         <div className="p-4 border-b border-white/20 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-cyber-red text-white border border-white shadow-[2px_2px_0px_0px_#ffffff]">
-                <Terminal className="w-4 h-4" />
+              <div className="p-1 bg-cyber-red text-white border-2 border-white shadow-[2px_2px_0px_0px_#ffffff] flex items-center justify-center shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icon.png" alt="ShinDB" className="w-6 h-6 object-contain" />
               </div>
               <div>
                 <div className="text-[10px] uppercase font-bold text-cyber-red tracking-wider">

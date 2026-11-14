@@ -94,12 +94,17 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-3.5">
         {/* Mobile Header containing Branding, Status, and Hamburger */}
         <div className="flex items-center justify-between w-full md:w-auto">
-          {/* Terminal Logo Branding */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-cyber-purple border border-white px-2 py-1 flex items-center gap-1.5 shadow-[2px_2px_0px_0px_#ffffff] group-hover:shadow-[3px_3px_0px_0px_var(--cyber-cyan)] transition-all">
-              <Terminal className="w-4 h-4 text-white animate-pulse" />
+          {/* ShinDB Logo Branding */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative h-8 sm:h-9 flex items-center justify-center shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="ShinDB Logo"
+                className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)] group-hover:drop-shadow-[0_0_12px_var(--cyber-cyan)] group-hover:scale-105 transition-all"
+              />
             </div>
-            <span className="font-extrabold text-sm tracking-widest text-white uppercase group-hover:text-cyber-cyan transition-colors">
+            <span className="font-extrabold text-sm sm:text-base tracking-widest text-white uppercase group-hover:text-cyber-cyan transition-colors">
               ShinDB
             </span>
           </Link>

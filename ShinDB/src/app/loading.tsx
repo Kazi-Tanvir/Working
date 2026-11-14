@@ -8,7 +8,8 @@ export default function Loading() {
       {/* Sleek Terminal Loading Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-2 border-white/20 bg-black p-4 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)]">
         <div className="flex items-center gap-2.5">
-          <Terminal className="w-4 h-4 text-cyber-purple animate-pulse" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon.png" alt="ShinDB" className="w-6 h-6 object-contain animate-pulse" />
           <span className="font-extrabold text-xs uppercase tracking-widest text-white">
             &gt; STREAMING TELEMETRY RECORDS...
           </span>

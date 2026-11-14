@@ -115,8 +115,9 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="w-full flex flex-col items-start gap-6 pt-2 pb-6 border-b-2 border-white">
-        <div className="inline-flex items-center gap-2 bg-cyber-purple/20 border border-cyber-purple px-3 py-1 text-xs font-bold text-cyber-purple tracking-widest uppercase">
-          <Terminal className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2.5 bg-cyber-purple/20 border border-cyber-purple px-3 py-1.5 text-xs font-bold text-cyber-purple tracking-widest uppercase">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon.png" alt="ShinDB" className="w-5 h-5 object-contain" />
           <span>SHINDB // OBSIDIAN-STYLE PERSONAL MEDIA TRACKER</span>
         </div>
 

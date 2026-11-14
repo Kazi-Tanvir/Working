@@ -45,7 +45,9 @@ export default function LandingHero({
     <div className="w-full flex flex-col gap-12 font-mono py-4">
       {/* Top Protocol Status Banner */}
       <div className="flex flex-wrap items-center justify-between border-b border-white/20 pb-3 text-xs text-gray-400 gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon.png" alt="ShinDB" className="w-6 h-6 object-contain" />
           <span className="w-2.5 h-2.5 bg-cyber-lime rounded-full animate-ping" />
           <span className="text-white font-bold tracking-wider">ShinDB</span>
           <span className="text-gray-500 hidden sm:inline">// MEDIA TRACKER</span>
@@ -63,8 +65,9 @@ export default function LandingHero({
       {/* Hero Visual Box */}
       <div className="relative border-2 border-white bg-[#0a0a0f] p-8 md:p-14 shadow-[8px_8px_0px_0px_#ffffff] flex flex-col gap-8 overflow-hidden">
         {/* Subtle background tech grid effect */}
-        <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none select-none">
-          <Terminal className="w-72 h-72 text-white" />
+        <div className="absolute top-0 right-0 p-4 opacity-15 pointer-events-none select-none">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="" className="w-72 h-72 object-contain" />
         </div>
 
         {/* Hero Title & Subtitle */}

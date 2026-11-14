@@ -25,10 +25,18 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ShinDB // obsidian-style media tracker",
+  title: "ShinDB",
   description: "A premium, high-contrast cyber-neobrutalist dashboard for tracking Anime, Manga, Video Games, Movies, and TV Series.",
   keywords: ["anime tracker", "manga tracker", "backloggd tracker", "obsidian media dashboard", "cyberpunk myanimelist"],
   authors: [{ name: "NEO_DEVELOPER" }],
+  icons: {
+    icon: [
+      { url: "/icon.png", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

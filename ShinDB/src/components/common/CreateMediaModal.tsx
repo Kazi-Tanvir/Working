@@ -284,10 +284,18 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
                 <Search className="absolute left-3 w-4 h-4 text-gray-400" />
                 <input
                   id="input-media-search"
+                  name="mediaSearch"
+                  autoComplete="off"
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSearchQuery(val);
+                    if (!val.trim()) {
+                      setSearchResults([]);
+                    }
+                  }}
                   placeholder={`SEARCH ${defaultType.toUpperCase()} ARCHIVES... (AniList, TMDB, RAWG)`}
                   className="w-full bg-transparent text-white pl-10 pr-9 py-2.5 font-mono uppercase tracking-wider text-xs sm:text-sm outline-none placeholder:text-gray-600 focus:placeholder:text-gray-700"
                 />

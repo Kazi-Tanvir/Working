@@ -15,9 +15,16 @@ import { MediaItem } from "@/components/common/MediaCard";
 import type { SafeUser } from "@/lib/auth";
 
 function useAnimatedCount(target: number, durationMs = 800) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(target);
+  const prevTargetRef = React.useRef(target);
 
   useEffect(() => {
+    if (prevTargetRef.current === target) {
+      setCount(target);
+      return;
+    }
+    const startVal = prevTargetRef.current;
+    prevTargetRef.current = target;
     let startTimestamp: number | null = null;
     let animId: number;
 
@@ -25,7 +32,7 @@ function useAnimatedCount(target: number, durationMs = 800) {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / durationMs, 1);
       const ease = 1 - Math.pow(1 - progress, 4);
-      setCount(Math.floor(ease * target));
+      setCount(Math.floor(startVal + ease * (target - startVal)));
       if (progress < 1) {
         animId = requestAnimationFrame(step);
       } else {

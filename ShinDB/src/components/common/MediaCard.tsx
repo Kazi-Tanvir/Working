@@ -345,12 +345,13 @@ export default function MediaCard({
       const currentVal = parseInt(parts[0]) || 0;
       const totalPart = parts[1];
       const totalVal = parseInt(totalPart);
-      const unit = totalPart.replace(String(totalVal), "").trim();
+      const unit = totalPart.replace(String(totalVal), "").replace(/\?/g, "").trim();
 
       if (isNaN(totalVal) || currentVal < totalVal) {
         const step = unit.toLowerCase().includes("min") ? 10 : 1;
         const newVal = isNaN(totalVal) ? currentVal + step : Math.min(totalVal, currentVal + step);
-        const newProg = `${newVal}/${isNaN(totalVal) ? "?" : totalVal} ${unit}`;
+        const cleanUnit = unit || (item.progressUnit ? item.progressUnit.toUpperCase() : "EP");
+        const newProg = `${newVal}/${isNaN(totalVal) ? "?" : totalVal} ${cleanUnit}`;
         setCurrentProgress(newProg);
 
         let newStatus = currentStatus;
@@ -464,12 +465,13 @@ export default function MediaCard({
       const currentVal = parseInt(parts[0]) || 0;
       const totalPart = parts[1];
       const totalVal = parseInt(totalPart);
-      const unit = totalPart.replace(String(totalVal), "").trim();
+      const unit = totalPart.replace(String(totalVal), "").replace(/\?/g, "").trim();
 
       if (currentVal > 0) {
         const step = unit.toLowerCase().includes("min") ? 10 : 1;
         const newVal = Math.max(0, currentVal - step);
-        const newProg = `${newVal}/${isNaN(totalVal) ? "?" : totalVal} ${unit}`;
+        const cleanUnit = unit || (item.progressUnit ? item.progressUnit.toUpperCase() : "EP");
+        const newProg = `${newVal}/${isNaN(totalVal) ? "?" : totalVal} ${cleanUnit}`;
         setCurrentProgress(newProg);
 
         let newStatus = currentStatus;
@@ -947,9 +949,15 @@ export default function MediaCard({
         </div>
 
         {/* Floating Gallery Info Below Image */}
-        <div className="mt-2.5 px-0.5 text-left flex flex-col gap-1.5">
+        <div 
+          onClick={() => setIsModalOpen(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setIsModalOpen(true); }}
+          className="mt-2.5 px-0.5 text-left flex flex-col gap-1.5 cursor-pointer"
+        >
           <h3 
-            className="font-sans font-bold text-xs sm:text-sm text-gray-200 group-hover:text-white transition-colors leading-tight line-clamp-2 min-h-[2.3rem]"
+            className="font-sans font-bold text-xs sm:text-sm text-gray-200 group-hover:text-white transition-colors leading-tight line-clamp-2 min-h-[2.3rem] cursor-pointer"
             title={`${item.title} (${item.releaseYear})`}
           >
             {item.title}

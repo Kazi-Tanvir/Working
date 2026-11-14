@@ -123,6 +123,9 @@ export default function AdminAuditLogPage() {
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
+              id="admin-audit-search"
+              name="auditSearch"
+              autoComplete="off"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -264,8 +267,8 @@ export default function AdminAuditLogPage() {
                     {isExpanded && log.details && (
                       <tr className="bg-black/90 border-b border-white/20">
                         <td colSpan={6} className="p-4">
-                          <div className="p-3 bg-[#0d0d12] border border-white/20 text-[11px] text-cyber-cyan overflow-x-auto">
-                            <pre className="font-mono whitespace-pre-wrap">
+                          <div className="p-3 bg-[#0d0d12] border border-white/20 text-[11px] text-cyber-cyan overflow-x-auto max-w-[calc(100vw-3rem)]">
+                            <pre className="font-mono whitespace-pre-wrap break-all [word-break:break-all]">
                               {JSON.stringify(log.details, null, 2)}
                             </pre>
                           </div>

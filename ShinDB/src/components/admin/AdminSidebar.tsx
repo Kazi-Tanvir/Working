@@ -71,6 +71,7 @@ export default function AdminSidebar({ adminUser }: AdminSidebarProps) {
         </div>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle admin navigation menu"
           className="p-1.5 border border-white text-white hover:bg-white/10"
         >
           {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}

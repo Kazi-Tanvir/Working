@@ -108,7 +108,9 @@ export default function MediaModal({
   // Sync edits if item changes
   useEffect(() => {
     setStatus(item.status);
-    setRating(item.rating === "Unrated" || item.rating === "N/A" ? "" : item.rating.replace("/10", ""));
+    const rawRate = item.rating === "Unrated" || item.rating === "N/A" ? "" : item.rating.replace("/10", "").trim();
+    const parsedRate = parseFloat(rawRate);
+    setRating(!isNaN(parsedRate) ? String(parseFloat(parsedRate.toFixed(1))) : "");
     setProgress(item.progress);
     setNotes(item.notes || "");
     setCoverImage(item.coverImage);
@@ -701,7 +703,7 @@ export default function MediaModal({
     let cleanRating: string | number | null = null;
     const rateVal = parseFloat(rating);
     if (!isNaN(rateVal)) {
-      cleanRating = Math.min(10, Math.max(0, rateVal));
+      cleanRating = Math.round(Math.min(10, Math.max(0, rateVal)) * 10) / 10;
     }
 
     let progressVal = directProgressCurrent;

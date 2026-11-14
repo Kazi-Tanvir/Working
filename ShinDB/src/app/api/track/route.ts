@@ -44,9 +44,9 @@ function normalizeStatusInput(status: string | undefined, type: MediaType): Medi
 
 function parseRatingInput(rating?: string | number | null): number | null {
   if (rating === undefined || rating === null || rating === "N/A" || rating === "Unrated") return null;
-  if (typeof rating === "number") return Math.min(10, Math.max(0, rating));
+  if (typeof rating === "number") return Math.min(10, Math.max(0, Math.round(rating * 10) / 10));
   const num = parseFloat(String(rating).split("/")[0]);
-  return isNaN(num) ? null : Math.min(10, Math.max(0, num));
+  return isNaN(num) ? null : Math.min(10, Math.max(0, Math.round(num * 10) / 10));
 }
 
 function parseProgressInput(

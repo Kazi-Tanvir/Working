@@ -72,7 +72,7 @@ export function toMediaItem(
   let externalRatingFormatted: string | null = null;
   const canonicalExt = media.externalRating ?? getCanonicalExternalRating(media.title);
   if (canonicalExt !== null && canonicalExt !== undefined) {
-    const sourceLabel = media.type === "anime" || media.type === "manga" ? "MAL" : "IMDb";
+    const sourceLabel = media.type === "game" ? "RAWG" : media.type === "anime" || media.type === "manga" ? "MAL" : "IMDb";
     externalRatingFormatted = `${sourceLabel} ${canonicalExt.toFixed(1)}/10`;
   }
 
@@ -115,7 +115,7 @@ export function catalogToMediaItem(
   let externalRatingFormatted: string | null = null;
   const canonicalExt = media.externalRating ?? getCanonicalExternalRating(media.title);
   if (canonicalExt !== null && canonicalExt !== undefined) {
-    const sourceLabel = media.type === "anime" || media.type === "manga" ? "MAL" : "IMDb";
+    const sourceLabel = media.type === "game" ? "RAWG" : media.type === "anime" || media.type === "manga" ? "MAL" : "IMDb";
     externalRatingFormatted = `${sourceLabel} ${canonicalExt.toFixed(1)}/10`;
   }
 

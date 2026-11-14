@@ -168,6 +168,9 @@ export default function AdminUsersPage() {
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
+              id="admin-users-search"
+              name="userSearch"
+              autoComplete="off"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -200,8 +203,106 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* User Directory Table */}
-      <div className="bg-black border-2 border-white shadow-[6px_6px_0px_0px_#ffffff] overflow-x-auto">
+      {/* Mobile User Directory Cards (<= 768px) */}
+      <div className="md:hidden flex flex-col gap-3">
+        {isLoading ? (
+          <div className="p-8 text-center text-gray-400 bg-black border-2 border-white uppercase tracking-widest font-mono text-xs">
+            <Loader2 className="w-6 h-6 text-cyber-cyan animate-spin mx-auto mb-2" />
+            Accessing directory shards...
+          </div>
+        ) : users.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 bg-black border-2 border-white uppercase tracking-widest font-mono text-xs">
+            No matching user credentials detected.
+          </div>
+        ) : (
+          users.map((u) => (
+            <div key={u.id} className="bg-black border-2 border-white p-4 shadow-[4px_4px_0px_0px_#ffffff] flex flex-col gap-3 font-mono">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 border border-white bg-cyber-purple/20 flex items-center justify-center font-black text-xs text-white shrink-0 overflow-hidden">
+                    {u.avatarUrl && u.avatarUrl.trim() !== "" ? (
+                      <img src={u.avatarUrl} alt={u.username} className="w-full h-full object-cover" />
+                    ) : (
+                      u.username.slice(0, 2).toUpperCase()
+                    )}
+                  </div>
+                  <div>
+                    <Link href={`/admin/users/${u.id}`} className="font-bold text-sm text-white hover:text-cyber-cyan transition-colors block">
+                      @{u.username}
+                    </Link>
+                    <span className="text-[10px] text-gray-400 block truncate max-w-[180px]">
+                      {u.displayName || u.username}
+                    </span>
+                  </div>
+                </div>
+                {u.role === "admin" ? (
+                  <span className="px-2 py-0.5 border border-cyber-red bg-cyber-red/20 text-cyber-red text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1">
+                    <ShieldAlert className="w-3 h-3 inline" />
+                    ADMIN
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 border border-white/30 bg-white/5 text-gray-300 text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
+                    <UserCheck className="w-3 h-3 inline" />
+                    USER
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-[11px] border-t border-b border-white/10 py-2 text-gray-400">
+                <div>
+                  <span className="text-gray-500 uppercase text-[9px] block">Email:</span>
+                  <span className="text-white truncate block">{u.email}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 uppercase text-[9px] block">Auth Provider:</span>
+                  <span className="text-white uppercase">{u.authProvider}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 uppercase text-[9px] block">Tracked Entries:</span>
+                  <span className="text-white font-bold">{u.entriesCount}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 uppercase text-[9px] block">Registered:</span>
+                  <span className="text-white">{new Date(u.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <Link
+                  href={`/admin/users/${u.id}`}
+                  className="flex-1 py-1.5 px-3 border border-white/20 hover:border-white text-gray-300 hover:text-white transition-all bg-black text-xs font-bold uppercase flex items-center justify-center gap-1.5"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Profile</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleRoleToggle(u)}
+                  className={`flex-1 py-1.5 px-3 border text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    u.role === "admin"
+                      ? "border-cyber-red/40 hover:border-cyber-red text-cyber-red bg-cyber-red/10"
+                      : "border-cyber-purple/40 hover:border-cyber-purple text-cyber-purple bg-cyber-purple/10"
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>{u.role === "admin" ? "Demote" : "Promote"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(u)}
+                  className="py-1.5 px-3 border border-red-500/30 hover:border-red-500 text-red-400 hover:bg-red-500/10 text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center"
+                  title="Purge account completely"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop User Directory Table (>= 768px) */}
+      <div className="hidden md:block bg-black border-2 border-white shadow-[6px_6px_0px_0px_#ffffff] overflow-x-auto">
         <table className="w-full text-left text-xs font-mono">
           <thead className="bg-white/10 border-b-2 border-white uppercase text-[10px] tracking-wider text-gray-300">
             <tr>

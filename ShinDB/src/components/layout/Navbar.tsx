@@ -24,8 +24,8 @@ import {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
-  const { isSignedIn, user: clerkUser } = useUser();
+  const { user, logout, isLoading: authLoading } = useAuth();
+  const { isSignedIn, user: clerkUser, isLoaded: clerkLoaded } = useUser();
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState<number>(0);
@@ -240,6 +240,11 @@ export default function Navbar() {
                   }}
                 />
               </div>
+            </div>
+          ) : authLoading && !clerkLoaded && !user && !clerkUser ? (
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <div className="h-7 w-20 bg-white/5 border border-white/10 animate-pulse" />
+              <div className="h-7 w-20 bg-white/10 border border-white/20 animate-pulse" />
             </div>
           ) : user ? (
             <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">

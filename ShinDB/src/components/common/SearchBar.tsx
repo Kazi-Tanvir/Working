@@ -6,6 +6,7 @@ import { Search, Loader2, Plus, Check, Film, Tv, BookOpen, Gamepad2, X } from "l
 import { useDebounce } from "@/hooks/useDebounce";
 import type { SearchResultItem } from "@/utils/apiHelpers";
 import Badge from "./Badge";
+import { showToast } from "./Toast";
 import { getCoverImage, DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
 
 export default function SearchBar({ className }: { className?: string }) {
@@ -121,6 +122,7 @@ export default function SearchBar({ className }: { className?: string }) {
         router.refresh();
       } else if (res.status === 401) {
         setErrorIds(prev => ({ ...prev, [item.id]: "LOGIN REQ" }));
+        showToast("Please sign in to track media", "warning");
         setTimeout(() => {
           setErrorIds(prev => ({ ...prev, [item.id]: "" }));
         }, 4000);
@@ -164,10 +166,17 @@ export default function SearchBar({ className }: { className?: string }) {
         <Search className="absolute left-3 w-5 h-5 text-gray-400" />
         <input
           ref={inputRef}
+          id="global-search-input"
+          name="search"
+          autoComplete="off"
           type="text"
           value={query}
           onChange={(e) => {
-            setQuery(e.target.value);
+            const val = e.target.value;
+            setQuery(val);
+            if (!val.trim()) {
+              setResults([]);
+            }
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
@@ -293,7 +302,7 @@ export default function SearchBar({ className }: { className?: string }) {
                       >
                         <span className="flex items-center gap-1">
                           <X className="w-3.5 h-3.5" />
-                          [ERROR]
+                          {errorIds[item.id] === "LOGIN REQ" ? "[SIGN IN REQUIRED]" : "[ERROR]"}
                         </span>
                       </button>
                     ) : (

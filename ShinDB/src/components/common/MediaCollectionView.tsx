@@ -463,7 +463,7 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
           </div>
 
           {/* Action Toolbar */}
-          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3.5 relative w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-white/10 sm:border-transparent">
+          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3.5 relative w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-white/10 sm:border-transparent overflow-x-auto scrollbar-none flex-nowrap pb-1 sm:pb-0">
             {/* 1. Sync Button with Hover Dropdown (Airing + All Entries) */}
             <div
               className="relative"
@@ -627,6 +627,9 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
           >
             <Search className="w-3.5 h-3.5 text-gray-500 mr-2" />
             <input
+              id="catalog-filter-search"
+              name="filterQuery"
+              autoComplete="off"
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -780,22 +783,24 @@ export default function MediaCollectionView({ type, initialItems }: MediaCollect
           <p className="font-mono text-xs text-gray-400 max-w-md leading-relaxed">
             Your personal {type} list is currently empty. Search external databases to add titles to your personal archive or create a custom entry.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-2 relative z-10">
             <button
               id="btn-empty-add-search"
+              type="button"
               onClick={() => setIsCreateOpen(true)}
-              className="bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[11px] py-2 px-4 border-2 border-white tracking-widest uppercase transition-all shadow-[3px_3px_0px_0px_#ffffff] cursor-pointer flex items-center gap-1.5"
+              className="bg-cyber-purple hover:bg-white text-white hover:text-black font-extrabold text-[11px] py-2.5 px-4 border-2 border-white tracking-widest uppercase transition-all shadow-[3px_3px_0px_0px_#ffffff] cursor-pointer flex items-center gap-1.5 active:scale-95 touch-manipulation"
             >
               <Search className="w-3.5 h-3.5" />
               <span>SEARCH &amp; ADD TITLE</span>
             </button>
             <button
               id="btn-empty-create-new"
+              type="button"
               onClick={() => setIsCreateOpen(true)}
-              className="bg-black hover:bg-white/10 text-white font-bold text-[11px] py-2 px-4 border border-white/40 tracking-widest uppercase transition-all cursor-pointer flex items-center gap-1.5"
+              className="bg-black hover:bg-white/10 text-white font-bold text-[11px] py-2.5 px-4 border-2 border-white/40 hover:border-white tracking-widest uppercase transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 touch-manipulation"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>NEW CUSTOM ENTRY</span>
+              <span>SEARCH EXTERNAL ARCHIVE</span>
             </button>
           </div>
         </div>

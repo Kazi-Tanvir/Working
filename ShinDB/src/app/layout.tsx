@@ -41,9 +41,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-black text-white font-sans selection:bg-cyber-purple selection:text-white">
         <ClerkProvider
           appearance={{
-            ...dark,
+            baseTheme: dark,
             variables: {
-              ...dark.variables,
               colorPrimary: "#8b5cf6",
               colorBackground: "#0d0d0f",
               colorForeground: "#ffffff",
@@ -52,7 +51,6 @@ export default function RootLayout({
               borderRadius: "0px",
             },
             elements: {
-              ...dark.elements,
               card: "border-2 border-white shadow-[4px_4px_0px_0px_#ffffff] bg-[#0d0d0f] rounded-none",
               formButtonPrimary:
                 "bg-cyber-purple hover:bg-[#7c3aed] text-white border-2 border-white shadow-[3px_3px_0px_0px_#ffffff] font-mono uppercase tracking-wider rounded-none font-bold transition-all",

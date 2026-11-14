@@ -302,6 +302,9 @@ export default function AdminMediaPage() {
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
+              id="admin-media-search"
+              name="mediaSearch"
+              autoComplete="off"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -355,8 +358,127 @@ export default function AdminMediaPage() {
         </div>
       </div>
 
-      {/* Catalog Table */}
-      <div className="bg-black border-2 border-white shadow-[6px_6px_0px_0px_#ffffff] overflow-x-auto">
+      {/* Mobile Catalog Cards (<= 768px) */}
+      <div className="md:hidden flex flex-col gap-3">
+        {isLoading ? (
+          <div className="p-8 text-center text-gray-400 bg-black border-2 border-white uppercase tracking-widest font-mono text-xs">
+            <Loader2 className="w-6 h-6 text-cyber-yellow animate-spin mx-auto mb-2" />
+            Streaming master catalog records...
+          </div>
+        ) : media.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 bg-black border-2 border-white uppercase tracking-widest font-mono text-xs">
+            No catalog items found matching parameters.
+          </div>
+        ) : (
+          media.map((item) => {
+            const isSelected = selectedIds.includes(item.id);
+            return (
+              <div
+                key={item.id}
+                className={`bg-black border-2 border-white p-4 shadow-[4px_4px_0px_0px_#ffffff] flex flex-col gap-3 font-mono ${
+                  isSelected ? "border-cyber-purple bg-cyber-purple/10" : ""
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="pt-1">
+                    <input
+                      type="checkbox"
+                      id={`check-media-mob-${item.id}`}
+                      name={`select-media-${item.id}`}
+                      checked={isSelected}
+                      onChange={() => handleSelectToggle(item.id)}
+                      className="w-4 h-4 cursor-pointer accent-cyber-purple"
+                      title="Select up to 2 items to merge"
+                    />
+                  </div>
+                  <div className="w-12 h-16 border border-white/40 bg-black overflow-hidden shrink-0">
+                    {item.coverImage && item.coverImage.trim() !== "" ? (
+                      <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[8px] text-gray-600 font-bold">
+                        N/A
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-sm text-white truncate leading-tight">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                      <span className="px-1.5 py-0.2 border border-white/20 bg-white/5 uppercase text-[9px] font-bold">
+                        {item.type}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-mono">
+                        {item.releaseYear}
+                      </span>
+                      {item.externalRating && (
+                        <span className="text-[9px] text-cyber-yellow font-bold">
+                          ★ {item.externalRating.toFixed(1)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[9px] text-gray-500 font-mono truncate mt-0.5">
+                      ID: {item.id}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-b border-white/10 py-2 text-gray-400">
+                  <div>
+                    <span className="text-gray-500 uppercase text-[9px] block">Genres:</span>
+                    <span className="text-white truncate block">
+                      {Array.isArray(item.genres)
+                        ? item.genres.slice(0, 3).join(", ")
+                        : typeof item.genres === "string"
+                        ? item.genres
+                        : "—"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 uppercase text-[9px] block">Source:</span>
+                    <span className="text-cyber-cyan font-bold truncate block">
+                      {item.externalSource ? `${item.externalSource}#${item.externalId}` : "Local Entry"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 uppercase text-[9px] block">Trackers:</span>
+                    <span className="text-cyber-green font-bold">{item.trackedCount}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 uppercase text-[9px] block">Created:</span>
+                    <span className="text-white">{new Date(item.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(item)}
+                    className="flex-1 py-1.5 px-3 border border-white/30 hover:border-white text-gray-300 hover:text-white transition-all bg-black text-xs font-bold uppercase flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Edit Metadata</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDeleteTarget(item);
+                      setShowDeleteModal(true);
+                    }}
+                    className="py-1.5 px-3 border border-red-500/30 hover:border-red-500 text-red-400 hover:bg-red-500/10 text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center"
+                    title="Purge catalog item"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Catalog Table (>= 768px) */}
+      <div className="hidden md:block bg-black border-2 border-white shadow-[6px_6px_0px_0px_#ffffff] overflow-x-auto">
         <table className="w-full text-left text-xs font-mono">
           <thead className="bg-white/10 border-b-2 border-white uppercase text-[10px] tracking-wider text-gray-300">
             <tr>

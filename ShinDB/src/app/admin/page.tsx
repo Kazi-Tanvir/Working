@@ -254,7 +254,7 @@ export default function AdminDashboardPage() {
               href="/admin/media"
               className="w-full py-2 bg-cyber-cyan/20 hover:bg-cyber-cyan hover:text-black text-white text-center text-xs font-bold uppercase tracking-wider border border-white/40 hover:border-white block transition-all"
             >
-              Manage Catalog Catalog &rarr;
+              Manage Catalog &rarr;
             </Link>
           </div>
         </div>

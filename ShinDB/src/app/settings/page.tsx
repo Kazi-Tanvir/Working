@@ -303,6 +303,9 @@ export default function SettingsPage() {
                     </div>
                     <div className="flex-1 w-full">
                       <input
+                        id="settings-avatar-url"
+                        name="avatarUrl"
+                        autoComplete="url"
                         type="url"
                         value={avatarUrl}
                         onChange={(e) => setAvatarUrl(e.target.value)}
@@ -333,10 +336,13 @@ export default function SettingsPage() {
 
                 {/* Display Name */}
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
+                  <label htmlFor="settings-display-name" className="block text-xs font-bold uppercase text-gray-300 mb-1">
                     DISPLAY NAME
                   </label>
                   <input
+                    id="settings-display-name"
+                    name="displayName"
+                    autoComplete="nickname"
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
@@ -348,10 +354,13 @@ export default function SettingsPage() {
 
                 {/* Custom Badge */}
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
+                  <label htmlFor="settings-custom-badge" className="block text-xs font-bold uppercase text-gray-300 mb-1">
                     PROFILE BADGE
                   </label>
                   <input
+                    id="settings-custom-badge"
+                    name="customBadge"
+                    autoComplete="off"
                     type="text"
                     value={customBadge}
                     onChange={(e) => setCustomBadge(e.target.value)}
@@ -460,10 +469,13 @@ export default function SettingsPage() {
                 ) : (
                   <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
+                      <label htmlFor="current-password" className="block text-xs font-bold uppercase text-gray-300 mb-1">
                         CURRENT PASSWORD
                       </label>
                       <input
+                        id="current-password"
+                        name="currentPassword"
+                        autoComplete="current-password"
                         type="password"
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
@@ -473,10 +485,13 @@ export default function SettingsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
+                      <label htmlFor="new-password" className="block text-xs font-bold uppercase text-gray-300 mb-1">
                         NEW PASSWORD (MIN 8 CHARS)
                       </label>
                       <input
+                        id="new-password"
+                        name="newPassword"
+                        autoComplete="new-password"
                         type="password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
@@ -487,10 +502,13 @@ export default function SettingsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-300 mb-1">
+                      <label htmlFor="confirm-password" className="block text-xs font-bold uppercase text-gray-300 mb-1">
                         CONFIRM NEW PASSWORD
                       </label>
                       <input
+                        id="confirm-password"
+                        name="confirmPassword"
+                        autoComplete="new-password"
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}

@@ -445,8 +445,8 @@ export default function AdminMediaPage() {
                     <span className="text-cyber-green font-bold">{item.trackedCount}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500 uppercase text-[9px] block">Created:</span>
-                    <span className="text-white">{new Date(item.createdAt).toLocaleDateString()}</span>
+                    <span className="text-gray-500 uppercase text-[9px] block">Total Episodes:</span>
+                    <span className="text-white">{item.totalEpisodes ?? "—"}</span>
                   </div>
                 </div>
 
@@ -461,12 +461,9 @@ export default function AdminMediaPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      setDeleteTarget(item);
-                      setShowDeleteModal(true);
-                    }}
+                    onClick={() => setDeleteTarget(item)}
                     className="py-1.5 px-3 border border-red-500/30 hover:border-red-500 text-red-400 hover:bg-red-500/10 text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center"
-                    title="Purge catalog item"
+                    title="Delete from catalog"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

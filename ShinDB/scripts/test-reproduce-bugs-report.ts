@@ -71,7 +71,7 @@ assert.strictEqual(
 // M-BUG-01: Float precision leak in rating input
 // -------------------------------------------------------------
 console.log("\n[REPRODUCE M-BUG-01] Checking rating precision formatting");
-const rawRatingFloat = "7.699999809265137/10";
+const rawRatingFloat: string = "7.699999809265137/10";
 const rawParsedRating = rawRatingFloat === "Unrated" ? "" : rawRatingFloat.replace("/10", "");
 console.log("Current unformatted modal rating input value:", rawParsedRating);
 assert.strictEqual(

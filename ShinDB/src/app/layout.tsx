@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-black text-white font-sans selection:bg-cyber-purple selection:text-white">
         <ClerkProvider
           appearance={{
-            baseTheme: dark,
+            theme: dark,
             variables: {
               colorPrimary: "#8b5cf6",
               colorBackground: "#0d0d0f",

@@ -1107,9 +1107,6 @@ export default function MediaModal({
                           }`}
                         >
                           <span>S{s.seasonNumber}</span>
-                          {s.isCompleted && (
-                            <span className="text-[9px] leading-none text-cyber-green font-black">✓</span>
-                          )}
                         </button>
                       ))}
                     </div>
@@ -1141,8 +1138,7 @@ export default function MediaModal({
                                 : "bg-white/10 text-gray-300 border-white/20 hover:border-cyber-green hover:text-cyber-green"
                             }`}
                           >
-                            <Check className="w-3.5 h-3.5" />
-                            {activeSeason.isCompleted ? "✓ Completed (Reset)" : `Mark S${activeSeason.seasonNumber} Complete`}
+                            {activeSeason.isCompleted ? "Completed (Reset)" : `Mark S${activeSeason.seasonNumber} Complete`}
                           </button>
                         </div>
                       </div>
@@ -1361,9 +1357,6 @@ export default function MediaModal({
                           }`}
                         >
                           <span>S{s.seasonNumber}</span>
-                          {s.isCompleted && (
-                            <span className="text-[9px] leading-none text-cyber-green font-black">✓</span>
-                          )}
                         </button>
                       ))}
                     </div>
@@ -1396,8 +1389,7 @@ export default function MediaModal({
                                   : `Mark all ${activeSeason.episodeCount} episodes of Season ${activeSeason.seasonNumber} as completed.`
                               }
                             >
-                              <Check className="w-3 h-3" />
-                              {activeSeason.isCompleted ? "✓ Completed (Click to Reset)" : `Mark S${activeSeason.seasonNumber} Completed`}
+                              {activeSeason.isCompleted ? "Completed (Click to Reset)" : `Mark S${activeSeason.seasonNumber} Completed`}
                             </button>
                           )}
                         </div>
@@ -1512,7 +1504,7 @@ export default function MediaModal({
                             className="w-full sm:w-auto h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
                             title="Mark Movie Completed"
                           >
-                            ✓ Complete
+                            Complete
                           </button>
                         )}
                       </div>
@@ -1551,7 +1543,7 @@ export default function MediaModal({
                             className="w-full sm:w-auto h-8 px-3 border border-cyber-green/50 bg-cyber-green/15 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs cursor-pointer inline-flex items-center justify-center rounded-sm"
                             title="Mark All Episodes Completed"
                           >
-                            ✓ Complete All
+                            Complete All
                           </button>
                         )}
                       </div>

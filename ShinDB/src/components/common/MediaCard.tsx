@@ -533,12 +533,79 @@ export default function MediaCard({
     }
   };
 
-  // Direct complete
-  const handleComplete = (e: React.MouseEvent) => {
+  // Direct complete / toggle complete
+  const handleToggleComplete = (e: React.MouseEvent) => {
     e.stopPropagation();
     const prevProg = currentProgress;
     const prevStat = currentStatus;
     const prevSeas = seasonsState ? seasonsState.map((s) => ({ ...s })) : undefined;
+
+    const isCurrentlyCompleted = currentStatus === "Completed";
+
+    if (isCurrentlyCompleted) {
+      const revertStatus =
+        item.type === "manga" ? "Reading" : item.type === "game" ? "Playing" : "Watching";
+      setCurrentStatus(revertStatus);
+      if (onStatusChange) onStatusChange(item.id, revertStatus);
+
+      if (seasonsState && seasonsState.length > 0) {
+        const updatedSeasons = seasonsState.map((s) => ({
+          ...s,
+          episodesWatched: 0,
+          isCompleted: false,
+        }));
+        const newProg = formatStructuredProgress(
+          updatedSeasons,
+          1,
+          0,
+          calculateTotalEpisodes(updatedSeasons),
+          item.progressUnit
+        );
+        setSeasonsState(updatedSeasons);
+        setCurrentProgress(newProg);
+        if (onProgressChange) onProgressChange(item.id, newProg);
+
+        syncTrackUpdate(
+          {
+            id: item.id,
+            type: item.type,
+            status: revertStatus,
+            seasons: updatedSeasons,
+            progressCurrent: 0,
+            currentSeason: 1,
+          },
+          prevProg,
+          prevStat,
+          prevSeas
+        );
+      } else {
+        let newProg = "0";
+        if (currentProgress.includes("/")) {
+          const parts = currentProgress.split("/");
+          const totalPart = parts[1];
+          const totalVal = parseInt(totalPart);
+          const unit = totalPart.replace(String(totalVal), "").trim();
+          newProg = `0/${totalVal} ${unit}`;
+        } else if (item.progressTotal) {
+          newProg = `0/${item.progressTotal} ${item.progressUnit.toUpperCase()}`;
+        }
+        setCurrentProgress(newProg);
+        if (onProgressChange) onProgressChange(item.id, newProg);
+
+        syncTrackUpdate(
+          {
+            id: item.id,
+            type: item.type,
+            status: revertStatus,
+            progressCurrent: 0,
+          },
+          prevProg,
+          prevStat
+        );
+      }
+      showToast(`Reset "${item.title}" to ${revertStatus}`, "info");
+      return;
+    }
 
     setCurrentStatus("Completed");
     if (onStatusChange) onStatusChange(item.id, "Completed");
@@ -598,6 +665,7 @@ export default function MediaCard({
         prevStat
       );
     }
+    showToast(`✓ Marked "${item.title}" as Completed!`, "success");
   };
 
   const handleTrackItem = async (e: React.MouseEvent) => {
@@ -792,15 +860,17 @@ export default function MediaCard({
                         >
                           <Plus className="w-3 h-3" />
                         </button>
-                        {currentStatus !== "Completed" && (
-                          <button
-                            onClick={handleComplete}
-                            className="bg-white/10 hover:bg-cyber-green hover:text-black border border-white/20 text-white p-1 transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
-                            title="Mark Completed"
-                          >
-                            <Check className="w-3 h-3" />
-                          </button>
-                        )}
+                        <button
+                          onClick={handleToggleComplete}
+                          className={`p-1 border transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm ${
+                            currentStatus === "Completed"
+                              ? "bg-cyber-green/20 text-cyber-green border-cyber-green hover:bg-cyber-red/20 hover:text-cyber-red hover:border-cyber-red"
+                              : "bg-white/10 hover:bg-cyber-green hover:text-black border-white/20 text-white"
+                          }`}
+                          title={currentStatus === "Completed" ? "Completed (Click to Reset)" : "Mark Completed"}
+                        >
+                          <Check className="w-3 h-3" />
+                        </button>
                       </div>
                     </>
                   )}
@@ -930,15 +1000,17 @@ export default function MediaCard({
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
-                        {currentStatus !== "Completed" && (
-                          <button
-                            onClick={handleComplete}
-                            className="w-7 h-7 bg-white/10 hover:bg-cyber-green hover:text-black border border-white/20 text-white transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm"
-                            title="Mark Completed"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        <button
+                          onClick={handleToggleComplete}
+                          className={`w-7 h-7 border transition-all active:scale-95 cursor-pointer flex justify-center items-center rounded-sm ${
+                            currentStatus === "Completed"
+                              ? "bg-cyber-green/20 text-cyber-green border-cyber-green hover:bg-cyber-red/20 hover:text-cyber-red hover:border-cyber-red"
+                              : "bg-white/10 hover:bg-cyber-green hover:text-black border-white/20 text-white"
+                          }`}
+                          title={currentStatus === "Completed" ? "Completed (Click to Reset)" : "Mark Completed"}
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </>
                   )}

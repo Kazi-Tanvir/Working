@@ -1,4 +1,4 @@
-# ShinDB Bug Registry & Quality Audit
+# ShinDB Bug Registry & Quality Audit# ShinDB Bug Registry & Quality Audit
 
 Consolidated manual QA bug report compiled from desktop and mobile browser testing sessions.
 

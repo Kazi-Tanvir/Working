@@ -5,7 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { MediaType, MediaStatus, ProgressUnit } from "@prisma/client";
 import { toMediaItem } from "@/lib/media";
-import { getCanonicalExternalRating } from "@/utils/seasonHelpers";
+import { getCanonicalExternalRating, generateDefaultSeasons } from "@/utils/seasonHelpers";
 import { getUserFromRequest } from "@/lib/auth";
 import { resolveTitle } from "@/lib/import";
 
@@ -146,6 +146,7 @@ export async function POST(request: NextRequest) {
     const canonicalRating = getCanonicalExternalRating(cleanTitle);
 
     // 1. Find or create canonical Media metadata
+    let resolved: any = null;
     let media = mediaId
       ? await prisma.media.findUnique({ where: { id: mediaId } })
       : null;
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
 
     if (!media) {
       // STRICT: Must be a verified entry from an external API
-      const resolved = await resolveTitle(cleanTitle, type);
+      resolved = await resolveTitle(cleanTitle, type);
       if (!resolved.matched) {
         return NextResponse.json(
           {
@@ -179,14 +180,15 @@ export async function POST(request: NextRequest) {
           genres: resolved.genres.length > 0 ? resolved.genres : (genres || []),
           externalRating: resolved.externalRating ?? canonicalRating,
           totalEpisodes: prog.progressTotal || resolved.totalEpisodes,
+          defaultSeasons: resolved.defaultSeasons || undefined,
           progressUnit: prog.progressUnit,
           externalId: resolved.externalId,
           externalSource: resolved.externalSource,
         },
       });
-    } else if (!media.coverImage || !media.externalSource || !media.externalId) {
+    } else if (!media.coverImage || !media.externalSource || !media.externalId || (type === "series" && !media.defaultSeasons)) {
       // Legacy unverified or incomplete media record in database: upgrade with external API metadata
-      const resolved = await resolveTitle(cleanTitle, type);
+      resolved = await resolveTitle(cleanTitle, type);
       if (resolved.matched) {
         media = await prisma.media.update({
           where: { id: media.id },
@@ -196,10 +198,11 @@ export async function POST(request: NextRequest) {
             externalId: resolved.externalId || media.externalId,
             externalSource: resolved.externalSource || media.externalSource,
             totalEpisodes: resolved.totalEpisodes || media.totalEpisodes,
+            defaultSeasons: resolved.defaultSeasons || media.defaultSeasons,
             externalRating: resolved.externalRating ?? media.externalRating,
           },
         });
-      } else {
+      } else if (!media.coverImage || !media.externalSource || !media.externalId) {
         return NextResponse.json(
           {
             success: false,
@@ -229,15 +232,44 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Create personal tracking entry for this user
+    let initialSeasons: any = seasons ? (seasons as any) : undefined;
+    const initialStatus = normalizeStatusInput(status, type);
+    let initialProgress = progressCurrent !== undefined && progressCurrent !== null ? progressCurrent : prog.progressCurrent;
+
+    if (type === "series" && !initialSeasons) {
+      const templateSeasons = (media.defaultSeasons as any) || (resolved as any)?.defaultSeasons || generateDefaultSeasons(media.title, media.totalEpisodes, initialProgress);
+      if (Array.isArray(templateSeasons) && templateSeasons.length > 0) {
+        if (initialStatus === "completed") {
+          initialSeasons = templateSeasons.map((s: any) => ({
+            ...s,
+            episodesWatched: s.episodeCount,
+            isCompleted: true,
+          }));
+          initialProgress = (initialSeasons as any[]).reduce((sum, s) => sum + s.episodesWatched, 0);
+        } else {
+          initialSeasons = templateSeasons;
+        }
+      }
+    } else if (initialStatus === "completed" && type === "series" && Array.isArray(initialSeasons)) {
+      initialSeasons = initialSeasons.map((s: any) => ({
+        ...s,
+        episodesWatched: s.episodeCount,
+        isCompleted: true,
+      }));
+      initialProgress = (initialSeasons as any[]).reduce((sum, s) => sum + s.episodesWatched, 0);
+    } else if (initialStatus === "completed" && (!initialProgress || initialProgress === 0) && media.totalEpisodes) {
+      initialProgress = media.totalEpisodes;
+    }
+
     const userEntry = await prisma.userMediaEntry.create({
       data: {
         userId,
         mediaId: media.id,
-        status: normalizeStatusInput(status, type),
+        status: initialStatus,
         rating: parseRatingInput(rating),
-        progressCurrent: progressCurrent !== undefined && progressCurrent !== null ? progressCurrent : prog.progressCurrent,
+        progressCurrent: initialProgress,
         currentSeason: currentSeason || 1,
-        seasons: seasons ? (seasons as any) : undefined,
+        seasons: initialSeasons,
         notes: notes || null,
         isFavorite: isFavorite || false,
       },

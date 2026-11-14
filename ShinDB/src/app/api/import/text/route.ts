@@ -150,6 +150,7 @@ export async function POST(request: NextRequest) {
             releaseYear: resolved.releaseYear,
             genres: resolved.genres,
             totalEpisodes: resolved.totalEpisodes,
+            defaultSeasons: resolved.defaultSeasons,
             externalRating: resolved.externalRating,
             externalId: resolved.externalId,
             externalSource: resolved.externalSource,

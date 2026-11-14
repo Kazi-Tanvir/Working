@@ -638,6 +638,22 @@ export default function MediaCard({
   const aspectClass = isGame ? "aspect-video" : "aspect-[2/3]";
   const statusTheme = getStatusTheme(currentStatus);
 
+  const getCardProgressDisplay = () => {
+    if (item.type === "series") {
+      if (seasonsState && seasonsState.length > 0) {
+        const watched = calculateTotalWatched(seasonsState);
+        const total = calculateTotalEpisodes(seasonsState) || item.progressTotal || "?";
+        return `${watched}/${total}`;
+      }
+      const total = item.progressTotal ?? "?";
+      return `${item.progressCurrent}/${total}`;
+    }
+    if (currentProgress.includes("/")) {
+      return currentProgress.split(" ")[0];
+    }
+    return statusTheme.label;
+  };
+
   return (
     <>
       <div
@@ -943,7 +959,7 @@ export default function MediaCard({
             <div className="flex items-center gap-1.5 min-w-0">
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusTheme.dotBg}`} />
               <span className={`truncate uppercase tracking-wider font-semibold text-[9px] ${statusTheme.textColor}`}>
-                {currentProgress.includes("/") ? currentProgress.split(" ")[0] : statusTheme.label}
+                {getCardProgressDisplay()}
               </span>
             </div>
 

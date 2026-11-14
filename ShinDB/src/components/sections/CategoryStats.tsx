@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Tv, BookOpen, Gamepad2, Film, ArrowUpRight, LucideIcon } from "lucide-react";
 import { MediaItem } from "@/components/common/MediaCard";
 import { getCoverImage, DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
+import { calculateTotalWatched, calculateTotalEpisodes } from "@/utils/seasonHelpers";
 
 interface CategoryStatsProps {
   animeList: MediaItem[];
@@ -55,17 +56,39 @@ export default function CategoryStats({
     list.filter((i) => targets.includes(i.status.toLowerCase())).length;
 
   const parseProgressNum = (p: string) => {
+    const parentheticalMatch = (p || "").match(/\((\d+)\/\d+\s*(?:Total|EP)\)/i);
+    if (parentheticalMatch) return parseInt(parentheticalMatch[1], 10) || 0;
     const se = (p || "").match(/S(\d+)E(\d+)/i);
     if (se) return (parseInt(se[1], 10) - 1) * 10 + parseInt(se[2], 10);
     return parseInt((p || "").split("/")[0], 10) || 0;
   };
 
+  const getSeriesWatched = (i: MediaItem): number => {
+    const s = i.status.toLowerCase();
+    if (s === "plan to watch" || s === "plan_to_consume") return 0;
+    if (i.seasons && i.seasons.length > 0) {
+      const watched = calculateTotalWatched(i.seasons);
+      if (watched > 0) return watched;
+      if (s === "completed") return calculateTotalEpisodes(i.seasons);
+      return 0;
+    }
+    if (s === "completed" && (!i.progressCurrent || i.progressCurrent === 0)) {
+      return i.progressTotal || 0;
+    }
+    return i.progressCurrent || 0;
+  };
+
   const getProgressPercent = (item: MediaItem) => {
     if (item.status.toLowerCase() === "completed") return 100;
-    if (item.progress.includes("/")) {
-      const [c, t] = item.progress.split("/");
-      const curr = parseInt(c, 10);
-      const tot = parseInt(t, 10);
+    if (item.type === "series" && item.seasons && item.seasons.length > 0) {
+      const watched = calculateTotalWatched(item.seasons);
+      const total = calculateTotalEpisodes(item.seasons);
+      if (total > 0) return Math.min(100, Math.round((watched / total) * 100));
+    }
+    const match = (item.progress || "").match(/(\d+)\/(\d+)/);
+    if (match) {
+      const curr = parseInt(match[1], 10);
+      const tot = parseInt(match[2], 10);
       if (curr && tot > 0) return Math.min(100, Math.round((curr / tot) * 100));
     }
     return 25;
@@ -95,7 +118,7 @@ export default function CategoryStats({
 
   const mangaChs = mangaList.reduce((acc, i) => acc + parseProgressNum(i.progress), 0);
   const gameHrs = gamesList.reduce((acc, i) => acc + parseProgressNum(i.progress), 0);
-  const seriesEps = seriesList.reduce((acc, i) => acc + parseProgressNum(i.progress), 0);
+  const seriesEps = seriesList.reduce((acc, i) => acc + getSeriesWatched(i), 0);
   const completedMovies = countStatus(moviesList, ["completed"]);
   const moviesDurationMins = moviesList.reduce((acc, i) => {
     if (i.status.toLowerCase() === "completed") {

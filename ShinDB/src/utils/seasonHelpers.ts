@@ -28,7 +28,16 @@ export const CANONICAL_SEASONS_MAP: Record<string, number[]> = {
   "chernobyl": [5],
   "shogun": [10],
   "hannibal": [13, 13, 13],
-  "gen v": [8, 8]
+  "gen v": [8, 8],
+  "adolescence": [4],
+  "a knight of the seven kingdoms": [6],
+  "hostel daze": [5, 4, 6, 6],
+  "kota factory": [5, 5, 5],
+  "mirzapur": [9, 10, 10],
+  "panchayat": [8, 8, 8, 8],
+  "the sopranos": [13, 13, 13, 13, 13, 21],
+  "borat's american lockdown & debunking borat": [7],
+  "borat": [7]
 };
 
 // Canonical external ratings map (IMDb / MAL out of 10)
@@ -49,6 +58,12 @@ export const CANONICAL_EXTERNAL_RATINGS: Record<string, number> = {
   "severance": 8.7,
   "house of the dragon": 8.4,
   "chernobyl": 9.3,
+  "panchayat": 8.9,
+  "mirzapur": 8.5,
+  "hostel daze": 8.5,
+  "kota factory": 9.0,
+  "the sopranos": 9.2,
+  "adolescence": 7.8,
   "death note": 8.7,
   "fullmetal alchemist: brotherhood": 9.1,
   "hunter x hunter": 9.0,

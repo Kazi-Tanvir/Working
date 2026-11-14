@@ -8,6 +8,7 @@ import {
   getActiveSeasonNumber,
   formatStructuredProgress,
   getCanonicalExternalRating,
+  calculateTotalWatched,
 } from "@/utils/seasonHelpers";
 import { getCoverImage } from "@/utils/mediaDefaults";
 
@@ -49,13 +50,16 @@ export function toMediaItem(
   // Format progress string
   let progressStr = `${entry.progressCurrent} ${media.progressUnit}`;
   let currentSeason = entry.currentSeason || 1;
+  let calculatedProgressCurrent = entry.progressCurrent;
 
   if (parsedSeasons && parsedSeasons.length > 0) {
+    const totalWatched = calculateTotalWatched(parsedSeasons);
+    calculatedProgressCurrent = Math.max(entry.progressCurrent, totalWatched);
     currentSeason = getActiveSeasonNumber(parsedSeasons, entry.currentSeason);
     progressStr = formatStructuredProgress(
       parsedSeasons,
       currentSeason,
-      entry.progressCurrent,
+      calculatedProgressCurrent,
       media.totalEpisodes,
       media.progressUnit
     );
@@ -85,7 +89,7 @@ export function toMediaItem(
     rating: entry.rating !== null ? `${entry.rating.toFixed(1)}/10` : "Unrated",
     externalRating: externalRatingFormatted,
     progress: progressStr,
-    progressCurrent: entry.progressCurrent,
+    progressCurrent: calculatedProgressCurrent,
     progressTotal: media.totalEpisodes,
     progressUnit: media.progressUnit,
     currentSeason,

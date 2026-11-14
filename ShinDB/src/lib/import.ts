@@ -4,6 +4,7 @@ try {
 } catch {}
 import { prisma } from "@/lib/prisma";
 import { MediaStatus, MediaType } from "@prisma/client";
+import { generateDefaultSeasons, calculateTotalEpisodes } from "@/utils/seasonHelpers";
 
 // ----------------------------------------------------
 // 1. Text Parsing
@@ -75,6 +76,7 @@ export async function findOrCreateMedia(data: {
   genres?: string[];
   externalRating?: number | null;
   totalEpisodes?: number | null;
+  defaultSeasons?: any;
   externalId?: string;
   externalSource?: string;
 }) {
@@ -90,13 +92,20 @@ export async function findOrCreateMedia(data: {
       },
     });
     if (existingByExternal) {
-      if ((!existingByExternal.coverImage && data.coverImage) || (data.title && existingByExternal.title !== cleanTitle)) {
+      if (
+        (!existingByExternal.coverImage && data.coverImage) ||
+        (data.title && existingByExternal.title !== cleanTitle) ||
+        (!existingByExternal.totalEpisodes && data.totalEpisodes) ||
+        (!existingByExternal.defaultSeasons && data.defaultSeasons)
+      ) {
         try {
           return await prisma.media.update({
             where: { id: existingByExternal.id },
             data: {
               ...(data.coverImage && !existingByExternal.coverImage ? { coverImage: data.coverImage } : {}),
               ...(data.title && existingByExternal.title !== cleanTitle ? { title: cleanTitle } : {}),
+              ...(data.totalEpisodes && !existingByExternal.totalEpisodes ? { totalEpisodes: data.totalEpisodes } : {}),
+              ...(data.defaultSeasons && !existingByExternal.defaultSeasons ? { defaultSeasons: data.defaultSeasons } : {}),
             },
           });
         } catch {
@@ -119,10 +128,12 @@ export async function findOrCreateMedia(data: {
   });
 
   if (existing) {
-    // If existing lacks cover image or external IDs, augment it
+    // If existing lacks cover image, external IDs, totalEpisodes, or defaultSeasons, augment it
     if (
       (!existing.coverImage && data.coverImage) ||
-      (!existing.externalId && data.externalId)
+      (!existing.externalId && data.externalId) ||
+      (!existing.totalEpisodes && data.totalEpisodes) ||
+      (!existing.defaultSeasons && data.defaultSeasons)
     ) {
       return await prisma.media.update({
         where: { id: existing.id },
@@ -132,6 +143,8 @@ export async function findOrCreateMedia(data: {
           ...(data.externalSource && !existing.externalSource
             ? { externalSource: data.externalSource }
             : {}),
+          ...(data.totalEpisodes && !existing.totalEpisodes ? { totalEpisodes: data.totalEpisodes } : {}),
+          ...(data.defaultSeasons && !existing.defaultSeasons ? { defaultSeasons: data.defaultSeasons } : {}),
         },
       });
     }
@@ -152,6 +165,7 @@ export async function findOrCreateMedia(data: {
       genres: genres,
       externalRating: data.externalRating ?? null,
       totalEpisodes: data.totalEpisodes ?? null,
+      defaultSeasons: data.defaultSeasons ?? null,
       externalId: data.externalId ?? null,
       externalSource: data.externalSource ?? null,
     },
@@ -428,16 +442,64 @@ export async function resolveSeriesOrMovieFromTMDB(
         ? `https://image.tmdb.org/t/p/w500${matchedItem.poster_path}`
         : "";
 
+      let totalEpisodes: number | null = null;
+      let defaultSeasons: any = null;
+      let genres = [type === "movie" ? "Movie" : "Series"];
+
+      if (type === "series") {
+        try {
+          const detailRes = await fetch(
+            `https://api.themoviedb.org/3/tv/${matchedItem.id}?api_key=${apiKey}`,
+            { signal: AbortSignal.timeout(4000) }
+          );
+          if (detailRes.ok) {
+            const detail = await detailRes.json();
+            if (detail.number_of_episodes) {
+              totalEpisodes = detail.number_of_episodes;
+            }
+            if (Array.isArray(detail.genres) && detail.genres.length > 0) {
+              genres = detail.genres.map((g: any) => g.name);
+            }
+            if (Array.isArray(detail.seasons) && detail.seasons.length > 0) {
+              const regularSeasons = detail.seasons.filter((s: any) => s.season_number > 0);
+              if (regularSeasons.length > 0) {
+                defaultSeasons = regularSeasons.map((s: any) => ({
+                  seasonNumber: s.season_number,
+                  title: s.name || `Season ${s.season_number}`,
+                  episodeCount: s.episode_count || 0,
+                  episodesWatched: 0,
+                  isCompleted: false,
+                }));
+              }
+            }
+          }
+        } catch (detailErr) {
+          console.warn("[TMDB_TV_DETAILS_WARN]:", detailErr);
+        }
+
+        // Canonical map fallback if TMDB seasons/episodes were not retrieved
+        if (!defaultSeasons) {
+          const canonical = generateDefaultSeasons(matchedItem.title || matchedItem.name, totalEpisodes, 0);
+          if (canonical && canonical.length > 0) {
+            defaultSeasons = canonical;
+            if (!totalEpisodes) {
+              totalEpisodes = calculateTotalEpisodes(canonical);
+            }
+          }
+        }
+      }
+
       return {
         title: matchedItem.title || matchedItem.name,
         type: type as MediaType,
         coverImage: cover,
         releaseYear: isNaN(releaseYear) ? new Date().getFullYear() : releaseYear,
-        genres: [type === "movie" ? "Movie" : "Series"],
+        genres,
         externalRating: matchedItem.vote_average
           ? Math.round(matchedItem.vote_average * 10) / 10
           : null,
-        totalEpisodes: null,
+        totalEpisodes,
+        defaultSeasons,
         externalId: String(matchedItem.id),
         externalSource: "tmdb",
         matched: true,
@@ -570,6 +632,7 @@ export async function resolveTitle(
   genres: string[];
   externalRating: number | null;
   totalEpisodes: number | null;
+  defaultSeasons?: any;
   externalId?: string;
   externalSource?: string;
   matched: boolean;
@@ -629,6 +692,7 @@ export async function resolveTitle(
           : [],
         externalRating: localMatch.externalRating,
         totalEpisodes: localMatch.totalEpisodes,
+        defaultSeasons: localMatch.defaultSeasons,
         externalId: localMatch.externalId || undefined,
         externalSource: localMatch.externalSource,
         matched: true,

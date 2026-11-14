@@ -7,6 +7,7 @@ import { Tv, BookOpen, Gamepad2, Film, ArrowUpRight, LucideIcon } from "lucide-r
 import { MediaItem } from "@/components/common/MediaCard";
 import { getCoverImage, DEFAULT_COVER_IMAGES } from "@/utils/mediaDefaults";
 import { calculateTotalWatched, calculateTotalEpisodes } from "@/utils/seasonHelpers";
+import { getAnimeDuration } from "@/utils/animeHelpers";
 
 interface CategoryStatsProps {
   animeList: MediaItem[];
@@ -94,25 +95,38 @@ export default function CategoryStats({
     return 25;
   };
 
-  // Differentiate anime series episodes and anime movie runtimes
+  // Differentiate anime series episodes and anime movie runtimes with authentic duration calculation
   let animeSeriesEps = 0;
   let animeMovieMins = 0;
   let completedAnimeMovies = 0;
+  let totalAnimeMinutes = 0;
 
   for (const item of animeList) {
-    const isMovie = item.progressUnit === "mins" || item.progress.toLowerCase().includes("min");
-    const num = parseProgressNum(item.progress);
+    const s = item.status.toLowerCase();
+    if (s === "plan to watch" || s === "plan_to_consume") continue;
+
+    const watched = item.progressCurrent !== undefined && item.progressCurrent !== null
+      ? item.progressCurrent
+      : parseProgressNum(item.progress);
+
+    if (watched <= 0 && s !== "completed") continue;
+
+    const watchedCount = s === "completed" && watched === 0 ? (item.progressTotal || 1) : watched;
+    const { durationPerEp, isMovie } = getAnimeDuration(item);
+    const itemMins = watchedCount * durationPerEp;
+
+    totalAnimeMinutes += itemMins;
+
     if (isMovie) {
-      animeMovieMins += num;
-      if (item.status.toLowerCase() === "completed" || num > 0) {
+      animeMovieMins += itemMins;
+      if (s === "completed" || watchedCount > 0) {
         completedAnimeMovies += 1;
       }
     } else {
-      animeSeriesEps += num;
+      animeSeriesEps += watchedCount;
     }
   }
 
-  const totalAnimeMinutes = (animeSeriesEps * 23) + animeMovieMins;
   const animeDays = (totalAnimeMinutes / 1440).toFixed(1);
   const totalAnimeWatched = animeSeriesEps + completedAnimeMovies;
 

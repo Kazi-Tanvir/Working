@@ -95,7 +95,7 @@ model Media {
 
   userEntries     UserMediaEntry[]
 
-  @@unique([title, type])
+  @@unique([title, type, releaseYear])
   @@index([type])
   @@map("media_catalog")
 }

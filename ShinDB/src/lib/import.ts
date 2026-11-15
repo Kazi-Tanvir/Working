@@ -117,15 +117,25 @@ export async function findOrCreateMedia(data: {
     }
   }
 
-  // 2. Check by unique title + type
-  const existing = await prisma.media.findUnique({
-    where: {
-      title_type: {
+  // 2. Check by title + type (+ year if present)
+  let existing = data.releaseYear && data.releaseYear > 1900
+    ? await prisma.media.findFirst({
+        where: {
+          title: cleanTitle,
+          type: type,
+          releaseYear: data.releaseYear,
+        },
+      })
+    : null;
+
+  if (!existing) {
+    existing = await prisma.media.findFirst({
+      where: {
         title: cleanTitle,
         type: type,
       },
-    },
-  });
+    });
+  }
 
   if (existing) {
     // If existing lacks cover image, external IDs, totalEpisodes, or defaultSeasons, augment it
@@ -408,7 +418,8 @@ export async function resolveAnimeFromJikan(
 // TMDB RESOLVER (Series / TV / Movies)
 export async function resolveSeriesOrMovieFromTMDB(
   query: string,
-  type: "movie" | "series"
+  type: "movie" | "series",
+  year?: number
 ) {
   const apiKey = process.env.TMDB_API_KEY;
   if (!apiKey) return null;
@@ -424,13 +435,28 @@ export async function resolveSeriesOrMovieFromTMDB(
     const json = await res.json();
     const results = json.results || [];
 
-    const matchedItem = results.find((item: any) => {
+    let matchedItem = results.find((item: any) => {
       const mainTitle = item.title || item.name;
       const origTitle = item.original_title || item.original_name;
-      return (
-        isExactTitleMatch(mainTitle, query) || isExactTitleMatch(origTitle, query)
-      );
+      const matchesTitle = isExactTitleMatch(mainTitle, query) || isExactTitleMatch(origTitle, query);
+      if (!matchesTitle) return false;
+      if (year) {
+        const releaseDate = item.release_date || item.first_air_date || "";
+        const itemYear = releaseDate ? parseInt(releaseDate.split("-")[0], 10) : null;
+        return itemYear !== null && Math.abs(itemYear - year) <= 1;
+      }
+      return true;
     });
+
+    if (!matchedItem && year) {
+      matchedItem = results.find((item: any) => {
+        const mainTitle = item.title || item.name;
+        const origTitle = item.original_title || item.original_name;
+        return (
+          isExactTitleMatch(mainTitle, query) || isExactTitleMatch(origTitle, query)
+        );
+      });
+    }
 
     if (matchedItem) {
       const releaseDate =
@@ -623,7 +649,8 @@ export async function resolveGameFromRAWG(query: string) {
 export async function resolveTitle(
   rawTitle: string,
   type: MediaType,
-  apiSource?: string
+  apiSource?: string,
+  year?: number
 ): Promise<{
   title: string;
   type: MediaType;
@@ -664,7 +691,7 @@ export async function resolveTitle(
       if (jikanFallback) return jikanFallback;
     }
   } else if (type === "series" || type === "movie") {
-    const tmdbResult = await resolveSeriesOrMovieFromTMDB(query, type);
+    const tmdbResult = await resolveSeriesOrMovieFromTMDB(query, type, year);
     if (tmdbResult) return tmdbResult;
   } else if (type === "game") {
     const rawgResult = await resolveGameFromRAWG(query);
@@ -677,6 +704,7 @@ export async function resolveTitle(
       where: {
         type: type,
         title: query,
+        ...(year ? { releaseYear: year } : {}),
         externalSource: { not: null },
       },
     });

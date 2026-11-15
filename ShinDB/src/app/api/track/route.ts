@@ -145,21 +145,33 @@ export async function POST(request: NextRequest) {
     const prog = parseProgressInput(progress, type);
     const canonicalRating = getCanonicalExternalRating(cleanTitle);
 
+    const parsedYear = releaseYear ? Number(releaseYear) : undefined;
+
     // 1. Find or create canonical Media metadata
     let resolved: any = null;
     let media = mediaId
       ? await prisma.media.findUnique({ where: { id: mediaId } })
       : null;
 
-    if (!media) {
-      media = await prisma.media.findUnique({
-        where: { title_type: { title: cleanTitle, type } },
+    if (!media && parsedYear) {
+      media = await prisma.media.findFirst({
+        where: {
+          title: cleanTitle,
+          type,
+          releaseYear: parsedYear,
+        },
+      });
+    }
+
+    if (!media && !parsedYear) {
+      media = await prisma.media.findFirst({
+        where: { title: cleanTitle, type },
       });
     }
 
     if (!media) {
       // STRICT: Must be a verified entry from an external API
-      resolved = await resolveTitle(cleanTitle, type);
+      resolved = await resolveTitle(cleanTitle, type, undefined, parsedYear);
       if (!resolved.matched) {
         return NextResponse.json(
           {
@@ -176,7 +188,7 @@ export async function POST(request: NextRequest) {
           title: resolved.title,
           type,
           coverImage: coverImage || resolved.coverImage,
-          releaseYear: releaseYear ? Number(releaseYear) : resolved.releaseYear,
+          releaseYear: parsedYear || resolved.releaseYear,
           genres: resolved.genres.length > 0 ? resolved.genres : (genres || []),
           externalRating: resolved.externalRating ?? canonicalRating,
           totalEpisodes: prog.progressTotal || resolved.totalEpisodes,
@@ -188,7 +200,7 @@ export async function POST(request: NextRequest) {
       });
     } else if (!media.coverImage || !media.externalSource || !media.externalId || (type === "series" && !media.defaultSeasons)) {
       // Legacy unverified or incomplete media record in database: upgrade with external API metadata
-      resolved = await resolveTitle(cleanTitle, type);
+      resolved = await resolveTitle(cleanTitle, type, undefined, parsedYear || media.releaseYear);
       if (resolved.matched) {
         media = await prisma.media.update({
           where: { id: media.id },

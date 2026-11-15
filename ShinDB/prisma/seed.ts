@@ -110,17 +110,20 @@ async function seedCollection(filename: string, type: MediaType, baseUserId: str
       defaultSeasons = generateDefaultSeasons(title, total, current);
     }
 
+    const year = Number(item.releaseYear) || 2026;
+
     // 1. Upsert into Master Media Catalog (Shared across all users)
     const media = await prisma.media.upsert({
       where: {
-        title_type: {
+        title_type_releaseYear: {
           title,
           type,
+          releaseYear: year,
         },
       },
       update: {
         coverImage: item.coverImage || "",
-        releaseYear: Number(item.releaseYear) || 2026,
+        releaseYear: year,
         genres,
         externalRating: canonicalRating,
         totalEpisodes: total,

@@ -253,6 +253,7 @@ export async function searchMedia(
               type: true,
               externalSource: true,
               externalId: true,
+              releaseYear: true,
             },
           },
         },
@@ -262,6 +263,11 @@ export async function searchMedia(
         if (!entry.media) continue;
         const typeTitleKey = `${entry.media.type}:${entry.media.title.toLowerCase().trim()}`;
         userTrackedMap.set(typeTitleKey, { status: entry.status, mediaId: entry.media.id });
+
+        if (entry.media.releaseYear) {
+          const typeTitleYearKey = `${entry.media.type}:${entry.media.title.toLowerCase().trim()}:${entry.media.releaseYear}`;
+          userTrackedMap.set(typeTitleYearKey, { status: entry.status, mediaId: entry.media.id });
+        }
 
         if (entry.media.externalSource && entry.media.externalId) {
           const extKey = `${entry.media.externalSource.toLowerCase()}:${entry.media.externalId}`;
@@ -278,14 +284,15 @@ export async function searchMedia(
   const keysSeen = new Set<string>();
 
   for (const item of externalResults) {
-    const key = `${item.type}:${item.title.toLowerCase().trim()}`;
-    if (keysSeen.has(key)) continue;
-    keysSeen.add(key);
+    const dedupeKey = `${item.type}:${item.title.toLowerCase().trim()}:${item.releaseYear || item.id}`;
+    if (keysSeen.has(dedupeKey)) continue;
+    keysSeen.add(dedupeKey);
 
     const extId = item.id.replace(/^(anilist|tmdb-movie|tmdb-tv|rawg)-/, "");
     const extKey = `${item.apiSource.toLowerCase()}:${extId}`;
+    const titleKey = `${item.type}:${item.title.toLowerCase().trim()}`;
 
-    const tracked = userTrackedMap.get(extKey) || userTrackedMap.get(key);
+    const tracked = userTrackedMap.get(extKey) || userTrackedMap.get(dedupeKey) || userTrackedMap.get(titleKey);
     if (tracked) {
       merged.push({
         ...item,

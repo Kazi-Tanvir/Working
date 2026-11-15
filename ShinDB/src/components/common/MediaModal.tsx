@@ -34,6 +34,7 @@ import {
   volumeToChapter
 } from "@/utils/mangaHelpers";
 import { DEFAULT_COVER_IMAGES, getCoverImage } from "@/utils/mediaDefaults";
+import { useMobileBackClose } from "@/hooks/useMobileBackClose";
 
 interface MediaModalProps {
   item: MediaItem;
@@ -126,6 +127,9 @@ export default function MediaModal({
     setShowConfirmDelete(false);
     setErrorMsg("");
   }, [item, isOpen, chaptersPerVol]);
+
+  // Mobile back button / swipe-back gesture closes modal on phone
+  useMobileBackClose(isOpen, onClose);
 
   // Lock scroll on body and handle Escape key down to close modal
   useEffect(() => {

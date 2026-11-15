@@ -27,6 +27,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import type { SearchResultItem } from "@/utils/apiHelpers";
 import { MediaItem } from "./MediaCard";
 import { DEFAULT_COVER_IMAGES, getCoverImage } from "@/utils/mediaDefaults";
+import { useMobileBackClose } from "@/hooks/useMobileBackClose";
 
 interface CreateMediaModalProps {
   isOpen: boolean;
@@ -70,6 +71,9 @@ export default function CreateMediaModal({ isOpen, onClose, defaultType, onItemA
       }, 100);
     }
   }, [isOpen, defaultType]);
+
+  // Mobile back button / swipe-back gesture closes modal on phone
+  useMobileBackClose(isOpen, onClose);
 
   // Lock scroll on body and handle Escape key down to close modal
   useEffect(() => {

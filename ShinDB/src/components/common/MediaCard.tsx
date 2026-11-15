@@ -749,7 +749,10 @@ export default function MediaCard({
           <div className={`absolute bottom-0 left-0 right-0 h-1.5 ${statusTheme.stripeBg} z-10`} />
 
           {/* Obsidian Sleek Interactive Hover Console Overlay */}
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 sm:p-2.5 flex flex-col justify-between select-none">
+          <div 
+            onClick={() => setIsModalOpen(true)}
+            className="absolute inset-0 bg-black/90 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 sm:p-2.5 flex flex-col justify-between select-none cursor-pointer"
+          >
             {isGame ? (
               /* --- LANDSCAPE (GAME) CONSOLE OVERLAY: Clean, uncluttered layout --- */
               <div className="flex flex-col justify-between h-full w-full">
